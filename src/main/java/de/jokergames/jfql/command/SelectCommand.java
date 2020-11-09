@@ -83,7 +83,7 @@ public class SelectCommand extends Command {
                 for (String var : values) {
                     if (!table.getStructure().contains(var)) {
                         remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown key!")));
-                        break;
+                        return true;
                     }
                 }
 
@@ -141,11 +141,11 @@ public class SelectCommand extends Command {
 
                     List<Column> columns = new ArrayList<>();
 
-                    String[] where = JFQL.getInstance().getFormatter().formatString(arguments.get("WHERE")).split(" OR ");
+                    String[] where = JFQL.getInstance().getFormatter().formatString(arguments.get("WHERE")).replace(" or ", " OR ").split(" OR ");
                     List<List<String[]>> conditions = new ArrayList<>();
 
                     for (int j = 0; j < where.length; j++) {
-                        String[] args = where[j].split(" AND ");
+                        String[] args = where[j].replace(" and ", " AND ").split(" AND ");
 
                         List<String[]> list1 = new ArrayList<>();
 
@@ -176,13 +176,18 @@ public class SelectCommand extends Command {
                                 if (column.getContent().containsKey(strings[0])) {
                                     if (column.getContent(strings[0]).toString().equals(strings[1])) {
                                         finished++;
+                                    } else if (column.getContent(strings[0]) == null && strings[1].equalsIgnoreCase("null")) {
+                                        finished++;
                                     }
+                                } else if (strings[1].equalsIgnoreCase("null")) {
+                                    finished++;
                                 }
 
                             }
 
                             if (finished == list1.size()) {
                                 columns.add(column);
+                                break;
                             }
                         }
 
@@ -297,7 +302,7 @@ public class SelectCommand extends Command {
                 for (String var : values) {
                     if (!table.getStructure().contains(var)) {
                         JFQL.getInstance().getConsole().logError("Unknown key!");
-                        break;
+                        return true;
                     }
                 }
 
@@ -368,11 +373,11 @@ public class SelectCommand extends Command {
 
                     List<Column> columns = new ArrayList<>();
 
-                    String[] where = JFQL.getInstance().getFormatter().formatString(arguments.get("WHERE")).split(" OR ");
+                    String[] where = JFQL.getInstance().getFormatter().formatString(arguments.get("WHERE")).replace(" or ", " OR ").split(" OR ");
                     List<List<String[]>> conditions = new ArrayList<>();
 
                     for (int j = 0; j < where.length; j++) {
-                        String[] args = where[j].split(" AND ");
+                        String[] args = where[j].replace(" and ", " AND ").split(" AND ");
 
                         List<String[]> list1 = new ArrayList<>();
 
@@ -403,13 +408,18 @@ public class SelectCommand extends Command {
                                 if (column.getContent().containsKey(strings[0])) {
                                     if (column.getContent(strings[0]).toString().equals(strings[1])) {
                                         finished++;
+                                    } else if (column.getContent(strings[0]) == null && strings[1].equalsIgnoreCase("null")) {
+                                        finished++;
                                     }
+                                } else if (strings[1].equalsIgnoreCase("null")) {
+                                    finished++;
                                 }
 
                             }
 
                             if (finished == list1.size()) {
                                 columns.add(column);
+                                break;
                             }
                         }
 
