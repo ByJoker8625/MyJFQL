@@ -10,7 +10,6 @@ import de.jokergames.jfql.database.Table;
 import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.user.User;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -60,55 +59,7 @@ public class RemoveCommand extends Command {
                 }
 
                 if (arguments.containsKey("WHERE")) {
-                    String[] where = JFQL.getInstance().getFormatter().formatString(arguments.get("WHERE")).split(" OR ");
-                    List<List<String[]>> conditions = new ArrayList<>();
-
-                    for (int j = 0; j < where.length; j++) {
-                        String[] args = where[j].split(" AND ");
-
-                        List<String[]> list = new ArrayList<>();
-
-                        for (int i = 0; i < args.length; i++) {
-                            String[] strings = args[i].split(" = ");
-
-                            strings[0] = strings[0].replace("'", "");
-                            strings[1] = strings[1].replace("'", "");
-
-                            if (!table.getStructure().contains(strings[0])) {
-                                remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown key!")));
-                                return true;
-                            }
-
-                            list.add(strings);
-                        }
-
-                        conditions.add(list);
-                    }
-
-                    List<Column> list;
-
-                    if (column.equals("*")) {
-                        list = table.getColumns();
-                    } else {
-                        list = Collections.singletonList(table.getColumn(column));
-                    }
-
-                    final List<Column> columns = new ArrayList<>();
-
-                    for (Column col : list) {
-                        for (List<String[]> list1 : conditions) {
-                            for (String[] strings : list1) {
-
-                                if (col.getContent().containsKey(strings[0])) {
-                                    if (col.getContent(strings[0]).toString().equals(strings[1])) {
-                                        columns.add(col);
-                                    }
-                                }
-
-                            }
-                        }
-
-                    }
+                    List<Column> columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
 
                     for (Column col : columns) {
                         table.removeColumn(col.getContent(table.getPrimary()).toString());
@@ -160,61 +111,13 @@ public class RemoveCommand extends Command {
                 }
 
                 if (arguments.containsKey("WHERE")) {
-                    String[] where = JFQL.getInstance().getFormatter().formatString(arguments.get("WHERE")).split(" OR ");
-                    List<List<String[]>> conditions = new ArrayList<>();
-
-                    for (int j = 0; j < where.length; j++) {
-                        String[] args = where[j].split(" AND ");
-
-                        List<String[]> list = new ArrayList<>();
-
-                        for (int i = 0; i < args.length; i++) {
-                            String[] strings = args[i].split(" = ");
-
-                            strings[0] = strings[0].replace("'", "");
-                            strings[1] = strings[1].replace("'", "");
-
-                            if (!table.getStructure().contains(strings[0])) {
-                                JFQL.getInstance().getConsole().logError("Unknown key!");
-                                return true;
-                            }
-
-                            list.add(strings);
-                        }
-
-                        conditions.add(list);
-                    }
-
-                    List<Column> list;
-
-                    if (column.equals("*")) {
-                        list = table.getColumns();
-                    } else {
-                        list = Collections.singletonList(table.getColumn(column));
-                    }
-
-                    final List<Column> columns = new ArrayList<>();
-
-                    for (Column col : list) {
-                        for (List<String[]> list1 : conditions) {
-                            for (String[] strings : list1) {
-
-                                if (col.getContent().containsKey(strings[0])) {
-                                    if (col.getContent(strings[0]).toString().equals(strings[1])) {
-                                        columns.add(col);
-                                    }
-                                }
-
-                            }
-                        }
-
-                    }
+                    List<Column> columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
 
                     for (Column col : columns) {
                         table.removeColumn(col.getContent(table.getPrimary()).toString());
                     }
 
-                    JFQL.getInstance().getConsole().logInfo("Column/s  was removed.");
+                    JFQL.getInstance().getConsole().logInfo("Column/s was removed.");
                     dataBase.addTable(table);
                     dataBaseHandler.saveDataBase(dataBase);
                 } else {
@@ -230,7 +133,7 @@ public class RemoveCommand extends Command {
                         table.removeColumn(col.getContent(table.getPrimary()).toString());
                     }
 
-                    JFQL.getInstance().getConsole().logInfo("Column/s  was removed.");
+                    JFQL.getInstance().getConsole().logInfo("Column/s was removed.");
                     dataBase.addTable(table);
                     dataBaseHandler.saveDataBase(dataBase);
                 }

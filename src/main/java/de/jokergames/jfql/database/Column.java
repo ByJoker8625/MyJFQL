@@ -18,6 +18,11 @@ public class Column {
         this.creation = System.currentTimeMillis();
     }
 
+    public Column(Map<String, Object> content) {
+        this.content = content;
+        this.creation = System.currentTimeMillis();
+    }
+
     public long getCreation() {
         return creation;
     }

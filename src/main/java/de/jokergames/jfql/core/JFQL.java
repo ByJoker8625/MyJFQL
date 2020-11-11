@@ -1,6 +1,7 @@
 package de.jokergames.jfql.core;
 
 import de.jokergames.jfql.command.*;
+import de.jokergames.jfql.core.lang.ConditionHelper;
 import de.jokergames.jfql.core.lang.LangFormatter;
 import de.jokergames.jfql.database.DBSession;
 import de.jokergames.jfql.database.Database;
@@ -40,6 +41,7 @@ public final class JFQL {
     private final Builder builder;
     private final DBSession DBSession;
     private final ModuleHandler moduleHandler;
+    private final ConditionHelper conditionHelper;
     private HttpService httpService;
 
     public JFQL() {
@@ -53,6 +55,7 @@ public final class JFQL {
         this.configHandler = new ConfigHandler();
         this.moduleHandler = new ModuleHandler();
         this.builder = new Builder();
+        this.conditionHelper = new ConditionHelper();
         this.commandHandler = new CommandHandler();
         this.DBSession = new DBSession();
         this.dataBaseHandler = new DatabaseHandler(configHandler.getFactory());
@@ -202,6 +205,10 @@ public final class JFQL {
 
     public CommandHandler getCommandHandler() {
         return commandHandler;
+    }
+
+    public ConditionHelper getConditionHelper() {
+        return conditionHelper;
     }
 
     public HttpService getHttpService() {

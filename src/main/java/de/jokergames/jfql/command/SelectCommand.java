@@ -139,59 +139,7 @@ public class SelectCommand extends Command {
                         index++;
                     }
 
-                    List<Column> columns = new ArrayList<>();
-
-                    String[] where = JFQL.getInstance().getFormatter().formatString(arguments.get("WHERE")).replace(" or ", " OR ").split(" OR ");
-                    List<List<String[]>> conditions = new ArrayList<>();
-
-                    for (int j = 0; j < where.length; j++) {
-                        String[] args = where[j].replace(" and ", " AND ").split(" AND ");
-
-                        List<String[]> list1 = new ArrayList<>();
-
-                        for (int i = 0; i < args.length; i++) {
-                            String[] strings = args[i].split(" = ");
-
-                            strings[0] = strings[0].replace("'", "");
-                            strings[1] = strings[1].replace("'", "");
-
-                            if (!table.getStructure().contains(strings[0])) {
-                                remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown key!")));
-                                return true;
-                            }
-
-                            list1.add(strings);
-                        }
-
-                        conditions.add(list1);
-                    }
-
-                    for (Column column : table.getColumns()) {
-
-                        for (List<String[]> list1 : conditions) {
-                            int finished = 0;
-
-                            for (String[] strings : list1) {
-
-                                if (column.getContent().containsKey(strings[0])) {
-                                    if (column.getContent(strings[0]).toString().equals(strings[1])) {
-                                        finished++;
-                                    } else if (column.getContent(strings[0]) == null && strings[1].equalsIgnoreCase("null")) {
-                                        finished++;
-                                    }
-                                } else if (strings[1].equalsIgnoreCase("null")) {
-                                    finished++;
-                                }
-
-                            }
-
-                            if (finished == list1.size()) {
-                                columns.add(column);
-                                break;
-                            }
-                        }
-
-                    }
+                    List<Column> columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
 
                     if (limit != -1) {
                         List<Column> list1 = new ArrayList<>();
@@ -371,59 +319,7 @@ public class SelectCommand extends Command {
 
                     final TablePrinter tablePrinter = new TablePrinter(structure.length, structure);
 
-                    List<Column> columns = new ArrayList<>();
-
-                    String[] where = JFQL.getInstance().getFormatter().formatString(arguments.get("WHERE")).replace(" or ", " OR ").split(" OR ");
-                    List<List<String[]>> conditions = new ArrayList<>();
-
-                    for (int j = 0; j < where.length; j++) {
-                        String[] args = where[j].replace(" and ", " AND ").split(" AND ");
-
-                        List<String[]> list1 = new ArrayList<>();
-
-                        for (int i = 0; i < args.length; i++) {
-                            String[] strings = args[i].split(" = ");
-
-                            strings[0] = strings[0].replace("'", "");
-                            strings[1] = strings[1].replace("'", "");
-
-                            if (!table.getStructure().contains(strings[0])) {
-                                JFQL.getInstance().getConsole().logError("Unknown key!");
-                                return true;
-                            }
-
-                            list1.add(strings);
-                        }
-
-                        conditions.add(list1);
-                    }
-
-                    for (Column column : table.getColumns()) {
-
-                        for (List<String[]> list1 : conditions) {
-                            int finished = 0;
-
-                            for (String[] strings : list1) {
-
-                                if (column.getContent().containsKey(strings[0])) {
-                                    if (column.getContent(strings[0]).toString().equals(strings[1])) {
-                                        finished++;
-                                    } else if (column.getContent(strings[0]) == null && strings[1].equalsIgnoreCase("null")) {
-                                        finished++;
-                                    }
-                                } else if (strings[1].equalsIgnoreCase("null")) {
-                                    finished++;
-                                }
-
-                            }
-
-                            if (finished == list1.size()) {
-                                columns.add(column);
-                                break;
-                            }
-                        }
-
-                    }
+                    List<Column> columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
 
                     if (limit != -1) {
                         ArrayList<Column> list1 = new ArrayList<>();
