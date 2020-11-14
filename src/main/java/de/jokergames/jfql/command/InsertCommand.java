@@ -114,7 +114,19 @@ public class InsertCommand extends Command {
 
                     remote.send(JFQL.getInstance().getBuilder().buildSuccess());
                 } else if (arguments.containsKey("WHERE")) {
-                    List<Column> columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
+                    List<Column> columns = null;
+
+                    try {
+                        columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
+                    } catch (Exception ex) {
+                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        return true;
+                    }
+
+                    if (columns == null) {
+                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        return true;
+                    }
 
                     for (Column column : columns) {
 
@@ -246,7 +258,19 @@ public class InsertCommand extends Command {
 
                     JFQL.getInstance().getConsole().logInfo("Insert values into '" + name + "'.");
                 } else if (arguments.containsKey("WHERE")) {
-                    List<Column> columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
+                    List<Column> columns = null;
+
+                    try {
+                        columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
+                    } catch (Exception ex) {
+                        JFQL.getInstance().getConsole().logError("Unknown error!");
+                        return true;
+                    }
+
+                    if (columns == null) {
+                        JFQL.getInstance().getConsole().logError("Unknown key!");
+                        return true;
+                    }
 
                     for (Column column : columns) {
 

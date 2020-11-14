@@ -139,7 +139,19 @@ public class SelectCommand extends Command {
                         index++;
                     }
 
-                    List<Column> columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
+                    List<Column> columns = null;
+
+                    try {
+                        columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
+                    } catch (Exception ex) {
+                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        return true;
+                    }
+
+                    if (columns == null) {
+                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        return true;
+                    }
 
                     if (limit != -1) {
                         List<Column> list1 = new ArrayList<>();
@@ -319,7 +331,19 @@ public class SelectCommand extends Command {
 
                     final TablePrinter tablePrinter = new TablePrinter(structure.length, structure);
 
-                    List<Column> columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
+                    List<Column> columns = null;
+
+                    try {
+                        columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
+                    } catch (Exception ex) {
+                        JFQL.getInstance().getConsole().logError("Unknown error!");
+                        return true;
+                    }
+
+                    if (columns == null) {
+                        JFQL.getInstance().getConsole().logError("Unknown key!");
+                        return true;
+                    }
 
                     if (limit != -1) {
                         ArrayList<Column> list1 = new ArrayList<>();

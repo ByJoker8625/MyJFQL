@@ -47,7 +47,7 @@ public final class JFQL {
     public JFQL() {
         instance = this;
 
-        this.version = "1.0-BETA";
+        this.version = "1.0";
         this.console = new Console();
         this.connection = new Connection();
         this.downloader = new Downloader(connection);

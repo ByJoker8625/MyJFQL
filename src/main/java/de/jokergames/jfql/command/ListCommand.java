@@ -6,6 +6,7 @@ import de.jokergames.jfql.core.JFQL;
 import de.jokergames.jfql.database.Database;
 import de.jokergames.jfql.database.DatabaseHandler;
 import de.jokergames.jfql.database.Table;
+import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.user.User;
 import de.jokergames.jfql.user.UserHandler;
 import de.jokergames.jfql.util.TablePrinter;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 public class ListCommand extends Command {
 
     public ListCommand() {
-        super("LIST", List.of("COMMAND", "DATABASES", "TABLES", "USERS"));
+        super("LIST", List.of("COMMAND", "DATABASES", "TABLES", "USERS", "FROM"));
     }
 
     @Override
@@ -49,8 +50,21 @@ public class ListCommand extends Command {
                     return false;
                 }
 
-                List<String> strings = dataBaseHandler.getDataBases().stream().flatMap(dataBase -> dataBase.getTables().stream()).map(Table::getName).collect(Collectors.toList());
-                remote.send(JFQL.getInstance().getBuilder().buildAnswer(strings, List.of("Tables")));
+                if (arguments.containsKey("FROM")) {
+                    String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
+
+                    if (dataBaseHandler.getDataBase(name) == null) {
+                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Database doesn't exists!")));
+                        return true;
+                    }
+
+                    final Database database = dataBaseHandler.getDataBase(name);
+                    remote.send(JFQL.getInstance().getBuilder().buildAnswer(database.getTables().stream().map(Table::getName).collect(Collectors.toList()), List.of("Tables")));
+                } else {
+                    List<String> strings = dataBaseHandler.getDataBases().stream().flatMap(dataBase -> dataBase.getTables().stream()).map(Table::getName).collect(Collectors.toList());
+                    remote.send(JFQL.getInstance().getBuilder().buildAnswer(strings, List.of("Tables")));
+                }
+
                 return true;
             } else if (arguments.containsKey("USERS")) {
                 if (!user.hasPermission("execute.list.users")) {
@@ -79,10 +93,27 @@ public class ListCommand extends Command {
                 List<String> strings = dataBaseHandler.getDataBases().stream().flatMap(dataBase -> dataBase.getTables().stream()).map(Table::getName).collect(Collectors.toList());
                 TablePrinter tablePrinter = new TablePrinter(1, "Tables");
 
-                for (String string : strings) {
-                    tablePrinter.addRow(string);
-                }
+                if (arguments.containsKey("FROM")) {
+                    String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
 
+                    if (dataBaseHandler.getDataBase(name) == null) {
+                        JFQL.getInstance().getConsole().logError("Database doesn't exists!");
+                        return true;
+                    }
+
+                    final Database database = dataBaseHandler.getDataBase(name);
+                    List<String> strings1 = database.getTables().stream().map(Table::getName).collect(Collectors.toList());
+
+                    for (String string : strings1) {
+                        tablePrinter.addRow(string);
+                    }
+
+                } else {
+
+                    for (String string : strings) {
+                        tablePrinter.addRow(string);
+                    }
+                }
                 tablePrinter.print();
                 return true;
             } else if (arguments.containsKey("USERS")) {

@@ -59,7 +59,19 @@ public class RemoveCommand extends Command {
                 }
 
                 if (arguments.containsKey("WHERE")) {
-                    List<Column> columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
+                    List<Column> columns = null;
+
+                    try {
+                        columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
+                    } catch (Exception ex) {
+                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        return true;
+                    }
+
+                    if (columns == null) {
+                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        return true;
+                    }
 
                     for (Column col : columns) {
                         table.removeColumn(col.getContent(table.getPrimary()).toString());
@@ -111,7 +123,19 @@ public class RemoveCommand extends Command {
                 }
 
                 if (arguments.containsKey("WHERE")) {
-                    List<Column> columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
+                    List<Column> columns = null;
+
+                    try {
+                        columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
+                    } catch (Exception ex) {
+                        JFQL.getInstance().getConsole().logError("Unknown error!");
+                        return true;
+                    }
+
+                    if (columns == null) {
+                        JFQL.getInstance().getConsole().logError("Unknown key!");
+                        return true;
+                    }
 
                     for (Column col : columns) {
                         table.removeColumn(col.getContent(table.getPrimary()).toString());
