@@ -34,7 +34,7 @@ public class Downloader {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             BufferedOutputStream outputStream = new BufferedOutputStream(fileOutputStream, j);
 
-            JFQL.getInstance().getConsole().logInfo("Starting download.");
+            JFQL.getInstance().getConsole().logInfo("Starting download...");
 
             byte[] bytes = new byte[j];
             int read;
@@ -49,6 +49,7 @@ public class Downloader {
             JFQL.getInstance().getConsole().logInfo("Download completed.");
             System.exit(0);
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new NetworkException("Download failed!");
         }
     }

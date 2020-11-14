@@ -47,7 +47,7 @@ public final class JFQL {
     public JFQL() {
         instance = this;
 
-        this.version = "1.0";
+        this.version = "1.0-BETA";
         this.console = new Console();
         this.connection = new Connection();
         this.downloader = new Downloader(connection);
@@ -90,8 +90,13 @@ public final class JFQL {
                 System.exit(0);
                 return;
             }
+        } catch (Exception ex) {
+            throw new NetworkException("Server connection failed!");
+        }
 
+        {
             console.logInfo("Successfully connected.");
+            console.clean();
 
             if (!connection.isLatest()) {
                 if (configuration.getBoolean("AutoUpdate")) {
@@ -100,9 +105,6 @@ public final class JFQL {
                     console.logWarning("You aren't up to date. Please download the latest version.");
                 }
             }
-
-        } catch (Exception ex) {
-            throw new NetworkException("Server connection failed!");
         }
 
         {
@@ -113,7 +115,6 @@ public final class JFQL {
                 dataBaseHandler.saveDataBase(new Database("test"));
         }
 
-        console.clean();
 
         try {
             commandHandler.registerCommand(new ShutdownCommand());
