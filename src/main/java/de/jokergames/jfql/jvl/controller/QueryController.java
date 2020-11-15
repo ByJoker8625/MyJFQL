@@ -29,8 +29,6 @@ public class QueryController extends Controller {
         final JSONObject jsonObject = new RequestReader(context.req).jsonRequest();
         final RemoteExecutor executor = new RemoteExecutor(context.req.getRemoteAddr(), context);
 
-        System.out.println(context);
-
         try {
             User user;
 
@@ -60,6 +58,8 @@ public class QueryController extends Controller {
                 executor.send(new JSONObject());
                 return;
             }
+
+            JFQL.getInstance().getConsole().logInfo("[" + executor.getName() + "] ordered [\"" + jsonObject.getString("query") + "\"].");
 
             boolean exec = JFQL.getInstance().getCommandHandler().execute(user, executor, JFQL.getInstance().getFormatter().formatCommand(jsonObject.getString("query")));
 
