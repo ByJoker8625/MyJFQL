@@ -46,7 +46,7 @@ public class SelectCommand extends Command {
                     limit = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LIMIT"));
 
                     if (limit <= -1) {
-                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Limit can't be smaller than 0!")));
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Limit can't be smaller than 0!")));
                         return true;
                     }
                 }
@@ -54,7 +54,7 @@ public class SelectCommand extends Command {
                 final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDBSession().get(user.getName()));
 
                 if (dataBase.getTable(name) == null) {
-                    remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Database doesn't exists!")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Database doesn't exists!")));
                     return true;
                 }
 
@@ -76,13 +76,13 @@ public class SelectCommand extends Command {
                 }
 
                 if (values.isEmpty()) {
-                    remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("No values to select!")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("No values to select!")));
                     return true;
                 }
 
                 for (String var : values) {
                     if (!table.getStructure().contains(var)) {
-                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown key!")));
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown key!")));
                         return true;
                     }
                 }
@@ -91,7 +91,7 @@ public class SelectCommand extends Command {
                     Column column = table.getColumn(JFQL.getInstance().getFormatter().formatString(arguments.get("PRIMARY-KEY")));
 
                     if (column == null) {
-                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new FileNotFoundException()));
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new FileNotFoundException()));
                         return true;
                     }
 
@@ -119,7 +119,7 @@ public class SelectCommand extends Command {
                         columns.add(column);
                     }
 
-                    remote.send(JFQL.getInstance().getBuilder().buildAnswer(columns, table.getStructure()));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(columns, table.getStructure()));
                 } else if (arguments.containsKey("WHERE")) {
                     List<String> list;
 
@@ -144,12 +144,12 @@ public class SelectCommand extends Command {
                     try {
                         columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
                     } catch (Exception ex) {
-                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
                         return true;
                     }
 
                     if (columns == null) {
-                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
                         return true;
                     }
 
@@ -171,7 +171,7 @@ public class SelectCommand extends Command {
                         columns = new ArrayList<>(list1);
                     }
 
-                    remote.send(JFQL.getInstance().getBuilder().buildAnswer(columns, structure));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(columns, structure));
                 } else {
                     List<String> list;
 
@@ -210,13 +210,13 @@ public class SelectCommand extends Command {
                         columns = new ArrayList<>(list1);
                     }
 
-                    remote.send(JFQL.getInstance().getBuilder().buildAnswer(columns, structure));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(columns, structure));
                 }
 
                 return true;
             }
 
-            remote.send(JFQL.getInstance().getBuilder().buildSyntax());
+            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
         } else {
 
             if (arguments.containsKey("VALUE") && arguments.containsKey("FROM")) {

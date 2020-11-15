@@ -1,10 +1,8 @@
 package de.jokergames.jfql.command.executor;
 
-import com.sun.net.httpserver.HttpExchange;
 import de.jokergames.jfql.exception.NetworkException;
+import io.javalin.http.Context;
 import org.json.JSONObject;
-
-import java.io.OutputStream;
 
 /**
  * @author Janick
@@ -12,26 +10,22 @@ import java.io.OutputStream;
 
 public class RemoteExecutor extends Executor {
 
-    private final HttpExchange exchange;
+    private final Context context;
 
-    public RemoteExecutor(String name, HttpExchange exchange) {
+    public RemoteExecutor(String name, Context context) {
         super(name);
-        this.exchange = exchange;
+        this.context = context;
     }
 
     public void sendInfo(JSONObject response) {
         try {
-            exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-            exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-            exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "*");
-            exchange.getResponseHeaders().add("Access-Control-Allow-Credentials", "true");
-            exchange.getResponseHeaders().add("Access-Control-Allow-Credentials-Header", "*");
+            context.header("Access-Control-Allow-Origin", "*");
+            context.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+            context.header("Access-Control-Allow-Headers", "*");
+            context.header("Access-Control-Allow-Credentials", "true");
+            context.header("Access-Control-Allow-Credentials-Header", "*");
 
-            exchange.sendResponseHeaders(200, response.toString().length());
-
-            OutputStream outputStream = exchange.getResponseBody();
-            outputStream.write(response.toString().getBytes());
-            outputStream.close();
+            context.result(response.toString()).status(200);
         } catch (Exception ex) {
             throw new NetworkException(ex);
         }
@@ -39,17 +33,13 @@ public class RemoteExecutor extends Executor {
 
     public void send(JSONObject response) {
         try {
-            exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-            exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-            exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "*");
-            exchange.getResponseHeaders().add("Access-Control-Allow-Credentials", "true");
-            exchange.getResponseHeaders().add("Access-Control-Allow-Credentials-Header", "*");
+            context.header("Access-Control-Allow-Origin", "*");
+            context.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+            context.header("Access-Control-Allow-Headers", "*");
+            context.header("Access-Control-Allow-Credentials", "true");
+            context.header("Access-Control-Allow-Credentials-Header", "*");
 
-            exchange.sendResponseHeaders(response.getInt("rCode"), response.toString().length());
-
-            OutputStream outputStream = exchange.getResponseBody();
-            outputStream.write(response.toString().getBytes());
-            outputStream.close();
+            context.result(response.toString()).status(response.getInt("rCode"));
         } catch (Exception ex) {
             throw new NetworkException(ex);
         }
@@ -57,12 +47,12 @@ public class RemoteExecutor extends Executor {
 
     public void sendError(int rCode) {
         try {
-            exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-            exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-            exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "*");
-            exchange.getResponseHeaders().add("Access-Control-Allow-Credentials", "true");
-            exchange.getResponseHeaders().add("Access-Control-Allow-Credentials-Header", "*");
-            exchange.sendResponseHeaders(rCode, -1);
+            context.header("Access-Control-Allow-Origin", "*");
+            context.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+            context.header("Access-Control-Allow-Headers", "*");
+            context.header("Access-Control-Allow-Credentials", "true");
+            context.header("Access-Control-Allow-Credentials-Header", "*");
+            context.status(rCode);
         } catch (Exception ex) {
             throw new NetworkException(ex);
         }

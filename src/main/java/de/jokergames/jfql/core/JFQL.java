@@ -2,15 +2,15 @@ package de.jokergames.jfql.core;
 
 import de.jokergames.jfql.command.*;
 import de.jokergames.jfql.core.lang.ConditionHelper;
-import de.jokergames.jfql.core.lang.LangFormatter;
+import de.jokergames.jfql.core.lang.Formatter;
 import de.jokergames.jfql.database.DBSession;
 import de.jokergames.jfql.database.Database;
 import de.jokergames.jfql.database.DatabaseHandler;
 import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.exception.ModuleException;
 import de.jokergames.jfql.exception.NetworkException;
-import de.jokergames.jfql.http.HttpService;
-import de.jokergames.jfql.http.util.Builder;
+import de.jokergames.jfql.jvl.JavalinService;
+import de.jokergames.jfql.jvl.controller.ControllerRegistry;
 import de.jokergames.jfql.module.ModuleHandler;
 import de.jokergames.jfql.user.ConsoleUser;
 import de.jokergames.jfql.user.UserHandler;
@@ -31,36 +31,36 @@ public final class JFQL {
     private final Console console;
     private final CommandHandler commandHandler;
     private final ConfigHandler configHandler;
-    private final LangFormatter langFormatter;
+    private final Formatter formatter;
     private final String version;
     private final Downloader downloader;
     private final Connection connection;
     private final JSONObject configuration;
     private final DatabaseHandler dataBaseHandler;
     private final UserHandler userHandler;
-    private final Builder builder;
     private final DBSession DBSession;
     private final ModuleHandler moduleHandler;
     private final ConditionHelper conditionHelper;
-    private HttpService httpService;
+    private final ControllerRegistry controllerRegistry;
+    private JavalinService javalinService;
 
     public JFQL() {
         instance = this;
 
-        this.version = "1.0-BETA";
+        this.version = "1.0";
         this.console = new Console();
         this.connection = new Connection();
         this.downloader = new Downloader(connection);
-        this.langFormatter = new LangFormatter();
+        this.formatter = new Formatter();
         this.configHandler = new ConfigHandler();
         this.moduleHandler = new ModuleHandler();
-        this.builder = new Builder();
         this.conditionHelper = new ConditionHelper();
         this.commandHandler = new CommandHandler();
         this.DBSession = new DBSession();
         this.dataBaseHandler = new DatabaseHandler(configHandler.getFactory());
         this.configuration = configHandler.getConfig();
         this.userHandler = new UserHandler(configHandler.getFactory());
+        this.controllerRegistry = new ControllerRegistry();
     }
 
     public static JFQL getInstance() {
@@ -131,16 +131,6 @@ public final class JFQL {
         }
 
         try {
-            console.logInfo("Starting server on port " + configuration.getInt("Port") + "...");
-            httpService = new HttpService();
-            console.logInfo("Server was successfully started!");
-        } catch (Exception ex) {
-            throw new NetworkException("Can't start http server");
-        }
-
-        console.clean();
-
-        try {
             moduleHandler.enableModules();
         } catch (Exception ex) {
             throw new ModuleException("Can't load modules!");
@@ -150,8 +140,16 @@ public final class JFQL {
             console.clean();
         }
 
+        try {
+            javalinService = new JavalinService();
+        } catch (Exception ex) {
+            throw new NetworkException("Can't start javalin server");
+        }
+
+        console.clean();
+
         while (true) {
-            commandHandler.execute(langFormatter.formatCommand(console.read()));
+            commandHandler.execute(formatter.formatCommand(console.read()));
         }
     }
 
@@ -172,8 +170,8 @@ public final class JFQL {
         return configHandler;
     }
 
-    public LangFormatter getFormatter() {
-        return langFormatter;
+    public Formatter getFormatter() {
+        return formatter;
     }
 
     public String getVersion() {
@@ -212,12 +210,12 @@ public final class JFQL {
         return conditionHelper;
     }
 
-    public HttpService getHttpService() {
-        return httpService;
+    public JavalinService getJavalinService() {
+        return javalinService;
     }
 
-    public Builder getBuilder() {
-        return builder;
+    public ControllerRegistry getControllerRegistry() {
+        return controllerRegistry;
     }
 
     public Console getConsole() {

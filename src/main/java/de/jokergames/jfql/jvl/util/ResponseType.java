@@ -1,10 +1,10 @@
-package de.jokergames.jfql.http.util;
+package de.jokergames.jfql.jvl.util;
 
 /**
  * @author Janick
  */
 
-public enum Type {
+public enum ResponseType {
 
     SUCCESS(200),
     REST(200),
@@ -15,13 +15,13 @@ public enum Type {
 
     int rCode;
 
-    Type(int rCode) {
+    ResponseType(int rCode) {
         this.rCode = rCode;
     }
 
-    public static Type byRCode(int rCode) {
+    public static ResponseType byRCode(int rCode) {
 
-        for (Type type : Type.values()) {
+        for (ResponseType type : ResponseType.values()) {
             if (type.rCode == rCode) {
                 return type;
             }
@@ -30,7 +30,7 @@ public enum Type {
         return null;
     }
 
-    public int getrCode() {
+    public int getRCode() {
         return rCode;
     }
 

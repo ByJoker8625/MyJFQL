@@ -43,7 +43,7 @@ public class ListCommand extends Command {
                 }
 
                 List<String> strings = dataBaseHandler.getDataBases().stream().map(Database::getName).collect(Collectors.toList());
-                remote.send(JFQL.getInstance().getBuilder().buildAnswer(strings, List.of("Databases")));
+                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(strings, List.of("Databases")));
                 return true;
             } else if (arguments.containsKey("TABLES")) {
                 if (!user.hasPermission("execute.list.tables")) {
@@ -54,15 +54,15 @@ public class ListCommand extends Command {
                     String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
 
                     if (dataBaseHandler.getDataBase(name) == null) {
-                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Database doesn't exists!")));
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Database doesn't exists!")));
                         return true;
                     }
 
                     final Database database = dataBaseHandler.getDataBase(name);
-                    remote.send(JFQL.getInstance().getBuilder().buildAnswer(database.getTables().stream().map(Table::getName).collect(Collectors.toList()), List.of("Tables")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(database.getTables().stream().map(Table::getName).collect(Collectors.toList()), List.of("Tables")));
                 } else {
                     List<String> strings = dataBaseHandler.getDataBases().stream().flatMap(dataBase -> dataBase.getTables().stream()).map(Table::getName).collect(Collectors.toList());
-                    remote.send(JFQL.getInstance().getBuilder().buildAnswer(strings, List.of("Tables")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(strings, List.of("Tables")));
                 }
 
                 return true;
@@ -72,11 +72,11 @@ public class ListCommand extends Command {
                 }
 
                 List<String> strings = userHandler.getUsers().stream().map(User::getName).collect(Collectors.toList());
-                remote.send(JFQL.getInstance().getBuilder().buildAnswer(strings, List.of("Users")));
+                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(strings, List.of("Users")));
                 return true;
             }
 
-            remote.send(JFQL.getInstance().getBuilder().buildSyntax());
+            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
         } else {
 
             if (arguments.containsKey("DATABASES")) {

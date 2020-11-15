@@ -54,17 +54,17 @@ public class InsertCommand extends Command {
                 }
 
                 if (dataBase.getTable(name) == null) {
-                    remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Table doesn't exists!")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Table doesn't exists!")));
                     return true;
                 }
 
                 if (keys.isEmpty() || values.isEmpty()) {
-                    remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Keys or values are empty!")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Keys or values are empty!")));
                     return true;
                 }
 
                 if (keys.size() > values.size() || values.size() > keys.size()) {
-                    remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Enter suitable keys and values!")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Enter suitable keys and values!")));
                     return true;
                 }
 
@@ -90,7 +90,7 @@ public class InsertCommand extends Command {
                 }
 
                 if (contains) {
-                    remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown key!")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown key!")));
                     return true;
                 }
 
@@ -112,19 +112,19 @@ public class InsertCommand extends Command {
                     dataBase.addTable(table);
                     dataBaseHandler.saveDataBase(dataBase);
 
-                    remote.send(JFQL.getInstance().getBuilder().buildSuccess());
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
                 } else if (arguments.containsKey("WHERE")) {
                     List<Column> columns = null;
 
                     try {
                         columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
                     } catch (Exception ex) {
-                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
                         return true;
                     }
 
                     if (columns == null) {
-                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
                         return true;
                     }
 
@@ -144,10 +144,10 @@ public class InsertCommand extends Command {
                     dataBase.addTable(table);
                     dataBaseHandler.saveDataBase(dataBase);
 
-                    remote.send(JFQL.getInstance().getBuilder().buildSuccess());
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
                 } else {
                     if (content.get(table.getPrimary()) == null) {
-                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown primary key!")));
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown primary key!")));
                         return true;
                     }
 
@@ -168,13 +168,13 @@ public class InsertCommand extends Command {
                     dataBase.addTable(table);
                     dataBaseHandler.saveDataBase(dataBase);
 
-                    remote.send(JFQL.getInstance().getBuilder().buildSuccess());
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
                 }
 
                 return true;
             }
 
-            remote.send(JFQL.getInstance().getBuilder().buildSyntax());
+            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
         } else {
             final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDBSession().get(user.getName()));
 

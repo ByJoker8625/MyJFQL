@@ -43,12 +43,12 @@ public class CreateCommand extends Command {
                 }
 
                 if (dataBaseHandler.getDataBase(name) != null) {
-                    remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Database already exists!")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Database already exists!")));
                     return true;
                 }
 
                 dataBaseHandler.saveDataBase(new Database(name));
-                remote.send(JFQL.getInstance().getBuilder().buildSuccess());
+                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
                 return true;
             }
 
@@ -81,25 +81,25 @@ public class CreateCommand extends Command {
                 }
 
                 if (dataBaseHandler.getDataBase(base) == null) {
-                    remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new FileNotFoundException()));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new FileNotFoundException()));
                     return true;
                 }
 
                 final Database dataBase = dataBaseHandler.getDataBase(base);
 
                 if (dataBase.getTable(name) != null) {
-                    remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Table already exists!")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Table already exists!")));
                     return true;
                 }
 
 
-                remote.send(JFQL.getInstance().getBuilder().buildSuccess());
+                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
                 dataBase.addTable(new Table(name, structure, primaryKey));
                 dataBaseHandler.saveDataBase(dataBase);
                 return true;
             }
 
-            remote.send(JFQL.getInstance().getBuilder().buildSyntax());
+            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
         } else {
             if (arguments.containsKey("DATABASE")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("DATABASE"));

@@ -25,7 +25,7 @@ public class CommandHandler {
     public boolean execute(User user, Executor executor, Map<String, List<String>> arguments) {
         if (arguments == null) {
             if (executor instanceof RemoteExecutor) {
-                ((RemoteExecutor) executor).send(JFQL.getInstance().getBuilder().buildBadMethod(new NullPointerException()));
+                ((RemoteExecutor) executor).send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new NullPointerException()));
             } else {
                 JFQL.getInstance().getConsole().logError("Command was not found!");
             }

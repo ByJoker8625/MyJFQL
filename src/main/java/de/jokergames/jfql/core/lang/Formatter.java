@@ -9,7 +9,7 @@ import java.util.*;
  * @language JavaFileQueryLanguage (JFQL)
  */
 
-public class LangFormatter {
+public class Formatter {
 
 
     public Map<String, List<String>> formatCommand(String command) {

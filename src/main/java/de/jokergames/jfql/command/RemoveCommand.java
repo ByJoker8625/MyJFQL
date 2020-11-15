@@ -43,7 +43,7 @@ public class RemoveCommand extends Command {
                 final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDBSession().get(user.getName()));
 
                 if (dataBase.getTable(name) == null) {
-                    remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Table doesn't exists!")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Table doesn't exists!")));
                     return true;
                 }
 
@@ -54,7 +54,7 @@ public class RemoveCommand extends Command {
                 }
 
                 if (table.getColumn(column) == null && !column.equals("*")) {
-                    remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown column!")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown column!")));
                     return true;
                 }
 
@@ -64,12 +64,12 @@ public class RemoveCommand extends Command {
                     try {
                         columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
                     } catch (Exception ex) {
-                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
                         return true;
                     }
 
                     if (columns == null) {
-                        remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
                         return true;
                     }
 
@@ -77,7 +77,7 @@ public class RemoveCommand extends Command {
                         table.removeColumn(col.getContent(table.getPrimary()).toString());
                     }
 
-                    remote.send(JFQL.getInstance().getBuilder().buildSuccess());
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
                     dataBase.addTable(table);
                     dataBaseHandler.saveDataBase(dataBase);
                 } else {
@@ -93,7 +93,7 @@ public class RemoveCommand extends Command {
                         table.removeColumn(col.getContent(table.getPrimary()).toString());
                     }
 
-                    remote.send(JFQL.getInstance().getBuilder().buildSuccess());
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
                     dataBase.addTable(table);
                     dataBaseHandler.saveDataBase(dataBase);
                 }
@@ -101,7 +101,7 @@ public class RemoveCommand extends Command {
                 return true;
             }
 
-            remote.send(JFQL.getInstance().getBuilder().buildSyntax());
+            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
         } else {
 
             if (arguments.containsKey("FROM") && arguments.containsKey("COLUMN")) {

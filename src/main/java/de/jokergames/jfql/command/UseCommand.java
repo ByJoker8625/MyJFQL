@@ -39,16 +39,16 @@ public class UseCommand extends Command {
                 }
 
                 if (dataBaseHandler.getDataBase(name) == null) {
-                    remote.send(JFQL.getInstance().getBuilder().buildBadMethod(new CommandException("Database doesn't exists!")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Database doesn't exists!")));
                     return true;
                 }
 
                 JFQL.getInstance().getDBSession().put(user.getName(), name);
-                remote.send(JFQL.getInstance().getBuilder().buildSuccess());
+                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
                 return true;
             }
 
-            remote.send(JFQL.getInstance().getBuilder().buildSyntax());
+            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
         } else {
             if (arguments.containsKey("DATABASE")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("DATABASE"));
