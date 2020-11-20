@@ -2,6 +2,7 @@ package de.jokergames.jfql.jvl;
 
 import de.jokergames.jfql.core.JFQL;
 import de.jokergames.jfql.jvl.controller.Controller;
+import de.jokergames.jfql.jvl.controller.ControllerRegistry;
 import de.jokergames.jfql.jvl.controller.QueryController;
 import de.jokergames.jfql.jvl.util.ResponseBuilder;
 import io.javalin.Javalin;
@@ -14,15 +15,17 @@ public class JavalinService {
 
     private final Javalin app;
     private final ResponseBuilder responseBuilder;
+    private final ControllerRegistry controllerRegistry;
 
     public JavalinService() {
-        this.app = Javalin.create();
         this.responseBuilder = new ResponseBuilder();
+        this.controllerRegistry = new ControllerRegistry();
+        this.app = Javalin.create();
+
+        controllerRegistry.registerController(new QueryController());
         app.config.showJavalinBanner = false;
 
-        JFQL.getInstance().getControllerRegistry().registerController(new QueryController());
-
-        for (Controller controller : JFQL.getInstance().getControllerRegistry().getControllers()) {
+        for (Controller controller : controllerRegistry.getControllers()) {
             switch (controller.getMethod()) {
                 case GET:
                     app.get(controller.getPath(), controller);
@@ -39,8 +42,12 @@ public class JavalinService {
         app.start(JFQL.getInstance().getConfiguration().getInt("Port"));
     }
 
-    public Javalin getApp() {
+    public Javalin getJavalinApp() {
         return app;
+    }
+
+    public ControllerRegistry getControllerRegistry() {
+        return controllerRegistry;
     }
 
     public ResponseBuilder getResponseBuilder() {

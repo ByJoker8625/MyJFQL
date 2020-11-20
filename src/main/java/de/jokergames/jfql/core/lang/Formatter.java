@@ -7,6 +7,7 @@ import java.util.*;
 /**
  * @author Janick
  * @language JavaFileQueryLanguage (JFQL)
+ * @data 9.11.2020
  */
 
 public class Formatter {
@@ -50,7 +51,7 @@ public class Formatter {
         List<String> keyWords;
 
         try {
-            keyWords = JFQL.getInstance().getCommandHandler().getCommand(strings.get(1)).getSyntax();
+            keyWords = JFQL.getInstance().getCommandService().getCommand(strings.get(1)).getSyntax();
         } catch (Exception ex) {
             return null;
         }
@@ -84,7 +85,6 @@ public class Formatter {
 
         }
 
-
         return arguments;
     }
 
@@ -106,6 +106,16 @@ public class Formatter {
         }
 
         return Integer.parseInt(string.replace("'", ""));
+    }
+
+    public double formatDouble(List<String> strings) {
+        String string = strings.get(0);
+
+        for (int i = 1; i < strings.size(); i++) {
+            string += " " + strings.get(i);
+        }
+
+        return Double.parseDouble(string.replace("'", ""));
     }
 
 }

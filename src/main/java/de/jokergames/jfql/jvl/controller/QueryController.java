@@ -2,6 +2,7 @@ package de.jokergames.jfql.jvl.controller;
 
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
+import de.jokergames.jfql.event.ClientLoginEvent;
 import de.jokergames.jfql.jvl.util.Method;
 import de.jokergames.jfql.jvl.util.RequestReader;
 import de.jokergames.jfql.jvl.util.ResponseBuilder;
@@ -36,6 +37,7 @@ public class QueryController extends Controller {
                 JSONObject auth = jsonObject.getJSONObject("auth");
 
                 if (userHandler.getUser(auth.getString("user")) == null) {
+                    JFQL.getInstance().getEventService().callEvent(ClientLoginEvent.TYPE, new ClientLoginEvent(executor, false));
                     executor.send(builder.buildForbidden());
                     return;
                 }
@@ -43,11 +45,13 @@ public class QueryController extends Controller {
                 user = userHandler.getUser(auth.getString("user"));
 
                 if (user.is(User.Property.CONSOLE)) {
+                    JFQL.getInstance().getEventService().callEvent(ClientLoginEvent.TYPE, new ClientLoginEvent(executor, false));
                     executor.send(builder.buildForbidden());
                     return;
                 }
 
                 if (!user.getPassword().equals(auth.getString("password"))) {
+                    JFQL.getInstance().getEventService().callEvent(ClientLoginEvent.TYPE, new ClientLoginEvent(executor, false));
                     executor.send(builder.buildForbidden());
                     return;
                 }
@@ -55,13 +59,14 @@ public class QueryController extends Controller {
             }
 
             if (jsonObject.getString("query").equals("#connect")) {
-                executor.send(new JSONObject());
+                executor.sendError(200);
                 return;
             }
 
+            JFQL.getInstance().getEventService().callEvent(ClientLoginEvent.TYPE, new ClientLoginEvent(executor, true));
             JFQL.getInstance().getConsole().logInfo("[" + executor.getName() + "] ordered [\"" + jsonObject.getString("query") + "\"].");
 
-            boolean exec = JFQL.getInstance().getCommandHandler().execute(user, executor, JFQL.getInstance().getFormatter().formatCommand(jsonObject.getString("query")));
+            boolean exec = JFQL.getInstance().getCommandService().execute(user, executor, JFQL.getInstance().getFormatter().formatCommand(jsonObject.getString("query")));
 
             if (!exec) {
                 executor.send(builder.buildForbidden());

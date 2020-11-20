@@ -4,6 +4,7 @@ import de.jokergames.jfql.command.executor.ConsoleExecutor;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
+import de.jokergames.jfql.event.CommandExecuteEvent;
 import de.jokergames.jfql.user.User;
 
 import java.util.ArrayList;
@@ -14,11 +15,11 @@ import java.util.Map;
  * @author Janick
  */
 
-public class CommandHandler {
+public class CommandService {
 
     private final List<Command> commands;
 
-    public CommandHandler() {
+    public CommandService() {
         this.commands = new ArrayList<>();
     }
 
@@ -30,6 +31,7 @@ public class CommandHandler {
                 JFQL.getInstance().getConsole().logError("Command was not found!");
             }
 
+            JFQL.getInstance().getEventService().callEvent(CommandExecuteEvent.TYPE, new CommandExecuteEvent(executor, user, JFQL.getInstance().getFormatter().formatString(arguments.get("COMMAND"))));
             return false;
         }
 

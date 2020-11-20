@@ -6,11 +6,11 @@ import de.jokergames.jfql.core.lang.Formatter;
 import de.jokergames.jfql.database.DBSession;
 import de.jokergames.jfql.database.Database;
 import de.jokergames.jfql.database.DatabaseHandler;
+import de.jokergames.jfql.event.EventService;
 import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.exception.ModuleException;
 import de.jokergames.jfql.exception.NetworkException;
 import de.jokergames.jfql.jvl.JavalinService;
-import de.jokergames.jfql.jvl.controller.ControllerRegistry;
 import de.jokergames.jfql.module.ModuleHandler;
 import de.jokergames.jfql.user.ConsoleUser;
 import de.jokergames.jfql.user.UserHandler;
@@ -29,7 +29,7 @@ public final class JFQL {
     private static JFQL instance;
 
     private final Console console;
-    private final CommandHandler commandHandler;
+    private final CommandService commandService;
     private final ConfigHandler configHandler;
     private final Formatter formatter;
     private final String version;
@@ -40,8 +40,8 @@ public final class JFQL {
     private final UserHandler userHandler;
     private final DBSession DBSession;
     private final ModuleHandler moduleHandler;
+    private final EventService eventService;
     private final ConditionHelper conditionHelper;
-    private final ControllerRegistry controllerRegistry;
     private JavalinService javalinService;
 
     public JFQL() {
@@ -53,14 +53,14 @@ public final class JFQL {
         this.downloader = new Downloader(connection);
         this.formatter = new Formatter();
         this.configHandler = new ConfigHandler();
+        this.eventService = new EventService();
         this.moduleHandler = new ModuleHandler();
         this.conditionHelper = new ConditionHelper();
-        this.commandHandler = new CommandHandler();
+        this.commandService = new CommandService();
         this.DBSession = new DBSession();
         this.dataBaseHandler = new DatabaseHandler(configHandler.getFactory());
         this.configuration = configHandler.getConfig();
         this.userHandler = new UserHandler(configHandler.getFactory());
-        this.controllerRegistry = new ControllerRegistry();
     }
 
     public static JFQL getInstance() {
@@ -115,17 +115,16 @@ public final class JFQL {
                 dataBaseHandler.saveDataBase(new Database("test"));
         }
 
-
         try {
-            commandHandler.registerCommand(new ShutdownCommand());
-            commandHandler.registerCommand(new UsrCommand());
-            commandHandler.registerCommand(new ListCommand());
-            commandHandler.registerCommand(new UseCommand());
-            commandHandler.registerCommand(new InsertCommand());
-            commandHandler.registerCommand(new CreateCommand());
-            commandHandler.registerCommand(new DeleteCommand());
-            commandHandler.registerCommand(new SelectCommand());
-            commandHandler.registerCommand(new RemoveCommand());
+            commandService.registerCommand(new ShutdownCommand());
+            commandService.registerCommand(new UsrCommand());
+            commandService.registerCommand(new ListCommand());
+            commandService.registerCommand(new UseCommand());
+            commandService.registerCommand(new InsertCommand());
+            commandService.registerCommand(new CreateCommand());
+            commandService.registerCommand(new DeleteCommand());
+            commandService.registerCommand(new SelectCommand());
+            commandService.registerCommand(new RemoveCommand());
         } catch (Exception ex) {
             throw new CommandException("Can't load commands!");
         }
@@ -149,7 +148,7 @@ public final class JFQL {
         console.clean();
 
         while (true) {
-            commandHandler.execute(formatter.formatCommand(console.read()));
+            commandService.execute(formatter.formatCommand(console.read()));
         }
     }
 
@@ -202,20 +201,24 @@ public final class JFQL {
         return DBSession;
     }
 
-    public CommandHandler getCommandHandler() {
-        return commandHandler;
+    public CommandService getCommandService() {
+        return commandService;
     }
 
     public ConditionHelper getConditionHelper() {
         return conditionHelper;
     }
 
-    public JavalinService getJavalinService() {
-        return javalinService;
+    public EventService getEventService() {
+        return eventService;
     }
 
-    public ControllerRegistry getControllerRegistry() {
-        return controllerRegistry;
+    public Downloader getDownloader() {
+        return downloader;
+    }
+
+    public JavalinService getJavalinService() {
+        return javalinService;
     }
 
     public Console getConsole() {
