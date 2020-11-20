@@ -40,7 +40,7 @@ public class RemoveCommand extends Command {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
                 String column = JFQL.getInstance().getFormatter().formatString(arguments.get("COLUMN"));
 
-                final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDBSession().get(user.getName()));
+                final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
 
                 if (dataBase.getTable(name) == null) {
                     remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Table doesn't exists!")));
@@ -108,7 +108,7 @@ public class RemoveCommand extends Command {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
                 String column = JFQL.getInstance().getFormatter().formatString(arguments.get("COLUMN"));
 
-                final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDBSession().get(user.getName()));
+                final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
 
                 if (dataBase.getTable(name) == null) {
                     JFQL.getInstance().getConsole().logError("Table '" + name + "' doesn't exists!");

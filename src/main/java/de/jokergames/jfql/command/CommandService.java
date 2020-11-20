@@ -31,10 +31,11 @@ public class CommandService {
                 JFQL.getInstance().getConsole().logError("Command was not found!");
             }
 
-            JFQL.getInstance().getEventService().callEvent(CommandExecuteEvent.TYPE, new CommandExecuteEvent(executor, user, JFQL.getInstance().getFormatter().formatString(arguments.get("COMMAND"))));
+            JFQL.getInstance().getEventService().callEvent(CommandExecuteEvent.TYPE, new CommandExecuteEvent(executor, user, null));
             return false;
         }
 
+        JFQL.getInstance().getEventService().callEvent(CommandExecuteEvent.TYPE, new CommandExecuteEvent(executor, user, JFQL.getInstance().getFormatter().formatString(arguments.get("COMMAND"))));
         return getCommand(arguments.get("COMMAND").get(0)).handle(executor, arguments, user);
     }
 

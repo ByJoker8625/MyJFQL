@@ -11,6 +11,7 @@ import java.io.File;
 public class ConfigHandler {
 
     private final FileFactory factory;
+    private boolean crt = false;
 
     public ConfigHandler() {
         File file = new File("database");
@@ -18,6 +19,7 @@ public class ConfigHandler {
 
         if (!file.exists()) {
             file.mkdirs();
+            crt = true;
         }
 
         file = new File("module");
@@ -47,6 +49,10 @@ public class ConfigHandler {
 
     public JSONObject getConfig() {
         return factory.load(new File("config.json"));
+    }
+
+    public boolean isCrt() {
+        return crt;
     }
 
     public FileFactory getFactory() {

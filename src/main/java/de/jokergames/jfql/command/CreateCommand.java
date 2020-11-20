@@ -71,7 +71,7 @@ public class CreateCommand extends Command {
                 if (arguments.containsKey("INTO")) {
                     base = JFQL.getInstance().getFormatter().formatString(arguments.get("INTO"));
                 } else {
-                    base = JFQL.getInstance().getDBSession().get(user.getName());
+                    base = JFQL.getInstance().getDbSession().get(user.getName());
                 }
 
                 if (arguments.containsKey("PRIMARY-KEY")) {
@@ -128,7 +128,7 @@ public class CreateCommand extends Command {
                 if (arguments.containsKey("INTO")) {
                     base = JFQL.getInstance().getFormatter().formatString(arguments.get("INTO"));
                 } else {
-                    base = JFQL.getInstance().getDBSession().get(user.getName());
+                    base = JFQL.getInstance().getDbSession().get(user.getName());
                 }
 
                 if (arguments.containsKey("PRIMARY-KEY")) {

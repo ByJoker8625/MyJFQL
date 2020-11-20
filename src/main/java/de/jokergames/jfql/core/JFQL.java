@@ -38,7 +38,7 @@ public final class JFQL {
     private final JSONObject configuration;
     private final DatabaseHandler dataBaseHandler;
     private final UserHandler userHandler;
-    private final DBSession DBSession;
+    private final DBSession dbSession;
     private final ModuleHandler moduleHandler;
     private final EventService eventService;
     private final ConditionHelper conditionHelper;
@@ -57,7 +57,7 @@ public final class JFQL {
         this.moduleHandler = new ModuleHandler();
         this.conditionHelper = new ConditionHelper();
         this.commandService = new CommandService();
-        this.DBSession = new DBSession();
+        this.dbSession = new DBSession();
         this.dataBaseHandler = new DatabaseHandler(configHandler.getFactory());
         this.configuration = configHandler.getConfig();
         this.userHandler = new UserHandler(configHandler.getFactory());
@@ -111,7 +111,7 @@ public final class JFQL {
             if (userHandler.getUser("Console") == null)
                 userHandler.saveUser(new ConsoleUser());
 
-            if (dataBaseHandler.getDataBase("test") == null)
+            if (configHandler.isCrt())
                 dataBaseHandler.saveDataBase(new Database("test"));
         }
 
@@ -197,8 +197,8 @@ public final class JFQL {
         return userHandler;
     }
 
-    public DBSession getDBSession() {
-        return DBSession;
+    public DBSession getDbSession() {
+        return dbSession;
     }
 
     public CommandService getCommandService() {

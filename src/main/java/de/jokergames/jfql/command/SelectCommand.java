@@ -51,7 +51,7 @@ public class SelectCommand extends Command {
                     }
                 }
 
-                final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDBSession().get(user.getName()));
+                final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
 
                 if (dataBase.getTable(name) == null) {
                     remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Database doesn't exists!")));
@@ -233,7 +233,7 @@ public class SelectCommand extends Command {
                 }
 
 
-                final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDBSession().get(user.getName()));
+                final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
 
                 if (dataBase.getTable(name) == null) {
                     JFQL.getInstance().getConsole().logError("Table '" + name + "' doesn't exists!");

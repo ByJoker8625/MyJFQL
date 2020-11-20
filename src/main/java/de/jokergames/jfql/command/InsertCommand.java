@@ -36,7 +36,7 @@ public class InsertCommand extends Command {
                 return false;
             }
 
-            final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDBSession().get(user.getName()));
+            final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
 
             if (arguments.containsKey("INTO") && arguments.containsKey("KEY") && arguments.containsKey("VALUE")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("INTO"));
@@ -176,7 +176,7 @@ public class InsertCommand extends Command {
 
             remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
         } else {
-            final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDBSession().get(user.getName()));
+            final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
 
             if (arguments.containsKey("INTO") && arguments.containsKey("KEY") && arguments.containsKey("VALUE")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("INTO"));

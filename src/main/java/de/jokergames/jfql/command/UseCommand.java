@@ -43,7 +43,7 @@ public class UseCommand extends Command {
                     return true;
                 }
 
-                JFQL.getInstance().getDBSession().put(user.getName(), name);
+                JFQL.getInstance().getDbSession().put(user.getName(), name);
                 remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
                 return true;
             }
@@ -58,7 +58,7 @@ public class UseCommand extends Command {
                     return true;
                 }
 
-                JFQL.getInstance().getDBSession().put(user.getName(), name);
+                JFQL.getInstance().getDbSession().put(user.getName(), name);
                 JFQL.getInstance().getConsole().logError("Change database to '" + name + "'.");
                 return true;
             }

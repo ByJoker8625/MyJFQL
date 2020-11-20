@@ -60,7 +60,7 @@ public class DeleteCommand extends Command {
                 if (arguments.containsKey("FROM")) {
                     base = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
                 } else {
-                    base = JFQL.getInstance().getDBSession().get(user.getName());
+                    base = JFQL.getInstance().getDbSession().get(user.getName());
                 }
 
                 if (dataBaseHandler.getDataBase(base) == null) {
@@ -103,7 +103,7 @@ public class DeleteCommand extends Command {
                 if (arguments.containsKey("FROM")) {
                     base = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
                 } else {
-                    base = JFQL.getInstance().getDBSession().get(user.getName());
+                    base = JFQL.getInstance().getDbSession().get(user.getName());
                 }
 
                 if (dataBaseHandler.getDataBase(base) == null) {

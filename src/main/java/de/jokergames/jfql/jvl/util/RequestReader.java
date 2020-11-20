@@ -4,6 +4,8 @@ import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Janick
@@ -28,6 +30,19 @@ public class RequestReader {
         }
 
         return builder.toString();
+    }
+
+    public Map<String, String> mapRequest() throws Exception {
+        final Map<String, String> map = new HashMap<>();
+
+        for (String string : stringRequest().split("&")) {
+            final String[] strings = string.split("=");
+
+            if (strings[1] != null)
+                map.put(strings[0], strings[1]);
+        }
+
+        return map;
     }
 
     public JSONObject jsonRequest() throws Exception {
