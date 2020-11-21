@@ -10,7 +10,7 @@ import java.util.List;
  * @author Janick
  */
 
-public class Sorter {
+public class ColumnSorter {
 
     public List<Column> sort(String key, List<Column> columns) {
         final List<Column> list = new ArrayList<>();
@@ -21,14 +21,9 @@ public class Sorter {
 
         for (Column column : sort(columns)) {
 
-            System.out.println(key);
-            System.out.println(column);
-
             if (column.getContent(key) == null) {
                 unknowns.add(column);
             } else {
-                System.out.println(1);
-
                 String item = column.getContent(key).toString();
 
                 boolean number = true;
@@ -60,46 +55,6 @@ public class Sorter {
         List<Column> list = new ArrayList<>(columns);
         list.sort(Comparator.comparingLong(Column::getCreation));
         return list;
-    }
-
-    public boolean isUpperCase(char c) {
-        String s = new String(new char[]{c});
-
-        String upperCase = s.toUpperCase();
-        String lowCase = s.toLowerCase();
-
-        if (s.equals(upperCase)) {
-            return true;
-        } else if (s.equals(lowCase)) {
-            return false;
-        }
-
-        return false;
-    }
-
-    public int getSlot(char c) {
-        String lowCase = "abcdefghijklmnopqrstuvwxyz";
-        String upperCase = lowCase.toUpperCase();
-
-        if (isUpperCase(c)) {
-            char[] chars = upperCase.toCharArray();
-
-            for (int i = 0; i < chars.length; i++) {
-                if (chars[i] == c) {
-                    return i;
-                }
-            }
-        } else {
-            char[] chars = lowCase.toCharArray();
-
-            for (int i = 0; i < chars.length; i++) {
-                if (chars[i] == c) {
-                    return i;
-                }
-            }
-        }
-
-        return -1;
     }
 
 }

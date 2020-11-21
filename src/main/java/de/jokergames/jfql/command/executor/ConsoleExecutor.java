@@ -20,8 +20,8 @@ public class ConsoleExecutor extends Executor {
         JFQL.getInstance().getConsole().logInfo(s);
     }
 
-    public void sandWarning(String s) {
-        JFQL.getInstance().getConsole().logWarning(s);
+    public void send(String s) {
+        JFQL.getInstance().getConsole().log(s);
     }
 
 }

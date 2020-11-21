@@ -135,7 +135,12 @@ public final class JFQL {
             commandService.registerCommand(new DeleteCommand());
             commandService.registerCommand(new SelectCommand());
             commandService.registerCommand(new RemoveCommand());
-            commandService.registerCommand(new QsCommand());
+
+            if (configuration.getBoolean("VirtualQueryScripts")) {
+                commandService.registerCommand(new VqsCommand());
+            }
+
+
         } catch (Exception ex) {
             throw new CommandException("Can't load commands!");
         }

@@ -39,6 +39,10 @@ public class Console {
         clean("[" + getTime() + "] ERROR: " + s);
     }
 
+    public void log(String s) {
+        clean("[" + getTime() + "] " + s);
+    }
+
     public void logWarning(String s) {
         clean("[" + getTime() + "] WARNING: " + s);
     }

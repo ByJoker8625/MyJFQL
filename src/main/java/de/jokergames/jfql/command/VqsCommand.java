@@ -3,6 +3,7 @@ package de.jokergames.jfql.command;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
+import de.jokergames.jfql.core.lang.VirtualQueryScript;
 import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.user.User;
 
@@ -19,21 +20,26 @@ import java.util.Map;
  * @author Janick
  */
 
-public class QsCommand extends Command {
+public class VqsCommand extends Command {
 
-    public QsCommand() {
-        super("QS", List.of("COMMAND", "FILE", "URL", "LINE"));
+    public VqsCommand() {
+        super("VQS", List.of("COMMAND", "FILE", "URL", "LINE", "SHOW"));
     }
 
     @Override
     public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
-        final CommandService commandService = JFQL.getInstance().getCommandService();
+        VirtualQueryScript virtualQueryScript;
+
+        if (!arguments.containsKey("SHOW")) {
+            virtualQueryScript = new VirtualQueryScript(user);
+        } else {
+            virtualQueryScript = new VirtualQueryScript(user, true);
+        }
 
         if (executor instanceof RemoteExecutor) {
             final RemoteExecutor remote = (RemoteExecutor) executor;
 
-            if (!user.hasPermission("execute.eqs")) {
-                System.out.println(1);
+            if (!user.hasPermission("execute.vqs")) {
                 return false;
             }
 
@@ -53,14 +59,13 @@ public class QsCommand extends Command {
                     return true;
                 }
 
-                if (!user.hasPermission("execute.eqs.url.*") && !user.hasPermission("execute.eqs.url." + url.toString())) {
-                    System.out.println(2);
+                if (!user.hasPermission("execute.vqs.url.*") && !user.hasPermission("execute.vqs.url." + url.toString())) {
                     return false;
                 }
 
 
-                if (!path.endsWith(".jfql")) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("File '" + path + "' isn't a .eqs file!")));
+                if (!path.toLowerCase().endsWith(".jfql")) {
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("File '" + path + "' isn't a .jfql file!")));
                     return true;
                 }
 
@@ -75,7 +80,7 @@ public class QsCommand extends Command {
                     }
 
                 } catch (Exception ex) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknwon url error!")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown url error!")));
                     return true;
                 }
 
@@ -84,29 +89,18 @@ public class QsCommand extends Command {
                     return true;
                 }
 
+                int line = -1;
+
                 if (arguments.containsKey("LINE")) {
-                    int line = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LINE"));
+                    line = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LINE"));
 
                     if (queries.get(line) == null) {
                         remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("No query ad line " + line + "!")));
                         return true;
                     }
-
-                    try {
-                        commandService.execute(queries.get(line));
-                    } catch (Exception ex) {
-                        new CommandException(ex).printStackTrace();
-                    }
-                } else {
-                    for (String query : queries) {
-                        try {
-                            commandService.execute(query);
-                        } catch (Exception ex) {
-                            new CommandException(ex).printStackTrace();
-                        }
-                    }
                 }
 
+                virtualQueryScript.invokeLineScript(queries, line);
                 remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
                 return true;
             }
@@ -120,7 +114,7 @@ public class QsCommand extends Command {
                     return true;
                 }
 
-                if (!user.hasPermission("execute.eqs.file.*") && !user.hasPermission("execute.eqs.file." + file.getName())) {
+                if (!user.hasPermission("execute.vqs.file.*") && !user.hasPermission("execute.vqs.file." + file.getName())) {
                     return false;
                 }
 
@@ -129,8 +123,8 @@ public class QsCommand extends Command {
                     return true;
                 }
 
-                if (!path.endsWith(".jfql")) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("File '" + path + "' isn't a .eqs file!")));
+                if (!path.toLowerCase().endsWith(".jfql")) {
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("File '" + path + "' isn't a .jfql file!")));
                     return true;
                 }
 
@@ -145,7 +139,7 @@ public class QsCommand extends Command {
                     }
 
                 } catch (Exception ex) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknwon file error!")));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown file error!")));
                     return true;
                 }
 
@@ -154,29 +148,18 @@ public class QsCommand extends Command {
                     return true;
                 }
 
+                int line = -1;
+
                 if (arguments.containsKey("LINE")) {
-                    int line = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LINE"));
+                    line = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LINE"));
 
                     if (queries.get(line) == null) {
                         remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("No query ad line " + line + "!")));
                         return true;
                     }
-
-                    try {
-                        commandService.execute(queries.get(line));
-                    } catch (Exception ex) {
-                        new CommandException(ex).printStackTrace();
-                    }
-                } else {
-                    for (String query : queries) {
-                        try {
-                            commandService.execute(query);
-                        } catch (Exception ex) {
-                            new CommandException(ex).printStackTrace();
-                        }
-                    }
                 }
 
+                virtualQueryScript.invokeLineScript(queries, line);
                 remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
                 return true;
             }
@@ -201,8 +184,8 @@ public class QsCommand extends Command {
                     return true;
                 }
 
-                if (!path.endsWith(".eqs")) {
-                    JFQL.getInstance().getConsole().logError("Url '" + url + "' isn't a .eqs file!");
+                if (!path.endsWith(".jfql")) {
+                    JFQL.getInstance().getConsole().logError("Url '" + url + "' isn't a .jfql file!");
                     return true;
                 }
 
@@ -226,29 +209,18 @@ public class QsCommand extends Command {
                     return true;
                 }
 
+                int line = -1;
+
                 if (arguments.containsKey("LINE")) {
-                    int line = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LINE"));
+                    line = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LINE"));
 
                     if (queries.get(line) == null) {
                         JFQL.getInstance().getConsole().logError("No query ad line " + line + "!");
                         return true;
                     }
-
-                    try {
-                        commandService.execute(queries.get(line));
-                    } catch (Exception ex) {
-                        new CommandException(ex).printStackTrace();
-                    }
-                } else {
-                    for (String query : queries) {
-                        try {
-                            commandService.execute(query);
-                        } catch (Exception ex) {
-                            new CommandException(ex).printStackTrace();
-                        }
-                    }
                 }
 
+                virtualQueryScript.invokeLineScript(queries, line);
                 JFQL.getInstance().getConsole().logInfo("Execute all queries.");
                 return true;
             }
@@ -267,8 +239,8 @@ public class QsCommand extends Command {
                     return true;
                 }
 
-                if (!path.endsWith(".eqs")) {
-                    JFQL.getInstance().getConsole().logError("File '" + path + "' isn't a .eqs file!");
+                if (!path.endsWith(".jfql")) {
+                    JFQL.getInstance().getConsole().logError("File '" + path + "' isn't a .jfql file!");
                     return true;
                 }
 
@@ -292,29 +264,18 @@ public class QsCommand extends Command {
                     return true;
                 }
 
+                int line = -1;
+
                 if (arguments.containsKey("LINE")) {
-                    int line = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LINE"));
+                    line = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LINE"));
 
                     if (queries.get(line) == null) {
                         JFQL.getInstance().getConsole().logError("No query ad line " + line + "!");
                         return true;
                     }
-
-                    try {
-                        commandService.execute(queries.get(line));
-                    } catch (Exception ex) {
-                        new CommandException(ex).printStackTrace();
-                    }
-                } else {
-                    for (String query : queries) {
-                        try {
-                            commandService.execute(query);
-                        } catch (Exception ex) {
-                            new CommandException(ex).printStackTrace();
-                        }
-                    }
                 }
 
+                virtualQueryScript.invokeLineScript(queries, line);
                 JFQL.getInstance().getConsole().logInfo("Execute all queries.");
                 return true;
             }

@@ -1,6 +1,6 @@
 package de.jokergames.jfql.database;
 
-import de.jokergames.jfql.util.Sorter;
+import de.jokergames.jfql.util.ColumnSorter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,9 +67,9 @@ public class Table {
     public List<Column> getColumns(int type, String... strings) {
         switch (type) {
             case 0:
-                return new Sorter().sort(columns);
+                return new ColumnSorter().sort(columns);
             case 1:
-                return new Sorter().sort(strings[0], columns);
+                return new ColumnSorter().sort(strings[0], columns);
         }
 
         return columns;

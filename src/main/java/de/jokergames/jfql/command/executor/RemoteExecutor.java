@@ -18,6 +18,9 @@ public class RemoteExecutor extends Executor {
     }
 
     public void sendInfo(JSONObject response) {
+        if (context == null)
+            return;
+
         try {
             context.header("Access-Control-Allow-Origin", "*");
             context.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
@@ -32,6 +35,9 @@ public class RemoteExecutor extends Executor {
     }
 
     public void send(JSONObject response) {
+        if (context == null)
+            return;
+
         try {
             context.header("Access-Control-Allow-Origin", "*");
             context.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
@@ -46,6 +52,9 @@ public class RemoteExecutor extends Executor {
     }
 
     public void sendError(int rCode) {
+        if (context == null)
+            return;
+
         try {
             context.header("Access-Control-Allow-Origin", "*");
             context.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
