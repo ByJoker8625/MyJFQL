@@ -6,8 +6,11 @@ import de.jokergames.jfql.core.lang.Formatter;
 import de.jokergames.jfql.database.DBSession;
 import de.jokergames.jfql.database.Database;
 import de.jokergames.jfql.database.DatabaseHandler;
+import de.jokergames.jfql.event.ClientLoginEvent;
+import de.jokergames.jfql.event.CommandExecuteEvent;
 import de.jokergames.jfql.event.EventService;
 import de.jokergames.jfql.exception.CommandException;
+import de.jokergames.jfql.exception.EventException;
 import de.jokergames.jfql.exception.ModuleException;
 import de.jokergames.jfql.exception.NetworkException;
 import de.jokergames.jfql.jvl.JavalinService;
@@ -113,6 +116,13 @@ public final class JFQL {
 
             if (configHandler.isCrt())
                 dataBaseHandler.saveDataBase(new Database("test"));
+        }
+
+        try {
+            eventService.registerEvent(ClientLoginEvent.TYPE);
+            eventService.registerEvent(CommandExecuteEvent.TYPE);
+        } catch (Exception ex) {
+            throw new EventException("Can't load events!");
         }
 
         try {

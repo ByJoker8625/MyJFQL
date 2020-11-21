@@ -9,21 +9,16 @@ import de.jokergames.jfql.jvl.util.ResponseBuilder;
 import de.jokergames.jfql.user.User;
 import de.jokergames.jfql.user.UserHandler;
 import io.javalin.http.Context;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 /**
  * @author Janick
  */
 
-public class QueryController extends Controller {
+public class QueryController implements Controller {
 
-    public QueryController() {
-        super("/query", Method.POST);
-    }
-
-    @Override
-    public void handle(@NotNull Context context) throws Exception {
+    @ControllerDeclarer(path = "/query", method = Method.POST)
+    public void handleQuery(Context context) throws Exception {
         final UserHandler userHandler = JFQL.getInstance().getUserHandler();
         final ResponseBuilder builder = JFQL.getInstance().getJavalinService().getResponseBuilder();
 
@@ -64,7 +59,7 @@ public class QueryController extends Controller {
             }
 
             JFQL.getInstance().getEventService().callEvent(ClientLoginEvent.TYPE, new ClientLoginEvent(executor, true));
-            JFQL.getInstance().getConsole().logInfo("[" + executor.getName() + "] ordered [\"" + jsonObject.getString("query") + "\"].");
+            JFQL.getInstance().getConsole().logInfo("[" + executor.getName() + "] queried [\"" + jsonObject.getString("query") + "\"].");
 
             boolean exec = JFQL.getInstance().getCommandService().execute(user, executor, JFQL.getInstance().getFormatter().formatCommand(jsonObject.getString("query")));
 

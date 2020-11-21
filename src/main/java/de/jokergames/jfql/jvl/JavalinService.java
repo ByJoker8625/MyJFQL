@@ -2,10 +2,13 @@ package de.jokergames.jfql.jvl;
 
 import de.jokergames.jfql.core.JFQL;
 import de.jokergames.jfql.jvl.controller.Controller;
-import de.jokergames.jfql.jvl.controller.ControllerRegistry;
+import de.jokergames.jfql.jvl.controller.ControllerDeclarer;
+import de.jokergames.jfql.jvl.controller.ControllerService;
 import de.jokergames.jfql.jvl.controller.QueryController;
 import de.jokergames.jfql.jvl.util.ResponseBuilder;
 import io.javalin.Javalin;
+
+import java.util.List;
 
 /**
  * @author Janick
@@ -15,16 +18,32 @@ public class JavalinService {
 
     private final Javalin app;
     private final ResponseBuilder responseBuilder;
-    private final ControllerRegistry controllerRegistry;
+    private final ControllerService controllerService;
 
     public JavalinService() {
         this.responseBuilder = new ResponseBuilder();
-        this.controllerRegistry = new ControllerRegistry();
+        this.controllerService = new ControllerService();
         this.app = Javalin.create();
 
-        controllerRegistry.registerController(new QueryController());
+        controllerService.registerController(new QueryController());
         app.config.showJavalinBanner = false;
 
+        for (Controller controller : controllerService.getControllers()) {
+            final List<ControllerDeclarer> declarers = controllerService.getControllerDeclarerByController(controller);
+
+            for (ControllerDeclarer declarer : declarers) {
+                switch (declarer.method()) {
+                    case GET:
+                        app.get(declarer.path(), context -> controllerService.invokeMethodsByDeclarerAndController(controller, declarer, context));
+                        break;
+                    case POST:
+                        app.post(declarer.path(), context -> controllerService.invokeMethodsByDeclarerAndController(controller, declarer, context));
+                        break;
+                }
+
+            }
+
+        /*
         for (Controller controller : controllerRegistry.getControllers()) {
             switch (controller.getMethod()) {
                 case GET:
@@ -37,17 +56,18 @@ public class JavalinService {
                     app.post(controller.getPath(), controller);
                     break;
             }
-        }
+        }*/
 
-        app.start(JFQL.getInstance().getConfiguration().getInt("Port"));
+            app.start(JFQL.getInstance().getConfiguration().getInt("Port"));
+        }
     }
 
     public Javalin getJavalinApp() {
         return app;
     }
 
-    public ControllerRegistry getControllerRegistry() {
-        return controllerRegistry;
+    public ControllerService getControllerService() {
+        return controllerService;
     }
 
     public ResponseBuilder getResponseBuilder() {

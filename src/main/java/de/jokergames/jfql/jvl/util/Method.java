@@ -7,7 +7,6 @@ package de.jokergames.jfql.jvl.util;
 public enum Method {
 
     POST,
-    GET,
-    PUT
+    GET
 
 }

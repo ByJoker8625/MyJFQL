@@ -14,19 +14,19 @@ import java.util.List;
 public class EventService {
 
     private final List<Listener> listeners;
-    private final List<Event> events;
+    private final List<String> events;
 
     public EventService() {
         this.listeners = new ArrayList<>();
         this.events = new ArrayList<>();
     }
 
-    public void registerEvent(Event event) {
-        events.remove(event);
+    public void registerEvent(String event) {
+        events.add(event.toUpperCase());
     }
 
-    public void unregisterEvent(Event event) {
-        events.remove(event);
+    public void unregisterEvent(String event) {
+        events.remove(event.toUpperCase());
     }
 
     public void registerListener(Listener listener) {
@@ -38,10 +38,9 @@ public class EventService {
     }
 
     public void callEvent(String type, Event event) {
-        if (!events.stream().anyMatch(evn -> evn.getName().equals(event.getName()))) {
+        if (!events.contains(event.getName().toUpperCase())) {
             throw new EventException("Unknown event: " + event.getName());
         }
-
 
         for (Listener listener : listeners) {
             Class<?> clazz = listener.getClass();
@@ -64,7 +63,7 @@ public class EventService {
         }
     }
 
-    public List<Event> getEvents() {
+    public List<String> getEvents() {
         return events;
     }
 
