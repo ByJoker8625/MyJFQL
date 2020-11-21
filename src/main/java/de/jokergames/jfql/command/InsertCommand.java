@@ -97,6 +97,16 @@ public class InsertCommand extends Command {
                 if (arguments.containsKey("PRIMARY-KEY")) {
                     Column column = table.getColumn(JFQL.getInstance().getFormatter().formatString(arguments.get("PRIMARY-KEY")));
 
+                    for (String s : content.keySet()) {
+                        String s1 = content.get(s).toString();
+
+                        if (s1.equals("$++")) {
+                            content.put(s, table.getColumns(0).size() + 1);
+                        } else if (s1.equals("$--")) {
+                            content.put(s, table.getColumns(0).size() - 1);
+                        }
+                    }
+
                     if (column == null) {
                         column = new Column();
                         column.setContent(content);
@@ -134,7 +144,16 @@ public class InsertCommand extends Command {
                             if (content.get(s).toString().equalsIgnoreCase("null")) {
                                 content.remove(s);
                             } else {
-                                column.getContent().put(s, content.get(s));
+                                Object obj = content.get(s);
+
+                                if (obj.toString().equals("$++")) {
+                                    int j = table.getColumns(0).size() + 1;
+                                    column.putContent(j + "", obj);
+                                } else if (obj.toString().equals("$--")) {
+                                    int j = table.getColumns(0).size() - 1;
+                                    column.putContent(j + "", obj);
+                                } else
+                                    column.getContent().put(s, content.get(s));
                             }
                         }
 
@@ -153,6 +172,14 @@ public class InsertCommand extends Command {
 
                     Column column = table.getColumn(content.get(table.getPrimary()).toString());
 
+                    for (String s : content.keySet()) {
+                        if (content.get(s).equals("$++")) {
+                            content.put(s, table.getColumns().size() + 1);
+                        } else if (content.get(s).equals("$--")) {
+                            content.put(s, table.getColumns().size() - 1);
+                        }
+                    }
+
                     if (column == null) {
                         column = new Column();
                         column.setContent(content);
@@ -163,6 +190,7 @@ public class InsertCommand extends Command {
                     if (column.getContent(table.getPrimary()) == null) {
                         column.putContent(table.getPrimary(), content.get(table.getPrimary()).toString());
                     }
+
 
                     table.addColumn(column);
                     dataBase.addTable(table);
@@ -233,6 +261,14 @@ public class InsertCommand extends Command {
                 if (arguments.containsKey("PRIMARY-KEY")) {
                     Column column = table.getColumn(JFQL.getInstance().getFormatter().formatString(arguments.get("PRIMARY-KEY")));
 
+                    for (String s : content.keySet()) {
+                        if (content.get(s).equals("$++")) {
+                            content.put(s, table.getColumns().size() + 1);
+                        } else if (content.get(s).equals("$--")) {
+                            content.put(s, table.getColumns().size() - 1);
+                        }
+                    }
+
                     if (column == null) {
                         column = new Column();
                         column.setContent(content);
@@ -278,7 +314,16 @@ public class InsertCommand extends Command {
                             if (content.get(s).toString().equalsIgnoreCase("null")) {
                                 content.remove(s);
                             } else {
-                                column.getContent().put(s, content.get(s));
+                                Object obj = content.get(s);
+
+                                if (obj.toString().equals("$++")) {
+                                    int j = table.getColumns().size() + 1;
+                                    column.putContent(j + "", obj);
+                                } else if (obj.toString().equals("$--")) {
+                                    int j = table.getColumns().size() - 1;
+                                    column.putContent(j + "", obj);
+                                } else
+                                    column.getContent().put(s, content.get(s));
                             }
                         }
 
@@ -296,6 +341,14 @@ public class InsertCommand extends Command {
                     }
 
                     Column column = table.getColumn(content.get(table.getPrimary()).toString());
+
+                    for (String s : content.keySet()) {
+                        if (content.get(s).equals("$++")) {
+                            content.put(s, table.getColumns().size() + 1);
+                        } else if (content.get(s).equals("$--")) {
+                            content.put(s, table.getColumns().size() - 1);
+                        }
+                    }
 
                     if (column == null) {
                         column = new Column();

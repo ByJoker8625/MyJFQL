@@ -1,5 +1,8 @@
 package de.jokergames.jfql.database;
 
+import de.jokergames.jfql.core.JFQL;
+import de.jokergames.jfql.exception.FileException;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,8 +33,15 @@ public class DBSession {
     }
 
     public String get(String key) {
+        final DatabaseHandler dataBaseHandler = JFQL.getInstance().getDataBaseHandler();
+
         if (!directories.containsKey(key)) {
-            return "test";
+            if (dataBaseHandler.getDataBases().size() == 0)
+                throw new FileException("No database exists!");
+            else if (dataBaseHandler.getDataBase("test") != null)
+                return "test";
+            else
+                return dataBaseHandler.getDataBases().get(0).getName();
         }
 
         return directories.get(key);

@@ -64,7 +64,7 @@ public class DatabaseHandler {
                 column.setCreation(curObject.getLong("creation"));
                 column.setContent(curObject.getJSONObject("content").toMap());
 
-                table.getColumns().add(column);
+                table.addColumn(column);
             }
 
             dataBase.getTables().add(table);

@@ -24,7 +24,7 @@ public class SelectCommand extends Command {
 
 
     public SelectCommand() {
-        super("SELECT", List.of("COMMAND", "WHERE", "FROM", "VALUE", "PRIMARY-KEY", "LIMIT"));
+        super("SELECT", List.of("COMMAND", "WHERE", "FROM", "VALUE", "PRIMARY-KEY", "LIMIT", "SORT"));
     }
 
     @Override
@@ -41,6 +41,9 @@ public class SelectCommand extends Command {
             if (arguments.containsKey("VALUE") && arguments.containsKey("FROM")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
                 int limit = -1;
+
+                int sort = 0;
+                String sorter = null;
 
                 if (arguments.containsKey("LIMIT")) {
                     limit = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LIMIT"));
@@ -59,6 +62,17 @@ public class SelectCommand extends Command {
                 }
 
                 final Table table = dataBase.getTable(name);
+
+                if (arguments.containsKey("SORT")) {
+                    sorter = JFQL.getInstance().getFormatter().formatString(arguments.get("SORT"));
+
+                    if (!table.getStructure().contains(sorter)) {
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown key to sort!")));
+                        return true;
+                    }
+
+                    sort = 1;
+                }
 
                 if (!user.hasPermission("execute.select.database." + dataBase.getName() + ".*") && !user.hasPermission("execute.select.database." + dataBase.getName() + "." + table.getName())) {
                     return false;
@@ -142,7 +156,7 @@ public class SelectCommand extends Command {
                     List<Column> columns = null;
 
                     try {
-                        columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
+                        columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"), sort, sorter);
                     } catch (Exception ex) {
                         remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
                         return true;
@@ -191,7 +205,7 @@ public class SelectCommand extends Command {
                         index++;
                     }
 
-                    List<Column> columns = new ArrayList<>(table.getColumns());
+                    List<Column> columns = new ArrayList<>(table.getColumns(sort, sorter));
 
                     if (limit != -1) {
                         ArrayList<Column> list1 = new ArrayList<>();
@@ -223,6 +237,9 @@ public class SelectCommand extends Command {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
                 int limit = -1;
 
+                String sorter = null;
+                int sort = 0;
+
                 if (arguments.containsKey("LIMIT")) {
                     limit = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LIMIT"));
 
@@ -241,6 +258,17 @@ public class SelectCommand extends Command {
                 }
 
                 final Table table = dataBase.getTable(name);
+
+                if (arguments.containsKey("SORT")) {
+                    sorter = JFQL.getInstance().getFormatter().formatString(arguments.get("SORT"));
+
+                    if (!table.getStructure().contains(sorter)) {
+                        JFQL.getInstance().getConsole().logError("Unknown key to sort!");
+                        return true;
+                    }
+
+                    sort = 1;
+                }
 
                 List<String> values = new ArrayList<>();
 
@@ -334,7 +362,7 @@ public class SelectCommand extends Command {
                     List<Column> columns = null;
 
                     try {
-                        columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
+                        columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"), sort, sorter);
                     } catch (Exception ex) {
                         JFQL.getInstance().getConsole().logError("Unknown error!");
                         return true;
@@ -401,7 +429,7 @@ public class SelectCommand extends Command {
 
                     final TablePrinter tablePrinter = new TablePrinter(structure.length, structure);
 
-                    List<Column> columns = new ArrayList<>(table.getColumns());
+                    List<Column> columns = new ArrayList<>(table.getColumns(sort, sorter));
 
                     if (limit != -1) {
                         List<Column> list1 = new ArrayList<>();

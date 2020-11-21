@@ -49,7 +49,7 @@ public class TablePrinter {
         this.table = new ArrayList<>();
         this.tableSizes = new int[columns];
         this.updateSizes(descriptions);
-        this.ucode = true;
+        this.ucode = System.getProperty("os.name").equalsIgnoreCase("Linux");
         this.spacing = 1;
         this.aligns = new EnumAlignment[columns];
         this.comparator = null;

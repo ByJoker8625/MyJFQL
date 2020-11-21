@@ -135,7 +135,7 @@ public final class JFQL {
             commandService.registerCommand(new DeleteCommand());
             commandService.registerCommand(new SelectCommand());
             commandService.registerCommand(new RemoveCommand());
-            commandService.registerCommand(new RqyCommand());
+            commandService.registerCommand(new QsCommand());
         } catch (Exception ex) {
             throw new CommandException("Can't load commands!");
         }

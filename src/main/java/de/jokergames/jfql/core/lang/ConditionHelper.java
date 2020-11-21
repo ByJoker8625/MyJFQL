@@ -14,6 +14,10 @@ import java.util.List;
 public class ConditionHelper {
 
     public List<Column> getRequiredColumns(Table table, List<String> argument) {
+        return getRequiredColumns(table, argument, 0, null);
+    }
+
+    public List<Column> getRequiredColumns(Table table, List<String> argument, int sort, String sorter) {
         List<Column> columns = new ArrayList<>();
 
         final String[] where = JFQL.getInstance().getFormatter().formatString(argument).replace(" or ", " OR ").split(" OR ");
@@ -40,7 +44,15 @@ public class ConditionHelper {
             conditions.add(list1);
         }
 
-        for (Column col : table.getColumns()) {
+        List<Column> cols = new ArrayList<>();
+
+        if (sort == 0 || sorter == null) {
+            cols = table.getColumns();
+        } else {
+            cols = table.getColumns(sort, sorter);
+        }
+
+        for (Column col : cols) {
 
             for (List<String[]> requirements : conditions) {
                 int finished = 0;

@@ -19,10 +19,10 @@ import java.util.Map;
  * @author Janick
  */
 
-public class RqyCommand extends Command {
+public class QsCommand extends Command {
 
-    public RqyCommand() {
-        super("RQY", List.of("COMMAND", "FILE", "URL"));
+    public QsCommand() {
+        super("QS", List.of("COMMAND", "FILE", "URL", "LINE"));
     }
 
     @Override
@@ -32,7 +32,7 @@ public class RqyCommand extends Command {
         if (executor instanceof RemoteExecutor) {
             final RemoteExecutor remote = (RemoteExecutor) executor;
 
-            if (!user.hasPermission("execute.rqy")) {
+            if (!user.hasPermission("execute.eqs")) {
                 System.out.println(1);
                 return false;
             }
@@ -53,14 +53,14 @@ public class RqyCommand extends Command {
                     return true;
                 }
 
-                if (!user.hasPermission("execute.rqy.url.*") && !user.hasPermission("execute.rqy.url." + url.toString())) {
+                if (!user.hasPermission("execute.eqs.url.*") && !user.hasPermission("execute.eqs.url." + url.toString())) {
                     System.out.println(2);
                     return false;
                 }
 
 
-                if (!path.endsWith(".rqy")) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("File '" + path + "' isn't a .rqy file!")));
+                if (!path.endsWith(".jfql")) {
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("File '" + path + "' isn't a .eqs file!")));
                     return true;
                 }
 
@@ -84,11 +84,26 @@ public class RqyCommand extends Command {
                     return true;
                 }
 
-                for (String query : queries) {
+                if (arguments.containsKey("LINE")) {
+                    int line = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LINE"));
+
+                    if (queries.get(line) == null) {
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("No query ad line " + line + "!")));
+                        return true;
+                    }
+
                     try {
-                        commandService.execute(query);
+                        commandService.execute(queries.get(line));
                     } catch (Exception ex) {
                         new CommandException(ex).printStackTrace();
+                    }
+                } else {
+                    for (String query : queries) {
+                        try {
+                            commandService.execute(query);
+                        } catch (Exception ex) {
+                            new CommandException(ex).printStackTrace();
+                        }
                     }
                 }
 
@@ -105,7 +120,7 @@ public class RqyCommand extends Command {
                     return true;
                 }
 
-                if (!user.hasPermission("execute.rqy.file.*") && !user.hasPermission("execute.rqy.file." + file.getName())) {
+                if (!user.hasPermission("execute.eqs.file.*") && !user.hasPermission("execute.eqs.file." + file.getName())) {
                     return false;
                 }
 
@@ -114,8 +129,8 @@ public class RqyCommand extends Command {
                     return true;
                 }
 
-                if (!path.endsWith(".rqy")) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("File '" + path + "' isn't a .rqy file!")));
+                if (!path.endsWith(".jfql")) {
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("File '" + path + "' isn't a .eqs file!")));
                     return true;
                 }
 
@@ -139,11 +154,26 @@ public class RqyCommand extends Command {
                     return true;
                 }
 
-                for (String query : queries) {
+                if (arguments.containsKey("LINE")) {
+                    int line = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LINE"));
+
+                    if (queries.get(line) == null) {
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("No query ad line " + line + "!")));
+                        return true;
+                    }
+
                     try {
-                        commandService.execute(query);
+                        commandService.execute(queries.get(line));
                     } catch (Exception ex) {
                         new CommandException(ex).printStackTrace();
+                    }
+                } else {
+                    for (String query : queries) {
+                        try {
+                            commandService.execute(query);
+                        } catch (Exception ex) {
+                            new CommandException(ex).printStackTrace();
+                        }
                     }
                 }
 
@@ -171,8 +201,8 @@ public class RqyCommand extends Command {
                     return true;
                 }
 
-                if (!path.endsWith(".rqy")) {
-                    JFQL.getInstance().getConsole().logError("Url '" + url + "' isn't a .rqy file!");
+                if (!path.endsWith(".eqs")) {
+                    JFQL.getInstance().getConsole().logError("Url '" + url + "' isn't a .eqs file!");
                     return true;
                 }
 
@@ -196,11 +226,26 @@ public class RqyCommand extends Command {
                     return true;
                 }
 
-                for (String query : queries) {
+                if (arguments.containsKey("LINE")) {
+                    int line = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LINE"));
+
+                    if (queries.get(line) == null) {
+                        JFQL.getInstance().getConsole().logError("No query ad line " + line + "!");
+                        return true;
+                    }
+
                     try {
-                        commandService.execute(query);
+                        commandService.execute(queries.get(line));
                     } catch (Exception ex) {
                         new CommandException(ex).printStackTrace();
+                    }
+                } else {
+                    for (String query : queries) {
+                        try {
+                            commandService.execute(query);
+                        } catch (Exception ex) {
+                            new CommandException(ex).printStackTrace();
+                        }
                     }
                 }
 
@@ -222,8 +267,8 @@ public class RqyCommand extends Command {
                     return true;
                 }
 
-                if (!path.endsWith(".rqy")) {
-                    JFQL.getInstance().getConsole().logError("File '" + path + "' isn't a .rqy file!");
+                if (!path.endsWith(".eqs")) {
+                    JFQL.getInstance().getConsole().logError("File '" + path + "' isn't a .eqs file!");
                     return true;
                 }
 
@@ -247,11 +292,26 @@ public class RqyCommand extends Command {
                     return true;
                 }
 
-                for (String query : queries) {
+                if (arguments.containsKey("LINE")) {
+                    int line = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LINE"));
+
+                    if (queries.get(line) == null) {
+                        JFQL.getInstance().getConsole().logError("No query ad line " + line + "!");
+                        return true;
+                    }
+
                     try {
-                        commandService.execute(query);
+                        commandService.execute(queries.get(line));
                     } catch (Exception ex) {
                         new CommandException(ex).printStackTrace();
+                    }
+                } else {
+                    for (String query : queries) {
+                        try {
+                            commandService.execute(query);
+                        } catch (Exception ex) {
+                            new CommandException(ex).printStackTrace();
+                        }
                     }
                 }
 
