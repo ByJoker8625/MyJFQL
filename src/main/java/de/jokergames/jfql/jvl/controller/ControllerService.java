@@ -28,7 +28,6 @@ public class ControllerService {
     }
 
     public void invokeMethodsByDeclarerAndController(Controller controller, ControllerDeclarer declarer, Context context) {
-        final List<ControllerDeclarer> declarers = getControllerDeclarerByController(controller);
         final Class<?> clazz = controller.getClass();
 
         for (Method method : clazz.getMethods()) {

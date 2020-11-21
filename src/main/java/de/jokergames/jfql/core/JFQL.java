@@ -50,7 +50,7 @@ public final class JFQL {
     public JFQL() {
         instance = this;
 
-        this.version = "1.1";
+        this.version = "1.2";
         this.console = new Console();
         this.connection = new Connection();
         this.downloader = new Downloader(connection);
@@ -135,6 +135,7 @@ public final class JFQL {
             commandService.registerCommand(new DeleteCommand());
             commandService.registerCommand(new SelectCommand());
             commandService.registerCommand(new RemoveCommand());
+            commandService.registerCommand(new RqyCommand());
         } catch (Exception ex) {
             throw new CommandException("Can't load commands!");
         }
