@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ColumnSorter {
 
-    public List<Column> sort(String key, List<Column> columns) {
+    public List<Column> sort(String key, List<Column> columns, Order order) {
         final List<Column> list = new ArrayList<>();
 
         List<Column> numbers = new ArrayList<>();
@@ -42,8 +42,13 @@ public class ColumnSorter {
             }
         }
 
-        numbers.sort(Comparator.comparingInt(o -> Integer.parseInt(o.getContent(key).toString())));
-        letters.sort((o1, o2) -> String.valueOf(o1.getContent(key)).compareTo(o2.getContent(key).toString()));
+        if (order == Order.ASC) {
+            numbers.sort(Comparator.comparingInt(o -> Integer.parseInt(o.getContent(key).toString())));
+            letters.sort((o1, o2) -> String.valueOf(o1.getContent(key)).compareTo(o2.getContent(key).toString()));
+        } else if (order == Order.DEC) {
+            numbers.sort((o1, o2) -> -Integer.compare(Integer.parseInt(o1.getContent(key).toString()), Integer.parseInt(o2.getContent(key).toString())));
+            letters.sort((o1, o2) -> -String.valueOf(o1.getContent(key)).compareTo(o2.getContent(key).toString()));
+        }
 
         list.addAll(numbers);
         list.addAll(letters);
@@ -55,6 +60,16 @@ public class ColumnSorter {
         List<Column> list = new ArrayList<>(columns);
         list.sort(Comparator.comparingLong(Column::getCreation));
         return list;
+    }
+
+    public static enum Order {
+        DEC,
+        ASC
+    }
+
+    public static enum Type {
+        CREATION,
+        CUSTOM
     }
 
 }

@@ -57,19 +57,19 @@ public class Table {
     }
 
     public List<Column> getColumns() {
-        return getColumns(0);
+        return getColumns(ColumnSorter.Type.CREATION, ColumnSorter.Order.ASC);
     }
 
     public void setColumns(List<Column> columns) {
         this.columns = columns;
     }
 
-    public List<Column> getColumns(int type, String... strings) {
+    public List<Column> getColumns(ColumnSorter.Type type, ColumnSorter.Order order, String... strings) {
         switch (type) {
-            case 0:
+            case CREATION:
                 return new ColumnSorter().sort(columns);
-            case 1:
-                return new ColumnSorter().sort(strings[0], columns);
+            case CUSTOM:
+                return new ColumnSorter().sort(strings[0], columns, order);
         }
 
         return columns;

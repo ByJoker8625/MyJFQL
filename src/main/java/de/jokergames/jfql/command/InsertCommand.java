@@ -101,9 +101,9 @@ public class InsertCommand extends Command {
                         String s1 = content.get(s).toString();
 
                         if (s1.equals("$++")) {
-                            content.put(s, table.getColumns(0).size() + 1);
+                            content.put(s, table.getColumns().size() + 1);
                         } else if (s1.equals("$--")) {
-                            content.put(s, table.getColumns(0).size() - 1);
+                            content.put(s, table.getColumns().size() - 1);
                         }
                     }
 
@@ -147,10 +147,10 @@ public class InsertCommand extends Command {
                                 Object obj = content.get(s);
 
                                 if (obj.toString().equals("$++")) {
-                                    int j = table.getColumns(0).size() + 1;
+                                    int j = table.getColumns().size() + 1;
                                     column.putContent(j + "", obj);
                                 } else if (obj.toString().equals("$--")) {
-                                    int j = table.getColumns(0).size() - 1;
+                                    int j = table.getColumns().size() - 1;
                                     column.putContent(j + "", obj);
                                 } else
                                     column.getContent().put(s, content.get(s));

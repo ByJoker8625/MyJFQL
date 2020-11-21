@@ -9,6 +9,7 @@ import de.jokergames.jfql.database.DatabaseHandler;
 import de.jokergames.jfql.database.Table;
 import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.user.User;
+import de.jokergames.jfql.util.ColumnSorter;
 import de.jokergames.jfql.util.TablePrinter;
 
 import java.io.FileNotFoundException;
@@ -24,7 +25,7 @@ public class SelectCommand extends Command {
 
 
     public SelectCommand() {
-        super("SELECT", List.of("COMMAND", "WHERE", "FROM", "VALUE", "PRIMARY-KEY", "LIMIT", "SORT"));
+        super("SELECT", List.of("COMMAND", "WHERE", "FROM", "VALUE", "PRIMARY-KEY", "LIMIT", "SORT", "ORDER"));
     }
 
     @Override
@@ -42,7 +43,8 @@ public class SelectCommand extends Command {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
                 int limit = -1;
 
-                int sort = 0;
+                ColumnSorter.Type sort = ColumnSorter.Type.CREATION;
+                ColumnSorter.Order order = ColumnSorter.Order.ASC;
                 String sorter = null;
 
                 if (arguments.containsKey("LIMIT")) {
@@ -71,7 +73,23 @@ public class SelectCommand extends Command {
                         return true;
                     }
 
-                    sort = 1;
+                    sort = ColumnSorter.Type.CUSTOM;
+                }
+
+                if (arguments.containsKey("ORDER") && !arguments.containsKey("SORT")) {
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Enter a column to be sorted!")));
+                    return true;
+                }
+
+                if (arguments.containsKey("ORDER")) {
+
+                    try {
+                        order = ColumnSorter.Order.valueOf(JFQL.getInstance().getFormatter().formatString(arguments.get("ORDER")).toUpperCase());
+                    } catch (Exception ex) {
+                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown order type (DES, ASC)!")));
+                        return true;
+                    }
+
                 }
 
                 if (!user.hasPermission("execute.select.database." + dataBase.getName() + ".*") && !user.hasPermission("execute.select.database." + dataBase.getName() + "." + table.getName())) {
@@ -156,7 +174,7 @@ public class SelectCommand extends Command {
                     List<Column> columns = null;
 
                     try {
-                        columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"), sort, sorter);
+                        columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"), sort, sorter, order);
                     } catch (Exception ex) {
                         remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
                         return true;
@@ -205,7 +223,7 @@ public class SelectCommand extends Command {
                         index++;
                     }
 
-                    List<Column> columns = new ArrayList<>(table.getColumns(sort, sorter));
+                    List<Column> columns = new ArrayList<>(table.getColumns(sort, order, sorter));
 
                     if (limit != -1) {
                         ArrayList<Column> list1 = new ArrayList<>();
@@ -237,8 +255,9 @@ public class SelectCommand extends Command {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
                 int limit = -1;
 
+                ColumnSorter.Type sort = ColumnSorter.Type.CREATION;
+                ColumnSorter.Order order = ColumnSorter.Order.ASC;
                 String sorter = null;
-                int sort = 0;
 
                 if (arguments.containsKey("LIMIT")) {
                     limit = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LIMIT"));
@@ -267,7 +286,23 @@ public class SelectCommand extends Command {
                         return true;
                     }
 
-                    sort = 1;
+                    sort = ColumnSorter.Type.CUSTOM;
+                }
+
+                if (arguments.containsKey("ORDER") && !arguments.containsKey("SORT")) {
+                    JFQL.getInstance().getConsole().logError("Enter a column to be sorted!");
+                    return true;
+                }
+
+                if (arguments.containsKey("ORDER")) {
+
+                    try {
+                        order = ColumnSorter.Order.valueOf(JFQL.getInstance().getFormatter().formatString(arguments.get("ORDER")).toUpperCase());
+                    } catch (Exception ex) {
+                        JFQL.getInstance().getConsole().logError("Unknown order! Orders: ASC, DEC");
+                        return true;
+                    }
+
                 }
 
                 List<String> values = new ArrayList<>();
@@ -362,7 +397,7 @@ public class SelectCommand extends Command {
                     List<Column> columns = null;
 
                     try {
-                        columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"), sort, sorter);
+                        columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"), sort, sorter, order);
                     } catch (Exception ex) {
                         JFQL.getInstance().getConsole().logError("Unknown error!");
                         return true;
@@ -429,7 +464,7 @@ public class SelectCommand extends Command {
 
                     final TablePrinter tablePrinter = new TablePrinter(structure.length, structure);
 
-                    List<Column> columns = new ArrayList<>(table.getColumns(sort, sorter));
+                    List<Column> columns = new ArrayList<>(table.getColumns(sort, order, sorter));
 
                     if (limit != -1) {
                         List<Column> list1 = new ArrayList<>();
