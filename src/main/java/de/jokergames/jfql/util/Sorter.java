@@ -42,17 +42,13 @@ public class Sorter {
                 if (number) {
                     numbers.add(column);
                 } else {
-                    if (getSlot(item.charAt(0)) != -1) {
-                        letters.add(column);
-                    } else {
-                        unknowns.add(column);
-                    }
+                    letters.add(column);
                 }
             }
         }
 
         numbers.sort(Comparator.comparingInt(o -> Integer.parseInt(o.getContent(key).toString())));
-        letters.sort(Comparator.comparingInt(o -> getSlot(o.toString().charAt(0))));
+        letters.sort((o1, o2) -> String.valueOf(o1.getContent(key)).compareTo(o2.getContent(key).toString()));
 
         list.addAll(numbers);
         list.addAll(letters);
