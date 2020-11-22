@@ -3,6 +3,7 @@ package de.jokergames.jfql.command;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
+import de.jokergames.jfql.core.script.ScriptService;
 import de.jokergames.jfql.database.Database;
 import de.jokergames.jfql.database.DatabaseHandler;
 import de.jokergames.jfql.exception.CommandException;
@@ -18,12 +19,13 @@ import java.util.Map;
 public class DeleteCommand extends Command {
 
     public DeleteCommand() {
-        super("DELETE", List.of("COMMAND", "TABLE", "DATABASE", "FROM"));
+        super("DELETE", List.of("COMMAND", "SCRIPT", "TABLE", "DATABASE", "FROM"));
     }
 
     @Override
     public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
         final DatabaseHandler dataBaseHandler = JFQL.getInstance().getDataBaseHandler();
+        final ScriptService scriptService = JFQL.getInstance().getScriptService();
 
         if (executor instanceof RemoteExecutor) {
             RemoteExecutor remote = (RemoteExecutor) executor;
@@ -121,6 +123,19 @@ public class DeleteCommand extends Command {
                 JFQL.getInstance().getConsole().logInfo("Table '" + name + "' was deleted.");
                 dataBase.removeTable(name);
                 dataBaseHandler.saveDataBase(dataBase);
+                return true;
+            }
+
+            if (arguments.containsKey("SCRIPT")) {
+                String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
+
+                if (scriptService.getScript(name) == null) {
+                    JFQL.getInstance().getConsole().logError("Script '" + name + "' doesn't exists!");
+                    return true;
+                }
+
+                JFQL.getInstance().getConsole().logInfo("Delete script '" + name + "'.");
+                scriptService.getScript(name).getFile().delete();
                 return true;
             }
 

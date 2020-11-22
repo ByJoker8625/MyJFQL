@@ -3,6 +3,8 @@ package de.jokergames.jfql.command;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
+import de.jokergames.jfql.core.script.Script;
+import de.jokergames.jfql.core.script.ScriptService;
 import de.jokergames.jfql.database.Database;
 import de.jokergames.jfql.database.DatabaseHandler;
 import de.jokergames.jfql.database.Table;
@@ -22,13 +24,14 @@ import java.util.stream.Collectors;
 public class ListCommand extends Command {
 
     public ListCommand() {
-        super("LIST", List.of("COMMAND", "DATABASES", "TABLES", "USERS", "FROM"));
+        super("LIST", List.of("COMMAND", "DATABASES", "TABLES", "USERS", "FROM", "SCRIPTS"));
     }
 
     @Override
     public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
         final DatabaseHandler dataBaseHandler = JFQL.getInstance().getDataBaseHandler();
         final UserHandler userHandler = JFQL.getInstance().getUserHandler();
+        final ScriptService scriptService = JFQL.getInstance().getScriptService();
 
         if (executor instanceof RemoteExecutor) {
             RemoteExecutor remote = (RemoteExecutor) executor;
@@ -45,7 +48,8 @@ public class ListCommand extends Command {
                 List<String> strings = dataBaseHandler.getDataBases().stream().map(Database::getName).collect(Collectors.toList());
                 remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(strings, List.of("Databases")));
                 return true;
-            } else if (arguments.containsKey("TABLES")) {
+            }
+            if (arguments.containsKey("TABLES")) {
                 if (!user.hasPermission("execute.list.tables")) {
                     return false;
                 }
@@ -66,13 +70,23 @@ public class ListCommand extends Command {
                 }
 
                 return true;
-            } else if (arguments.containsKey("USERS")) {
+            }
+            if (arguments.containsKey("USERS")) {
                 if (!user.hasPermission("execute.list.users")) {
                     return false;
                 }
 
                 List<String> strings = userHandler.getUsers().stream().map(User::getName).collect(Collectors.toList());
                 remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(strings, List.of("Users")));
+                return true;
+            }
+            if (arguments.containsKey("SCRIPTS")) {
+                if (!user.hasPermission("execute.list.scripts")) {
+                    return false;
+                }
+
+                List<String> strings = scriptService.getScripts().stream().map(Script::getName).collect(Collectors.toList());
+                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(strings, List.of("Scripts")));
                 return true;
             }
 
@@ -89,7 +103,8 @@ public class ListCommand extends Command {
 
                 tablePrinter.print();
                 return true;
-            } else if (arguments.containsKey("TABLES")) {
+            }
+            if (arguments.containsKey("TABLES")) {
                 List<String> strings = dataBaseHandler.getDataBases().stream().flatMap(dataBase -> dataBase.getTables().stream()).map(Table::getName).collect(Collectors.toList());
                 TablePrinter tablePrinter = new TablePrinter(1, "Tables");
 
@@ -116,9 +131,21 @@ public class ListCommand extends Command {
                 }
                 tablePrinter.print();
                 return true;
-            } else if (arguments.containsKey("USERS")) {
+            }
+            if (arguments.containsKey("USERS")) {
                 List<String> strings = userHandler.getUsers().stream().map(User::getName).collect(Collectors.toList());
                 TablePrinter tablePrinter = new TablePrinter(1, "Users");
+
+                for (String string : strings) {
+                    tablePrinter.addRow(string);
+                }
+
+                tablePrinter.print();
+                return true;
+            }
+            if (arguments.containsKey("SCRIPTS")) {
+                List<String> strings = scriptService.getScripts().stream().map(Script::getName).collect(Collectors.toList());
+                TablePrinter tablePrinter = new TablePrinter(1, "Scripts");
 
                 for (String string : strings) {
                     tablePrinter.addRow(string);

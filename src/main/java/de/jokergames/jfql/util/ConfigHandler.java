@@ -47,7 +47,6 @@ public class ConfigHandler {
         if (!file.exists()) {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("AutoUpdate", true);
-            jsonObject.put("VirtualQueryScripts", true);
             jsonObject.put("Port", 2291);
             jsonObject.put("Server", "http://jokergames.ddnss.de/lib/rest.json");
 
@@ -58,9 +57,6 @@ public class ConfigHandler {
 
         if (configuration.opt("AutoUpdate") == null)
             configuration.put("AutoUpdate", true);
-
-        if (configuration.opt("VirtualQueryScripts") == null)
-            configuration.put("VirtualQueryScripts", true);
 
         if (configuration.opt("Port") == null)
             configuration.put("Port", 2291);

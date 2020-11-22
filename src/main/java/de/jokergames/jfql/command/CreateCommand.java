@@ -3,6 +3,7 @@ package de.jokergames.jfql.command;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
+import de.jokergames.jfql.core.script.Script;
 import de.jokergames.jfql.database.Database;
 import de.jokergames.jfql.database.DatabaseHandler;
 import de.jokergames.jfql.database.Table;
@@ -13,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * @author Janick
@@ -21,7 +23,7 @@ import java.util.Map;
 public class CreateCommand extends Command {
 
     public CreateCommand() {
-        super("CREATE", List.of("COMMAND", "DATABASE", "TABLE", "STRUCTURE", "INTO", "PRIMARY-KEY"));
+        super("CREATE", List.of("COMMAND", "SCRIPT", "DATABASE", "TABLE", "STRUCTURE", "INTO", "PRIMARY-KEY"));
     }
 
     @Override
@@ -153,6 +155,32 @@ public class CreateCommand extends Command {
                 JFQL.getInstance().getConsole().logInfo("Table '" + name + "' was created.");
                 dataBase.addTable(new Table(name, structure, primaryKey));
                 dataBaseHandler.saveDataBase(dataBase);
+                return true;
+            }
+
+            if (arguments.containsKey("SCRIPT")) {
+                String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
+
+                final Script script = new Script(name);
+                List<String> commands = new ArrayList<>();
+
+                JFQL.getInstance().getConsole().log("Script: \"" + name + "\" {");
+                System.out.print("... ");
+
+                final Scanner scanner = JFQL.getInstance().getConsole().getScanner();
+                {
+                    String scanned;
+
+                    while (!(scanned = scanner.nextLine()).equals("}")) {
+                        commands.add(scanned);
+                        System.out.print(": ");
+                    }
+                }
+                script.setCommands(commands);
+
+                JFQL.getInstance().getConsole().logInfo("Script '" + name + "' was created.");
+                JFQL.getInstance().getConsole().logInfo("To invoke this enter: 'INVOKE SCRIPT " + name + "'");
+                JFQL.getInstance().getScriptService().saveScript(script);
                 return true;
             }
 

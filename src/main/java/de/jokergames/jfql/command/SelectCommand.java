@@ -3,6 +3,8 @@ package de.jokergames.jfql.command;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
+import de.jokergames.jfql.core.script.Script;
+import de.jokergames.jfql.core.script.ScriptService;
 import de.jokergames.jfql.database.Column;
 import de.jokergames.jfql.database.Database;
 import de.jokergames.jfql.database.DatabaseHandler;
@@ -25,12 +27,13 @@ public class SelectCommand extends Command {
 
 
     public SelectCommand() {
-        super("SELECT", List.of("COMMAND", "WHERE", "FROM", "VALUE", "PRIMARY-KEY", "LIMIT", "SORT", "ORDER"));
+        super("SELECT", List.of("COMMAND", "SCRIPT", "WHERE", "FROM", "VALUE", "PRIMARY-KEY", "LIMIT", "SORT", "ORDER"));
     }
 
     @Override
     public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
         final DatabaseHandler dataBaseHandler = JFQL.getInstance().getDataBaseHandler();
+        final ScriptService scriptService = JFQL.getInstance().getScriptService();
 
         if (executor instanceof RemoteExecutor) {
             RemoteExecutor remote = (RemoteExecutor) executor;
@@ -250,6 +253,18 @@ public class SelectCommand extends Command {
 
             remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
         } else {
+            if (arguments.containsKey("SCRIPT")) {
+                String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
+
+                if (scriptService.getScript(name) == null) {
+                    JFQL.getInstance().getConsole().logError("Script '" + name + "' doesn't exists!");
+                    return true;
+                }
+
+                final Script script = scriptService.getScript(name);
+                JFQL.getInstance().getConsole().log(script.toString());
+                return true;
+            }
 
             if (arguments.containsKey("VALUE") && arguments.containsKey("FROM")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
