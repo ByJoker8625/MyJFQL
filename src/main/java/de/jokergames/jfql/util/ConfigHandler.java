@@ -21,7 +21,6 @@ public class ConfigHandler {
 
         if (!file.exists()) {
             file.mkdirs();
-            crt = true;
         }
 
         file = new File("module");
@@ -34,6 +33,13 @@ public class ConfigHandler {
 
         if (!file.exists()) {
             file.mkdir();
+        }
+
+        file = new File("script");
+
+        if (!file.exists()) {
+            file.mkdir();
+            crt = true;
         }
 
         file = new File("config.json");

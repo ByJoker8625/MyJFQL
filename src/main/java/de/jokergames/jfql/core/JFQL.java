@@ -3,8 +3,9 @@ package de.jokergames.jfql.core;
 import de.jokergames.jfql.command.*;
 import de.jokergames.jfql.core.lang.ConditionHelper;
 import de.jokergames.jfql.core.lang.Formatter;
+import de.jokergames.jfql.core.qs.QueryScript;
+import de.jokergames.jfql.core.qs.ScriptHandler;
 import de.jokergames.jfql.database.DBSession;
-import de.jokergames.jfql.database.Database;
 import de.jokergames.jfql.database.DatabaseHandler;
 import de.jokergames.jfql.event.ClientLoginEvent;
 import de.jokergames.jfql.event.CommandExecuteEvent;
@@ -22,6 +23,9 @@ import de.jokergames.jfql.util.Connection;
 import de.jokergames.jfql.util.Console;
 import de.jokergames.jfql.util.Downloader;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Janick
@@ -44,13 +48,14 @@ public final class JFQL {
     private final DBSession dbSession;
     private final ModuleHandler moduleHandler;
     private final EventService eventService;
+    private final ScriptHandler scriptHandler;
     private final ConditionHelper conditionHelper;
     private JavalinService javalinService;
 
     public JFQL() {
         instance = this;
 
-        this.version = "1.2.1";
+        this.version = "1.2.2-BETA";
         this.console = new Console();
         this.connection = new Connection();
         this.downloader = new Downloader(connection);
@@ -64,6 +69,7 @@ public final class JFQL {
         this.dataBaseHandler = new DatabaseHandler(configHandler.getFactory());
         this.configuration = configHandler.getConfig();
         this.userHandler = new UserHandler(configHandler.getFactory());
+        this.scriptHandler = new ScriptHandler();
     }
 
     public static JFQL getInstance() {
@@ -113,9 +119,6 @@ public final class JFQL {
         {
             if (userHandler.getUser("Console") == null)
                 userHandler.saveUser(new ConsoleUser());
-
-            if (configHandler.isCrt())
-                dataBaseHandler.saveDataBase(new Database("test"));
         }
 
         try {
@@ -137,7 +140,7 @@ public final class JFQL {
             commandService.registerCommand(new RemoveCommand());
 
             if (configuration.getBoolean("VirtualQueryScripts")) {
-                commandService.registerCommand(new VqsCommand());
+                commandService.registerCommand(new QSCommand());
             }
 
 
@@ -159,6 +162,21 @@ public final class JFQL {
             javalinService = new JavalinService();
         } catch (Exception ex) {
             throw new NetworkException("Can't start javalin server");
+        }
+
+        {
+            if (configHandler.isCrt()) {
+
+                {
+                    List<String> queries = new ArrayList<>();
+                    queries.add("create database test");
+                    queries.add("use database test");
+                    scriptHandler.saveQueryScript("default", queries);
+                }
+
+                final QueryScript script = new QueryScript(getConsoleUser(), false, false, scriptHandler.getQueryScript("default"));
+                scriptHandler.invokeScript(script);
+            }
         }
 
         console.clean();
@@ -223,6 +241,10 @@ public final class JFQL {
 
     public ConditionHelper getConditionHelper() {
         return conditionHelper;
+    }
+
+    public ScriptHandler getScriptHandler() {
+        return scriptHandler;
     }
 
     public EventService getEventService() {
