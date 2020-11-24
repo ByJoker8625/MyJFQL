@@ -43,7 +43,12 @@ public class ScriptService {
         else
             executor = new RemoteExecutor(UUID.randomUUID().toString(), null);
 
+        List<String> commands = new ArrayList<>();
+
         for (String command : script.getCommands())
+            if (!command.startsWith("#") && !command.startsWith("//")) commands.add(command);
+
+        for (String command : commands)
             JFQL.getInstance().getCommandService().execute(user, executor, JFQL.getInstance().getFormatter().formatCommand(command));
     }
 
