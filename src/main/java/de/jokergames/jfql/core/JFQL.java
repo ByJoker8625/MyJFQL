@@ -157,9 +157,11 @@ public final class JFQL {
         }
 
 
-        if (configHandler.isCrt()) {
-            scriptService.saveScript(new Script("create_default_db", "create database test", "use database test"));
-            scriptService.invokeScript("create_default_db", getConsoleUser(), false);
+        {
+            if (configHandler.isCrt()) {
+                scriptService.saveScript(new Script("create_default_db", "create database test", "use database test"));
+                scriptService.invokeScript("create_default_db", getConsoleUser(), false);
+            }
         }
 
         console.clean();

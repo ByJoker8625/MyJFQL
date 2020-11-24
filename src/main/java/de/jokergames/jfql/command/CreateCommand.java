@@ -23,7 +23,7 @@ import java.util.Scanner;
 public class CreateCommand extends Command {
 
     public CreateCommand() {
-        super("CREATE", List.of("COMMAND", "SCRIPT", "DATABASE", "TABLE", "STRUCTURE", "INTO", "PRIMARY-KEY"));
+        super("CREATE", List.of("COMMAND", "SCRIPT", "DATABASE", "TABLE", "STRUCTURE", "INTO", "PRIMARY-KEY", "SRC"));
     }
 
     @Override
@@ -101,6 +101,23 @@ public class CreateCommand extends Command {
                 return true;
             }
 
+            if (arguments.containsKey("SCRIPT") && arguments.containsKey("SRC")) {
+                String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
+                String src = JFQL.getInstance().getFormatter().formatString(arguments.get("SRC"));
+
+                if (!user.hasPermission("execute.create.script.*") && !user.hasPermission("execute.create.script." + name)) {
+                    return false;
+                }
+
+
+                final Script script = new Script(name);
+                script.formatCommands(src);
+
+                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
+                JFQL.getInstance().getScriptService().saveScript(script);
+                return true;
+            }
+
             remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
         } else {
             if (arguments.containsKey("DATABASE")) {
@@ -162,21 +179,25 @@ public class CreateCommand extends Command {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
 
                 final Script script = new Script(name);
-                List<String> commands = new ArrayList<>();
+                StringBuilder builder = new StringBuilder();
 
                 JFQL.getInstance().getConsole().log("Script: \"" + name + "\" {");
-                System.out.print("... ");
+                System.out.print(": ");
 
                 final Scanner scanner = JFQL.getInstance().getConsole().getScanner();
                 {
                     String scanned;
 
                     while (!(scanned = scanner.nextLine()).equals("}")) {
-                        commands.add(scanned);
+                        if (!scanned.endsWith(";")) {
+                            scanned += ";";
+                        }
+
+                        builder.append(scanned);
                         System.out.print(": ");
                     }
                 }
-                script.setCommands(commands);
+                script.formatCommands(builder.toString());
 
                 JFQL.getInstance().getConsole().logInfo("Script '" + name + "' was created.");
                 JFQL.getInstance().getConsole().logInfo("To invoke this enter: 'INVOKE SCRIPT " + name + "'");

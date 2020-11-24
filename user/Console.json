@@ -1,0 +1,12 @@
+{
+  "password": "ff0aa73e-857c-46d4-809c-1270547459e8",
+  "permissions": [
+    "*"
+  ],
+  "name": "Console",
+  "properties": [
+    "CONSOLE",
+    "NO_DELETE",
+    "NO_EDIT"
+  ]
+}

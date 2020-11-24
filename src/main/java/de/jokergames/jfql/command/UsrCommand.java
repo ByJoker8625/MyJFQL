@@ -12,7 +12,9 @@ import java.util.Map;
 
 /**
  * @author Janick
+ * @language This commands is not a JFQL query. It is only for the DBMS management.
  */
+
 
 public class UsrCommand extends Command {
 
@@ -60,6 +62,20 @@ public class UsrCommand extends Command {
             JFQL.getInstance().getConsole().logInfo("User '" + name + "' was deleted.");
             usr.getFile().delete();
             return true;
+        }
+
+        if (arguments.containsKey("DISPLAY")) {
+            String name = JFQL.getInstance().getFormatter().formatString(arguments.get("ADD"));
+
+            if (userHandler.getUser(name) == null) {
+                JFQL.getInstance().getConsole().logError("User '" + name + "' doesn't exists!");
+                return true;
+            }
+
+
+            final User usr = userHandler.getUser(name);
+
+            System.out.println(usr);
         }
 
         if (arguments.containsKey("ADD") && arguments.containsKey("PERMISSION")) {

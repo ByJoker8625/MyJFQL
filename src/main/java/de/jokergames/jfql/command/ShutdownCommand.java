@@ -10,6 +10,7 @@ import java.util.Map;
 
 /**
  * @author Janick
+ * @language This commands is not a JFQL query. It is only for the DBMS management.
  */
 
 public class ShutdownCommand extends Command {

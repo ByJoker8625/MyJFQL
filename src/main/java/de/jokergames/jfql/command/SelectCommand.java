@@ -42,6 +42,23 @@ public class SelectCommand extends Command {
                 return false;
             }
 
+            if (arguments.containsKey("SCRIPT")) {
+                String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
+
+
+                if (!user.hasPermission("execute.select.script.*") && !user.hasPermission("execute.select.script." + name)) {
+                    return false;
+                }
+                if (scriptService.getScript(name) == null) {
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Script doesn't exists!")));
+                    return true;
+                }
+
+                final Script script = scriptService.getScript(name);
+                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(script.getCommands(), List.of("Queries")));
+                return true;
+            }
+
             if (arguments.containsKey("VALUE") && arguments.containsKey("FROM")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
                 int limit = -1;

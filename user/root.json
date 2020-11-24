@@ -1,0 +1,8 @@
+{
+  "password": "pw",
+  "permissions": [
+    "*"
+  ],
+  "name": "root",
+  "properties": []
+}

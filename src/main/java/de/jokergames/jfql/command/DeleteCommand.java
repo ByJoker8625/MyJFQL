@@ -83,6 +83,23 @@ public class DeleteCommand extends Command {
                 return true;
             }
 
+            if (arguments.containsKey("SCRIPT")) {
+                String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
+
+                if (!user.hasPermission("execute.delete.script.*") && !user.hasPermission("execute.delete.script." + name)) {
+                    return false;
+                }
+
+                if (scriptService.getScript(name) == null) {
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Script doesn't exists!")));
+                    return true;
+                }
+
+                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
+                scriptService.getScript(name).getFile().delete();
+                return true;
+            }
+
             remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
         } else {
             if (arguments.containsKey("DATABASE")) {

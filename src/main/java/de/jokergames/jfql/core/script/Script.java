@@ -36,8 +36,20 @@ public class Script {
         this.commands = commands;
     }
 
+    public void formatCommands(String s) {
+        List<String> commands = new ArrayList<>();
+
+        s = s.replace("; ", ";");
+
+        for (String line : s.split(";")) {
+            commands.add(line);
+        }
+
+        setCommands(commands);
+    }
+
     public File getFile() {
-        return new File("script/" + name + ".jqs");
+        return new File("script/" + name + ".json");
     }
 
     @Override

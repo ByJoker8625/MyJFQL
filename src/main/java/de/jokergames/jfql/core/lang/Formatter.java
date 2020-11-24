@@ -89,6 +89,9 @@ public class Formatter {
     }
 
     public String formatString(List<String> strings) {
+        if (strings.size() == 0)
+            return null;
+
         String string = strings.get(0);
 
         for (int i = 1; i < strings.size(); i++) {
@@ -99,6 +102,9 @@ public class Formatter {
     }
 
     public int formatInteger(List<String> strings) {
+        if (strings.size() == 0)
+            return -1;
+
         String string = strings.get(0);
 
         for (int i = 1; i < strings.size(); i++) {
@@ -109,6 +115,9 @@ public class Formatter {
     }
 
     public double formatDouble(List<String> strings) {
+        if (strings.size() == 0)
+            return -1.0;
+
         String string = strings.get(0);
 
         for (int i = 1; i < strings.size(); i++) {
