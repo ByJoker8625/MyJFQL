@@ -19,7 +19,7 @@ import java.util.Map;
 public class UsrCommand extends Command {
 
     public UsrCommand() {
-        super("USR", List.of("COMMAND", "CREATE", "PASSWORD", "DELETE", "ADD", "REMOVE", "PERMISSION"));
+        super("USR", List.of("COMMAND", "CREATE", "PASSWORD", "DELETE", "ADD", "REMOVE", "PERMISSION"), List.of("USER"));
     }
 
     @Override

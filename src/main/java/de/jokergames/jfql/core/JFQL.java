@@ -10,6 +10,7 @@ import de.jokergames.jfql.database.DatabaseHandler;
 import de.jokergames.jfql.event.ClientLoginEvent;
 import de.jokergames.jfql.event.CommandExecuteEvent;
 import de.jokergames.jfql.event.EventService;
+import de.jokergames.jfql.event.InvokeScriptEvent;
 import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.exception.EventException;
 import de.jokergames.jfql.exception.ModuleException;
@@ -121,6 +122,7 @@ public final class JFQL {
         try {
             eventService.registerEvent(ClientLoginEvent.TYPE);
             eventService.registerEvent(CommandExecuteEvent.TYPE);
+            eventService.registerEvent(InvokeScriptEvent.TYPE);
         } catch (Exception ex) {
             throw new EventException("Can't load events!");
         }

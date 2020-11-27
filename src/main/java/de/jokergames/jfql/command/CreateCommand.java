@@ -10,7 +10,6 @@ import de.jokergames.jfql.database.Table;
 import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.user.User;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +22,7 @@ import java.util.Scanner;
 public class CreateCommand extends Command {
 
     public CreateCommand() {
-        super("CREATE", List.of("COMMAND", "SCRIPT", "DATABASE", "TABLE", "STRUCTURE", "INTO", "PRIMARY-KEY", "SRC"));
+        super("CREATE", List.of("COMMAND", "SCRIPT", "DATABASE", "TABLE", "STRUCTURE", "INTO", "PRIMARY-KEY", "SRC"), List.of("CRE"));
     }
 
     @Override
@@ -83,7 +82,7 @@ public class CreateCommand extends Command {
                 }
 
                 if (dataBaseHandler.getDataBase(base) == null) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new FileNotFoundException()));
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Database doesn't exists!")));
                     return true;
                 }
 
@@ -179,25 +178,30 @@ public class CreateCommand extends Command {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
 
                 final Script script = new Script(name);
-                StringBuilder builder = new StringBuilder();
 
-                JFQL.getInstance().getConsole().log("Script: \"" + name + "\" {");
-                System.out.print(": ");
+                if (arguments.containsKey("SRC")) {
+                    script.formatCommands(JFQL.getInstance().getFormatter().formatString(arguments.get("SRC")));
+                } else {
+                    StringBuilder builder = new StringBuilder();
 
-                final Scanner scanner = JFQL.getInstance().getConsole().getScanner();
-                {
-                    String scanned;
+                    JFQL.getInstance().getConsole().log("Script: \"" + name + "\" {");
+                    System.out.print(": ");
 
-                    while (!(scanned = scanner.nextLine()).equals("}")) {
-                        if (!scanned.endsWith(";")) {
-                            scanned += ";";
+                    final Scanner scanner = JFQL.getInstance().getConsole().getScanner();
+                    {
+                        String scanned;
+
+                        while (!(scanned = scanner.nextLine()).equals("}")) {
+                            if (!scanned.endsWith(";")) {
+                                scanned += ";";
+                            }
+
+                            builder.append(scanned);
+                            System.out.print(": ");
                         }
-
-                        builder.append(scanned);
-                        System.out.print(": ");
                     }
+                    script.formatCommands(builder.toString());
                 }
-                script.formatCommands(builder.toString());
 
                 JFQL.getInstance().getConsole().logInfo("Script '" + name + "' was created.");
                 JFQL.getInstance().getConsole().logInfo("To invoke this enter: 'INVOKE SCRIPT " + name + "'");

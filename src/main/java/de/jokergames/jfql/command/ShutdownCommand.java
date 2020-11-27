@@ -16,7 +16,7 @@ import java.util.Map;
 public class ShutdownCommand extends Command {
 
     public ShutdownCommand() {
-        super("SHUTDOWN", List.of("COMMAND"));
+        super("SHUTDOWN", List.of("COMMAND"), List.of("STOP"));
     }
 
     @Override

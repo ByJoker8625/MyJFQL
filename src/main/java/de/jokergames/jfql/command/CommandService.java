@@ -48,7 +48,7 @@ public class CommandService {
     }
 
     public Command getCommand(String s) {
-        return commands.stream().filter(command -> command.getName().equalsIgnoreCase(s)).findFirst().orElse(null);
+        return commands.stream().filter(command -> command.getName().equalsIgnoreCase(s) || command.getAliases().contains(s.toUpperCase())).findFirst().orElse(null);
     }
 
     public void execute(String command) {

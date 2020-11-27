@@ -4,6 +4,7 @@ import de.jokergames.jfql.command.executor.ConsoleExecutor;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
+import de.jokergames.jfql.event.InvokeScriptEvent;
 import de.jokergames.jfql.exception.FileException;
 import de.jokergames.jfql.user.User;
 import de.jokergames.jfql.util.FileFactory;
@@ -47,6 +48,8 @@ public class ScriptService {
 
         for (String command : script.getCommands())
             if (!command.startsWith("#") && !command.startsWith("//")) commands.add(command);
+
+        JFQL.getInstance().getEventService().callEvent(InvokeScriptEvent.TYPE, new InvokeScriptEvent(user, script));
 
         for (String command : commands)
             JFQL.getInstance().getCommandService().execute(user, executor, JFQL.getInstance().getFormatter().formatCommand(command));

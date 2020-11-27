@@ -21,7 +21,7 @@ import java.util.Map;
 public class RemoveCommand extends Command {
 
     public RemoveCommand() {
-        super("REMOVE", List.of("COMMAND", "WHERE", "FROM", "COLUMN"));
+        super("REMOVE", List.of("COMMAND", "WHERE", "FROM", "COLUMN"), List.of("REM"));
     }
 
 

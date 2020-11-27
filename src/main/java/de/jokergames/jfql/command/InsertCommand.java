@@ -22,7 +22,7 @@ import java.util.Map;
 public class InsertCommand extends Command {
 
     public InsertCommand() {
-        super("INSERT", List.of("COMMAND", "INTO", "WHERE", "KEY", "VALUE", "PRIMARY-KEY"));
+        super("INSERT", List.of("COMMAND", "INTO", "WHERE", "KEY", "VALUE", "PRIMARY-KEY"), List.of("INS"));
     }
 
     @Override
