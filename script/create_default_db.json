@@ -1,0 +1,7 @@
+{
+  "name": "create_default_db",
+  "commands": [
+    "create database test",
+    "use database test"
+  ]
+}

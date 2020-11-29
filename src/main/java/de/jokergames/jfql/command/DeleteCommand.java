@@ -34,6 +34,23 @@ public class DeleteCommand extends Command {
                 return false;
             }
 
+            if (arguments.containsKey("SCRIPT")) {
+                String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
+
+                if (!user.hasPermission("execute.delete.script.*") && !user.hasPermission("execute.delete.script." + name)) {
+                    return false;
+                }
+
+                if (scriptService.getScript(name) == null) {
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Script doesn't exists!")));
+                    return true;
+                }
+
+                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
+                scriptService.getScript(name).getFile().delete();
+                return true;
+            }
+
             if (arguments.containsKey("DATABASE")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("DATABASE"));
 
@@ -83,25 +100,21 @@ public class DeleteCommand extends Command {
                 return true;
             }
 
+            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
+        } else {
             if (arguments.containsKey("SCRIPT")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
 
-                if (!user.hasPermission("execute.delete.script.*") && !user.hasPermission("execute.delete.script." + name)) {
-                    return false;
-                }
-
                 if (scriptService.getScript(name) == null) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Script doesn't exists!")));
+                    JFQL.getInstance().getConsole().logError("Script '" + name + "' doesn't exists!");
                     return true;
                 }
 
-                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
+                JFQL.getInstance().getConsole().logInfo("Delete script '" + name + "'.");
                 scriptService.getScript(name).getFile().delete();
                 return true;
             }
 
-            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
-        } else {
             if (arguments.containsKey("DATABASE")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("DATABASE"));
 
@@ -140,19 +153,6 @@ public class DeleteCommand extends Command {
                 JFQL.getInstance().getConsole().logInfo("Table '" + name + "' was deleted.");
                 dataBase.removeTable(name);
                 dataBaseHandler.saveDataBase(dataBase);
-                return true;
-            }
-
-            if (arguments.containsKey("SCRIPT")) {
-                String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
-
-                if (scriptService.getScript(name) == null) {
-                    JFQL.getInstance().getConsole().logError("Script '" + name + "' doesn't exists!");
-                    return true;
-                }
-
-                JFQL.getInstance().getConsole().logInfo("Delete script '" + name + "'.");
-                scriptService.getScript(name).getFile().delete();
                 return true;
             }
 

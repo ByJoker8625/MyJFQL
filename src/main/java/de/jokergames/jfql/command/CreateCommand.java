@@ -36,6 +36,24 @@ public class CreateCommand extends Command {
                 return false;
             }
 
+            if (arguments.containsKey("SCRIPT") && arguments.containsKey("SRC")) {
+                String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
+                String src = JFQL.getInstance().getFormatter().formatString(arguments.get("SRC"));
+
+                if (!user.hasPermission("execute.create.script.*") && !user.hasPermission("execute.create.script." + name)) {
+                    return false;
+                }
+
+
+                final Script script = new Script(name);
+                script.formatCommands(src);
+
+                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
+                JFQL.getInstance().getScriptService().saveScript(script);
+                return true;
+            }
+
+
             if (arguments.containsKey("DATABASE")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("DATABASE"));
 
@@ -100,25 +118,44 @@ public class CreateCommand extends Command {
                 return true;
             }
 
-            if (arguments.containsKey("SCRIPT") && arguments.containsKey("SRC")) {
+
+            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
+        } else {
+            if (arguments.containsKey("SCRIPT")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
-                String src = JFQL.getInstance().getFormatter().formatString(arguments.get("SRC"));
-
-                if (!user.hasPermission("execute.create.script.*") && !user.hasPermission("execute.create.script." + name)) {
-                    return false;
-                }
-
 
                 final Script script = new Script(name);
-                script.formatCommands(src);
 
-                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
+                if (arguments.containsKey("SRC")) {
+                    script.formatCommands( JFQL.getInstance().getFormatter().formatString(arguments.get("SRC")));
+                } else {
+                    StringBuilder builder = new StringBuilder();
+
+                    JFQL.getInstance().getConsole().log("Script: \"" + name + "\" {");
+                    System.out.print(": ");
+
+                    final Scanner scanner = JFQL.getInstance().getConsole().getScanner();
+                    {
+                        String scanned;
+
+                        while (!(scanned = scanner.nextLine()).equals("}")) {
+                            if (!scanned.endsWith(";")) {
+                                scanned += ";";
+                            }
+
+                            builder.append(scanned);
+                            System.out.print(": ");
+                        }
+                    }
+                    script.formatCommands(builder.toString());
+                }
+
+                JFQL.getInstance().getConsole().logInfo("Script '" + name + "' was created.");
+                JFQL.getInstance().getConsole().logInfo("To invoke this enter: 'INVOKE SCRIPT " + name + "'");
                 JFQL.getInstance().getScriptService().saveScript(script);
                 return true;
             }
 
-            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
-        } else {
             if (arguments.containsKey("DATABASE")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("DATABASE"));
 
@@ -171,41 +208,6 @@ public class CreateCommand extends Command {
                 JFQL.getInstance().getConsole().logInfo("Table '" + name + "' was created.");
                 dataBase.addTable(new Table(name, structure, primaryKey));
                 dataBaseHandler.saveDataBase(dataBase);
-                return true;
-            }
-
-            if (arguments.containsKey("SCRIPT")) {
-                String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
-
-                final Script script = new Script(name);
-
-                if (arguments.containsKey("SRC")) {
-                    script.formatCommands(JFQL.getInstance().getFormatter().formatString(arguments.get("SRC")));
-                } else {
-                    StringBuilder builder = new StringBuilder();
-
-                    JFQL.getInstance().getConsole().log("Script: \"" + name + "\" {");
-                    System.out.print(": ");
-
-                    final Scanner scanner = JFQL.getInstance().getConsole().getScanner();
-                    {
-                        String scanned;
-
-                        while (!(scanned = scanner.nextLine()).equals("}")) {
-                            if (!scanned.endsWith(";")) {
-                                scanned += ";";
-                            }
-
-                            builder.append(scanned);
-                            System.out.print(": ");
-                        }
-                    }
-                    script.formatCommands(builder.toString());
-                }
-
-                JFQL.getInstance().getConsole().logInfo("Script '" + name + "' was created.");
-                JFQL.getInstance().getConsole().logInfo("To invoke this enter: 'INVOKE SCRIPT " + name + "'");
-                JFQL.getInstance().getScriptService().saveScript(script);
                 return true;
             }
 

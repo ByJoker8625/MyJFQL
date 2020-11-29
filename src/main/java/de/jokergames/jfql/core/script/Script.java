@@ -37,15 +37,7 @@ public class Script {
     }
 
     public void formatCommands(String s) {
-        List<String> commands = new ArrayList<>();
-
-        s = s.replace("; ", ";");
-
-        for (String line : s.split(";")) {
-            commands.add(line);
-        }
-
-        setCommands(commands);
+        setCommands(Arrays.asList(s.replace("; ", ";").split(";")));
     }
 
     public File getFile() {
