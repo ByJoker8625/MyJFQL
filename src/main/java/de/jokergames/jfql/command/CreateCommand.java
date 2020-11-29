@@ -127,7 +127,7 @@ public class CreateCommand extends Command {
                 final Script script = new Script(name);
 
                 if (arguments.containsKey("SRC")) {
-                    script.formatCommands( JFQL.getInstance().getFormatter().formatString(arguments.get("SRC")));
+                    script.formatCommands(JFQL.getInstance().getFormatter().formatString(arguments.get("SRC")));
                 } else {
                     StringBuilder builder = new StringBuilder();
 

@@ -19,7 +19,7 @@ import java.util.Map;
 public class UsrCommand extends Command {
 
     public UsrCommand() {
-        super("USR", List.of("COMMAND", "CREATE", "PASSWORD", "DELETE", "ADD", "REMOVE", "PERMISSION"), List.of("USER"));
+        super("USR", List.of("COMMAND", "CREATE", "PASSWORD", "DELETE", "ADD", "REMOVE", "DISPLAY", "PERMISSION"), List.of("USER"));
     }
 
     @Override
@@ -65,17 +65,16 @@ public class UsrCommand extends Command {
         }
 
         if (arguments.containsKey("DISPLAY")) {
-            String name = JFQL.getInstance().getFormatter().formatString(arguments.get("ADD"));
+            String name = JFQL.getInstance().getFormatter().formatString(arguments.get("DISPLAY"));
 
             if (userHandler.getUser(name) == null) {
                 JFQL.getInstance().getConsole().logError("User '" + name + "' doesn't exists!");
                 return true;
             }
 
-
             final User usr = userHandler.getUser(name);
-
-            System.out.println(usr);
+            JFQL.getInstance().getConsole().log(usr.toString());
+            return true;
         }
 
         if (arguments.containsKey("ADD") && arguments.containsKey("PERMISSION")) {
