@@ -1,10 +1,10 @@
 package de.jokergames.jfql.command;
 
+import de.jokergames.jfql.command.executor.ConsoleExecutor;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
 import de.jokergames.jfql.core.script.ScriptService;
-import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.user.User;
 import de.jokergames.jfql.user.UserHandler;
 
@@ -41,23 +41,24 @@ public class InvokeCommand extends Command {
                 }
 
                 if (scriptService.getScript(name) == null) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Script doesn't exists!")));
+                    remote.sendError("Script doesn't exists!");
                     return true;
                 }
 
-                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
+                remote.sendSuccess();
                 scriptService.invokeScript(name, user, false);
                 return true;
             }
 
-            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
+            remote.sendSyntax();
         } else {
+            ConsoleExecutor console = (ConsoleExecutor) executor;
 
             if (arguments.containsKey("SCRIPT")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
 
                 if (scriptService.getScript(name) == null) {
-                    JFQL.getInstance().getConsole().logError("Script '" + name + "' doesn't exists!");
+                    console.sendError("Script '" + name + "' doesn't exists!");
                     return true;
                 }
 
@@ -67,20 +68,20 @@ public class InvokeCommand extends Command {
                     String as = JFQL.getInstance().getFormatter().formatString(arguments.get("AS"));
 
                     if (userHandler.getUser(as) == null) {
-                        JFQL.getInstance().getConsole().logError("User '" + as + "' doesn't exists!");
+                        console.sendError("User '" + as + "' doesn't exists!");
                         return true;
                     }
 
                     usr = userHandler.getUser(as);
                 }
 
-                JFQL.getInstance().getConsole().logInfo("Invoking script '" + name + "'...");
+                console.sendInfo("Invoking script '" + name + "'...");
                 scriptService.invokeScript(name, usr, false);
-                JFQL.getInstance().getConsole().logInfo("Script successful executed.");
+                console.sendInfo("Script successful executed.");
                 return true;
             }
 
-            JFQL.getInstance().getConsole().logError("Unknown syntax!");
+            console.sendError("Unknown syntax!");
         }
 
         return true;

@@ -106,7 +106,7 @@ public final class JFQL {
             console.clean();
 
             if (!connection.isLatest()) {
-                if (configuration.getBoolean("AutoUpdate")) {
+                if (configuration.getBoolean("AutoUpdate") && !connection.latestIsBeta()) {
                     downloader.download();
                 } else {
                     console.logWarning("You aren't up to date. Please download the latest version.");
@@ -129,7 +129,8 @@ public final class JFQL {
 
         try {
             commandService.registerCommand(new ShutdownCommand());
-            commandService.registerCommand(new UsrCommand());
+            commandService.registerCommand(new UserCommand());
+            commandService.registerCommand(new VersionCommand());
             commandService.registerCommand(new ListCommand());
             commandService.registerCommand(new UseCommand());
             commandService.registerCommand(new InsertCommand());
@@ -158,9 +159,8 @@ public final class JFQL {
             throw new NetworkException("Can't start javalin server");
         }
 
-
         {
-            if (configHandler.isCrt()) {
+            if (configHandler.first()) {
                 scriptService.saveScript(new Script("create_default_db", "create database test", "use database test"));
                 scriptService.invokeScript("create_default_db", getConsoleUser(), false);
             }

@@ -1,5 +1,6 @@
 package de.jokergames.jfql.command;
 
+import de.jokergames.jfql.command.executor.ConsoleExecutor;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
@@ -7,7 +8,6 @@ import de.jokergames.jfql.database.Column;
 import de.jokergames.jfql.database.Database;
 import de.jokergames.jfql.database.DatabaseHandler;
 import de.jokergames.jfql.database.Table;
-import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.user.User;
 
 import java.util.ArrayList;
@@ -28,6 +28,7 @@ public class InsertCommand extends Command {
     @Override
     public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
         final DatabaseHandler dataBaseHandler = JFQL.getInstance().getDataBaseHandler();
+        final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
 
         if (executor instanceof RemoteExecutor) {
             RemoteExecutor remote = (RemoteExecutor) executor;
@@ -35,8 +36,6 @@ public class InsertCommand extends Command {
             if (!user.hasPermission("execute.insert")) {
                 return false;
             }
-
-            final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
 
             if (arguments.containsKey("INTO") && arguments.containsKey("KEY") && arguments.containsKey("VALUE")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("INTO"));
@@ -54,17 +53,17 @@ public class InsertCommand extends Command {
                 }
 
                 if (dataBase.getTable(name) == null) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Table doesn't exists!")));
+                    remote.sendError("Table doesn't exists!");
                     return true;
                 }
 
                 if (keys.isEmpty() || values.isEmpty()) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Keys or values are empty!")));
+                    remote.sendError("Keys or values are empty!");
                     return true;
                 }
 
                 if (keys.size() > values.size() || values.size() > keys.size()) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Enter suitable keys and values!")));
+                    remote.sendError("Enter suitable keys and values!");
                     return true;
                 }
 
@@ -90,7 +89,7 @@ public class InsertCommand extends Command {
                 }
 
                 if (contains) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown key!")));
+                    remote.sendError("Unknown key!");
                     return true;
                 }
 
@@ -122,19 +121,19 @@ public class InsertCommand extends Command {
                     dataBase.addTable(table);
                     dataBaseHandler.saveDataBase(dataBase);
 
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
+                    remote.sendSuccess();
                 } else if (arguments.containsKey("WHERE")) {
                     List<Column> columns = null;
 
                     try {
                         columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
                     } catch (Exception ex) {
-                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        remote.sendError("Unknown 'where' error!");
                         return true;
                     }
 
                     if (columns == null) {
-                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        remote.sendError("Unknown 'where' error!");
                         return true;
                     }
 
@@ -163,10 +162,10 @@ public class InsertCommand extends Command {
                     dataBase.addTable(table);
                     dataBaseHandler.saveDataBase(dataBase);
 
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
+                    remote.sendSuccess();
                 } else {
                     if (content.get(table.getPrimary()) == null) {
-                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown primary key!")));
+                        remote.sendError("Unknown primary key!");
                         return true;
                     }
 
@@ -196,15 +195,15 @@ public class InsertCommand extends Command {
                     dataBase.addTable(table);
                     dataBaseHandler.saveDataBase(dataBase);
 
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
+                    remote.sendSuccess();
                 }
 
                 return true;
             }
 
-            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
+            remote.sendSyntax();
         } else {
-            final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
+            ConsoleExecutor console = (ConsoleExecutor) executor;
 
             if (arguments.containsKey("INTO") && arguments.containsKey("KEY") && arguments.containsKey("VALUE")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("INTO"));
@@ -222,17 +221,17 @@ public class InsertCommand extends Command {
                 }
 
                 if (dataBase.getTable(name) == null) {
-                    JFQL.getInstance().getConsole().logError("Table '" + name + "' doesn't exists!");
+                    console.sendError("Table '" + name + "' doesn't exists!");
                     return true;
                 }
 
                 if (keys.isEmpty() || values.isEmpty()) {
-                    JFQL.getInstance().getConsole().logError("Please enter keys and values!");
+                    console.sendError("Please enter keys and values!");
                     return true;
                 }
 
                 if (keys.size() > values.size() || values.size() > keys.size()) {
-                    JFQL.getInstance().getConsole().logError("Please enter suitable keys and values!");
+                    console.sendError("Please enter suitable keys and values!");
                     return true;
                 }
 
@@ -254,7 +253,7 @@ public class InsertCommand extends Command {
                 }
 
                 if (contains) {
-                    JFQL.getInstance().getConsole().logError("Unknown key!");
+                    console.sendError("Unknown key!");
                     return true;
                 }
 
@@ -292,19 +291,19 @@ public class InsertCommand extends Command {
                     dataBase.addTable(table);
                     dataBaseHandler.saveDataBase(dataBase);
 
-                    JFQL.getInstance().getConsole().logInfo("Insert values into '" + name + "'.");
+                    console.sendInfo("Insert values into '" + name + "'.");
                 } else if (arguments.containsKey("WHERE")) {
                     List<Column> columns = null;
 
                     try {
                         columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
                     } catch (Exception ex) {
-                        JFQL.getInstance().getConsole().logError("Unknown error!");
+                        console.sendError("Unknown error!");
                         return true;
                     }
 
                     if (columns == null) {
-                        JFQL.getInstance().getConsole().logError("Unknown key!");
+                        console.sendError("Unknown key!");
                         return true;
                     }
 
@@ -333,10 +332,10 @@ public class InsertCommand extends Command {
                     dataBase.addTable(table);
                     dataBaseHandler.saveDataBase(dataBase);
 
-                    JFQL.getInstance().getConsole().logInfo("Insert values into '" + name + "'.");
+                    console.sendInfo("Insert values into '" + name + "'.");
                 } else {
                     if (content.get(table.getPrimary()) == null) {
-                        JFQL.getInstance().getConsole().logError("Unknown key!");
+                        console.sendError("Unknown key!");
                         return true;
                     }
 
@@ -373,13 +372,13 @@ public class InsertCommand extends Command {
                     dataBase.addTable(table);
                     dataBaseHandler.saveDataBase(dataBase);
 
-                    JFQL.getInstance().getConsole().logInfo("Insert values into '" + name + "'.");
+                    console.sendInfo("Insert values into '" + name + "'.");
                 }
 
                 return true;
             }
 
-            JFQL.getInstance().getConsole().logError("Unknown syntax!");
+            console.sendError("Unknown syntax!");
         }
 
         return true;

@@ -26,9 +26,9 @@ public class CommandService {
     public boolean execute(User user, Executor executor, Map<String, List<String>> arguments) {
         if (arguments == null) {
             if (executor instanceof RemoteExecutor) {
-                ((RemoteExecutor) executor).send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new NullPointerException()));
+                ((RemoteExecutor) executor).sendError("Command was not found!");
             } else {
-                JFQL.getInstance().getConsole().logError("Command was not found!");
+                ((ConsoleExecutor) executor).sendError("Command was not found!");
             }
 
             JFQL.getInstance().getEventService().callEvent(CommandExecuteEvent.TYPE, new CommandExecuteEvent(executor, user, null));

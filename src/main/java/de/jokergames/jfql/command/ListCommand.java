@@ -1,5 +1,6 @@
 package de.jokergames.jfql.command;
 
+import de.jokergames.jfql.command.executor.ConsoleExecutor;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
@@ -8,7 +9,6 @@ import de.jokergames.jfql.core.script.ScriptService;
 import de.jokergames.jfql.database.Database;
 import de.jokergames.jfql.database.DatabaseHandler;
 import de.jokergames.jfql.database.Table;
-import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.user.User;
 import de.jokergames.jfql.user.UserHandler;
 import de.jokergames.jfql.util.Sorter;
@@ -50,7 +50,7 @@ public class ListCommand extends Command {
                 limit = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LIMIT"));
 
                 if (limit <= -1) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Limit can't be smaller than 0!")));
+                    remote.sendError("Limit can't be smaller than 0!");
                     return true;
                 }
             }
@@ -60,7 +60,7 @@ public class ListCommand extends Command {
                 try {
                     order = Sorter.Order.valueOf(JFQL.getInstance().getFormatter().formatString(arguments.get("ORDER")).toUpperCase());
                 } catch (Exception ex) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown order type (DES, ASC)!")));
+                    remote.sendError("Unknown order type (DES, ASC)!");
                     return true;
                 }
 
@@ -77,7 +77,7 @@ public class ListCommand extends Command {
                     strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
                 }
 
-                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(sorter.sortList(strings, order), List.of("Databases")));
+                remote.sendAnswer(sorter.sortList(strings, order), List.of("Databases"));
                 return true;
             }
             if (arguments.containsKey("TABLES")) {
@@ -89,7 +89,7 @@ public class ListCommand extends Command {
                     String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
 
                     if (dataBaseHandler.getDataBase(name) == null) {
-                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Database doesn't exists!")));
+                        remote.sendError("Database doesn't exists!");
                         return true;
                     }
 
@@ -99,14 +99,14 @@ public class ListCommand extends Command {
                         strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
                     }
 
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(sorter.sortList(strings, order), List.of("Tables")));
+                    remote.sendAnswer(sorter.sortList(strings, order), List.of("Tables"));
                 } else {
                     List<String> strings = dataBaseHandler.getDataBases().stream().flatMap(dataBase -> dataBase.getTables().stream()).map(Table::getName).collect(Collectors.toList());
                     if (limit != -1) {
                         strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
                     }
 
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(sorter.sortList(strings, order), List.of("Tables")));
+                    remote.sendAnswer(sorter.sortList(strings, order), List.of("Tables"));
                 }
 
                 return true;
@@ -121,7 +121,7 @@ public class ListCommand extends Command {
                     strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
                 }
 
-                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(sorter.sortList(strings, order), List.of("Users")));
+                remote.sendAnswer(sorter.sortList(strings, order), List.of("Users"));
                 return true;
             }
             if (arguments.containsKey("SCRIPTS")) {
@@ -134,12 +134,14 @@ public class ListCommand extends Command {
                     strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
                 }
 
-                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(sorter.sortList(strings, order), List.of("Scripts")));
+                remote.sendAnswer(sorter.sortList(strings, order), List.of("Scripts"));
                 return true;
             }
 
-            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
+            remote.sendSyntax();
         } else {
+            ConsoleExecutor console = (ConsoleExecutor) executor;
+
             Sorter.Order order = Sorter.Order.ASC;
             int limit = -1;
 
@@ -147,7 +149,7 @@ public class ListCommand extends Command {
                 limit = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LIMIT"));
 
                 if (limit <= -1) {
-                    JFQL.getInstance().getConsole().logError("Limit can't be smaller than 0!");
+                    console.sendError("Limit can't be smaller than 0!");
                     return true;
                 }
             }
@@ -157,7 +159,7 @@ public class ListCommand extends Command {
                 try {
                     order = Sorter.Order.valueOf(JFQL.getInstance().getFormatter().formatString(arguments.get("ORDER")).toUpperCase());
                 } catch (Exception ex) {
-                    JFQL.getInstance().getConsole().logError("Unknown order! Orders: ASC, DEC");
+                    console.sendError("Unknown order! Orders: ASC, DEC");
                     return true;
                 }
 
@@ -186,7 +188,7 @@ public class ListCommand extends Command {
                     String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
 
                     if (dataBaseHandler.getDataBase(name) == null) {
-                        JFQL.getInstance().getConsole().logError("Database doesn't exists!");
+                        console.sendError("Database doesn't exists!");
                         return true;
                     }
 
@@ -245,7 +247,8 @@ public class ListCommand extends Command {
                 return true;
             }
 
-            JFQL.getInstance().getConsole().logError("Unknown syntax!");
+            console.sendError("Unknown syntax!");
+
         }
 
         return true;

@@ -1,10 +1,10 @@
 package de.jokergames.jfql.command;
 
+import de.jokergames.jfql.command.executor.ConsoleExecutor;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
 import de.jokergames.jfql.database.DatabaseHandler;
-import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.user.User;
 
 import java.util.List;
@@ -39,32 +39,35 @@ public class UseCommand extends Command {
                 }
 
                 if (dataBaseHandler.getDataBase(name) == null) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Database doesn't exists!")));
+                    remote.sendError("Database doesn't exists!");
                     return true;
                 }
 
                 JFQL.getInstance().getDbSession().put(user.getName(), name);
-                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
+                remote.sendSuccess();
                 return true;
             }
 
-            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
+            remote.sendSyntax();
         } else {
+            ConsoleExecutor console = (ConsoleExecutor) executor;
+
             if (arguments.containsKey("DATABASE")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("DATABASE"));
 
                 if (dataBaseHandler.getDataBase(name) == null) {
-                    JFQL.getInstance().getConsole().logError("Database '" + name + "' doesn't exists!");
+                    console.sendError("Database '" + name + "' doesn't exists!");
                     return true;
                 }
 
                 JFQL.getInstance().getDbSession().put(user.getName(), name);
-                JFQL.getInstance().getConsole().logError("Change database to '" + name + "'.");
+                console.sendInfo("Change database to '" + name + "'.");
                 return true;
             }
 
-            JFQL.getInstance().getConsole().logError("Unknown syntax!");
+            console.sendError("Unknown syntax!");
         }
+
 
         return true;
     }

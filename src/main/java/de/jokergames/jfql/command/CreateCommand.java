@@ -1,5 +1,6 @@
 package de.jokergames.jfql.command;
 
+import de.jokergames.jfql.command.executor.ConsoleExecutor;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
@@ -7,7 +8,6 @@ import de.jokergames.jfql.core.script.Script;
 import de.jokergames.jfql.database.Database;
 import de.jokergames.jfql.database.DatabaseHandler;
 import de.jokergames.jfql.database.Table;
-import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.user.User;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class CreateCommand extends Command {
                 final Script script = new Script(name);
                 script.formatCommands(src);
 
-                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
+                remote.sendSuccess();
                 JFQL.getInstance().getScriptService().saveScript(script);
                 return true;
             }
@@ -62,12 +62,12 @@ public class CreateCommand extends Command {
                 }
 
                 if (dataBaseHandler.getDataBase(name) != null) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Database already exists!")));
+                    remote.sendError("Database already exists!");
                     return true;
                 }
 
                 dataBaseHandler.saveDataBase(new Database(name));
-                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
+                remote.sendSuccess();
                 return true;
             }
 
@@ -100,27 +100,29 @@ public class CreateCommand extends Command {
                 }
 
                 if (dataBaseHandler.getDataBase(base) == null) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Database doesn't exists!")));
+                    remote.sendError("Database doesn't exists!");
                     return true;
                 }
 
                 final Database dataBase = dataBaseHandler.getDataBase(base);
 
                 if (dataBase.getTable(name) != null) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Table already exists!")));
+                    remote.sendError("Table already exists!");
                     return true;
                 }
 
 
-                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSuccess());
+                remote.sendSuccess();
                 dataBase.addTable(new Table(name, structure, primaryKey));
                 dataBaseHandler.saveDataBase(dataBase);
                 return true;
             }
 
 
-            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
+            remote.sendSyntax();
         } else {
+            ConsoleExecutor console = (ConsoleExecutor) executor;
+
             if (arguments.containsKey("SCRIPT")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
 
@@ -150,8 +152,8 @@ public class CreateCommand extends Command {
                     script.formatCommands(builder.toString());
                 }
 
-                JFQL.getInstance().getConsole().logInfo("Script '" + name + "' was created.");
-                JFQL.getInstance().getConsole().logInfo("To invoke this enter: 'INVOKE SCRIPT " + name + "'");
+                console.sendInfo("Script '" + name + "' was created.");
+                console.sendInfo("To invoke this enter: 'INVOKE SCRIPT " + name + "'");
                 JFQL.getInstance().getScriptService().saveScript(script);
                 return true;
             }
@@ -160,12 +162,12 @@ public class CreateCommand extends Command {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("DATABASE"));
 
                 if (dataBaseHandler.getDataBase(name) != null) {
-                    JFQL.getInstance().getConsole().logError("Database '" + name + "' was not found!");
+                    console.sendError("Database '" + name + "' was not found!");
                     return true;
                 }
 
                 dataBaseHandler.saveDataBase(new Database(name));
-                JFQL.getInstance().getConsole().logInfo("Database '" + name + "' was created.");
+                console.sendInfo("Database '" + name + "' was created.");
                 return true;
             }
 
@@ -193,25 +195,25 @@ public class CreateCommand extends Command {
                 }
 
                 if (dataBaseHandler.getDataBase(base) == null) {
-                    JFQL.getInstance().getConsole().logError("Database '" + name + "' was not found!");
+                    console.sendError("Database '" + name + "' was not found!");
                     return true;
                 }
 
                 final Database dataBase = dataBaseHandler.getDataBase(base);
 
                 if (dataBase.getTable(name) != null) {
-                    JFQL.getInstance().getConsole().logError("Table '" + name + "' already exists!");
+                    console.sendError("Table '" + name + "' already exists!");
                     return true;
                 }
 
 
-                JFQL.getInstance().getConsole().logInfo("Table '" + name + "' was created.");
+                console.sendInfo("Table '" + name + "' was created.");
                 dataBase.addTable(new Table(name, structure, primaryKey));
                 dataBaseHandler.saveDataBase(dataBase);
                 return true;
             }
 
-            JFQL.getInstance().getConsole().logError("Unknown syntax!");
+            console.sendError("Unknown syntax!");
         }
 
         return true;

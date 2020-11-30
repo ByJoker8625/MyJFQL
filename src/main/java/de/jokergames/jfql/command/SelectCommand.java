@@ -1,5 +1,6 @@
 package de.jokergames.jfql.command;
 
+import de.jokergames.jfql.command.executor.ConsoleExecutor;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
@@ -9,12 +10,10 @@ import de.jokergames.jfql.database.Column;
 import de.jokergames.jfql.database.Database;
 import de.jokergames.jfql.database.DatabaseHandler;
 import de.jokergames.jfql.database.Table;
-import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.user.User;
 import de.jokergames.jfql.util.Sorter;
 import de.jokergames.jfql.util.TablePrinter;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,12 +49,12 @@ public class SelectCommand extends Command {
                     return false;
                 }
                 if (scriptService.getScript(name) == null) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Script doesn't exists!")));
+                    remote.sendError("Script doesn't exists!");
                     return true;
                 }
 
                 final Script script = scriptService.getScript(name);
-                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(script.getCommands(), List.of("Queries")));
+                remote.sendAnswer(script.getCommands(), List.of("Queries"));
                 return true;
             }
 
@@ -71,7 +70,7 @@ public class SelectCommand extends Command {
                     limit = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LIMIT"));
 
                     if (limit <= -1) {
-                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Limit can't be smaller than 0!")));
+                        remote.sendError("Limit can't be smaller than 0!");
                         return true;
                     }
                 }
@@ -79,7 +78,7 @@ public class SelectCommand extends Command {
                 final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
 
                 if (dataBase.getTable(name) == null) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Database doesn't exists!")));
+                    remote.sendError("Database doesn't exists!");
                     return true;
                 }
 
@@ -89,7 +88,7 @@ public class SelectCommand extends Command {
                     sorter = JFQL.getInstance().getFormatter().formatString(arguments.get("SORT"));
 
                     if (!table.getStructure().contains(sorter)) {
-                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown key to sort!")));
+                        remote.sendError("Unknown key to sort!");
                         return true;
                     }
 
@@ -97,7 +96,7 @@ public class SelectCommand extends Command {
                 }
 
                 if (arguments.containsKey("ORDER") && !arguments.containsKey("SORT")) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Enter a column to be sorted!")));
+                    remote.sendError("Enter a column to be sorted!");
                     return true;
                 }
 
@@ -106,7 +105,7 @@ public class SelectCommand extends Command {
                     try {
                         order = Sorter.Order.valueOf(JFQL.getInstance().getFormatter().formatString(arguments.get("ORDER")).toUpperCase());
                     } catch (Exception ex) {
-                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown order type (DES, ASC)!")));
+                        remote.sendError("Unknown order type (DES, ASC)!");
                         return true;
                     }
 
@@ -128,13 +127,13 @@ public class SelectCommand extends Command {
                 }
 
                 if (values.isEmpty()) {
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("No values to select!")));
+                    remote.sendError("No values to select!");
                     return true;
                 }
 
                 for (String var : values) {
                     if (!table.getStructure().contains(var)) {
-                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown key!")));
+                        remote.sendError("Unknown key!");
                         return true;
                     }
                 }
@@ -143,7 +142,7 @@ public class SelectCommand extends Command {
                     Column column = table.getColumn(JFQL.getInstance().getFormatter().formatString(arguments.get("PRIMARY-KEY")));
 
                     if (column == null) {
-                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new FileNotFoundException()));
+                        remote.sendError("Column was not found!");
                         return true;
                     }
 
@@ -171,7 +170,7 @@ public class SelectCommand extends Command {
                         columns.add(column);
                     }
 
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(columns, table.getStructure()));
+                    remote.sendAnswer(columns, table.getStructure());
                 } else if (arguments.containsKey("WHERE")) {
                     List<String> list;
 
@@ -196,12 +195,12 @@ public class SelectCommand extends Command {
                     try {
                         columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"), sort, sorter, order);
                     } catch (Exception ex) {
-                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        remote.sendError("Unknown 'where' error!");
                         return true;
                     }
 
                     if (columns == null) {
-                        remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown 'where' error!")));
+                        remote.sendError("Unknown 'where' error!");
                         return true;
                     }
 
@@ -223,7 +222,7 @@ public class SelectCommand extends Command {
                         columns = new ArrayList<>(list1);
                     }
 
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(columns, structure));
+                    remote.sendAnswer(columns, structure);
                 } else {
                     List<String> list;
 
@@ -262,19 +261,21 @@ public class SelectCommand extends Command {
                         columns = new ArrayList<>(list1);
                     }
 
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(columns, structure));
+                    remote.sendAnswer(columns, structure);
                 }
 
                 return true;
             }
 
-            remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
+            remote.sendSyntax();
         } else {
+            ConsoleExecutor console = (ConsoleExecutor) executor;
+
             if (arguments.containsKey("SCRIPT")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
 
                 if (scriptService.getScript(name) == null) {
-                    JFQL.getInstance().getConsole().logError("Script '" + name + "' doesn't exists!");
+                    console.sendError("Script '" + name + "' doesn't exists!");
                     return true;
                 }
 
@@ -295,7 +296,7 @@ public class SelectCommand extends Command {
                     limit = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LIMIT"));
 
                     if (limit <= -1) {
-                        JFQL.getInstance().getConsole().logError("Limit can't be smaller than 0!");
+                        console.sendError("Limit can't be smaller than 0!");
                         return true;
                     }
                 }
@@ -304,7 +305,7 @@ public class SelectCommand extends Command {
                 final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
 
                 if (dataBase.getTable(name) == null) {
-                    JFQL.getInstance().getConsole().logError("Table '" + name + "' doesn't exists!");
+                    console.sendError("Table '" + name + "' doesn't exists!");
                     return true;
                 }
 
@@ -314,7 +315,7 @@ public class SelectCommand extends Command {
                     sorter = JFQL.getInstance().getFormatter().formatString(arguments.get("SORT"));
 
                     if (!table.getStructure().contains(sorter)) {
-                        JFQL.getInstance().getConsole().logError("Unknown key to sort!");
+                        console.sendError("Unknown key to sort!");
                         return true;
                     }
 
@@ -322,7 +323,7 @@ public class SelectCommand extends Command {
                 }
 
                 if (arguments.containsKey("ORDER") && !arguments.containsKey("SORT")) {
-                    JFQL.getInstance().getConsole().logError("Enter a column to be sorted!");
+                    console.sendError("Enter a column to be sorted!");
                     return true;
                 }
 
@@ -331,7 +332,7 @@ public class SelectCommand extends Command {
                     try {
                         order = Sorter.Order.valueOf(JFQL.getInstance().getFormatter().formatString(arguments.get("ORDER")).toUpperCase());
                     } catch (Exception ex) {
-                        JFQL.getInstance().getConsole().logError("Unknown order! Orders: ASC, DEC");
+                        console.sendError("Unknown order! Orders: ASC, DEC");
                         return true;
                     }
 
@@ -349,14 +350,14 @@ public class SelectCommand extends Command {
                 }
 
                 if (values.isEmpty()) {
-                    JFQL.getInstance().getConsole().logError("Please enter values to select!");
+                    console.sendError("Please enter values to select!");
                     return true;
                 }
 
 
                 for (String var : values) {
                     if (!table.getStructure().contains(var)) {
-                        JFQL.getInstance().getConsole().logError("Unknown key!");
+                        console.sendError("Unknown key!");
                         return true;
                     }
                 }
@@ -365,7 +366,7 @@ public class SelectCommand extends Command {
                     Column column = table.getColumn(JFQL.getInstance().getFormatter().formatString(arguments.get("PRIMARY-KEY")));
 
                     if (column == null) {
-                        JFQL.getInstance().getConsole().logError("Unknown primary key!");
+                        console.sendError("Unknown primary key!");
                         return true;
                     }
 
@@ -431,12 +432,12 @@ public class SelectCommand extends Command {
                     try {
                         columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"), sort, sorter, order);
                     } catch (Exception ex) {
-                        JFQL.getInstance().getConsole().logError("Unknown error!");
+                        console.sendError("Unknown error!");
                         return true;
                     }
 
                     if (columns == null) {
-                        JFQL.getInstance().getConsole().logError("Unknown key!");
+                        console.sendError("Unknown key!");
                         return true;
                     }
 
@@ -538,7 +539,7 @@ public class SelectCommand extends Command {
                 return true;
             }
 
-            JFQL.getInstance().getConsole().logError("Unknown syntax!");
+            console.sendError("Unknown syntax!");
         }
 
         return false;

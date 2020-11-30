@@ -5,7 +5,6 @@ import de.jokergames.jfql.core.JFQL;
 import de.jokergames.jfql.event.ClientLoginEvent;
 import de.jokergames.jfql.jvl.util.Method;
 import de.jokergames.jfql.jvl.util.RequestReader;
-import de.jokergames.jfql.jvl.util.ResponseBuilder;
 import de.jokergames.jfql.user.User;
 import de.jokergames.jfql.user.UserHandler;
 import io.javalin.http.Context;
@@ -20,7 +19,6 @@ public class QueryController implements Controller {
     @ControllerDeclarer(path = "/query", method = Method.POST)
     public void handleQuery(Context context) throws Exception {
         final UserHandler userHandler = JFQL.getInstance().getUserHandler();
-        final ResponseBuilder builder = JFQL.getInstance().getJavalinService().getResponseBuilder();
 
         final JSONObject jsonObject = new RequestReader(context.req).jsonRequest();
         final RemoteExecutor executor = new RemoteExecutor(context.req.getRemoteAddr(), context);
@@ -33,7 +31,7 @@ public class QueryController implements Controller {
 
                 if (userHandler.getUser(auth.getString("user")) == null) {
                     JFQL.getInstance().getEventService().callEvent(ClientLoginEvent.TYPE, new ClientLoginEvent(executor, false));
-                    executor.send(builder.buildForbidden());
+                    executor.sendForbidden();
                     return;
                 }
 
@@ -41,20 +39,20 @@ public class QueryController implements Controller {
 
                 if (user.is(User.Property.CONSOLE)) {
                     JFQL.getInstance().getEventService().callEvent(ClientLoginEvent.TYPE, new ClientLoginEvent(executor, false));
-                    executor.send(builder.buildForbidden());
+                    executor.sendForbidden();
                     return;
                 }
 
                 if (!user.getPassword().equals(auth.getString("password"))) {
                     JFQL.getInstance().getEventService().callEvent(ClientLoginEvent.TYPE, new ClientLoginEvent(executor, false));
-                    executor.send(builder.buildForbidden());
+                    executor.sendForbidden();
                     return;
                 }
 
             }
 
             if (jsonObject.getString("query").equals("#connect")) {
-                executor.sendError(200);
+                executor.status(200);
                 return;
             }
 
@@ -64,11 +62,11 @@ public class QueryController implements Controller {
             boolean exec = JFQL.getInstance().getCommandService().execute(user, executor, JFQL.getInstance().getFormatter().formatCommand(jsonObject.getString("query")));
 
             if (!exec) {
-                executor.send(builder.buildForbidden());
+                executor.sendForbidden();
             }
 
         } catch (Exception ex) {
-            executor.send(builder.buildBadMethod(ex));
+            executor.sendError(ex);
         }
     }
 

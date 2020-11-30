@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 
 public class Connection {
 
-    private JSONObject response;
+    private JSONObject jsonObject;
 
     public void connect(String url) throws Exception {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new URL(url).openStream(), StandardCharsets.UTF_8));
@@ -26,31 +26,35 @@ public class Connection {
             stringBuilder.append((char) i);
         }
 
-        this.response = new JSONObject(stringBuilder.toString());
+        this.jsonObject = new JSONObject(stringBuilder.toString());
+    }
+
+    public boolean latestIsBeta() {
+        return jsonObject.getString("Version").endsWith("-BETA") || jsonObject.getString("Version").endsWith("-SNAPSHOT");
     }
 
     public boolean isLatest() {
-        if (response == null)
+        if (jsonObject == null)
             return true;
 
-        return response.getString("Version").equals(JFQL.getInstance().getVersion());
+        return jsonObject.getString("Version").equals(JFQL.getInstance().getVersion());
     }
 
     public boolean isMaintenance() {
-        if (response == null)
+        if (jsonObject == null)
             return false;
 
-        return response.getBoolean("Maintenance");
+        return jsonObject.getBoolean("Maintenance");
     }
 
     public String getDownload() {
-        if (response == null)
+        if (jsonObject == null)
             return null;
 
-        return response.getString("Download");
+        return jsonObject.getString("Download");
     }
 
     public JSONObject getResponse() {
-        return response;
+        return jsonObject;
     }
 }

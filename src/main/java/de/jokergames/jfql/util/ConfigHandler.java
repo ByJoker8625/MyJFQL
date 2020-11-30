@@ -12,7 +12,7 @@ public class ConfigHandler {
 
     private final FileFactory factory;
     private final JSONObject configuration;
-    private boolean crt = false;
+    private boolean first = false;
 
 
     public ConfigHandler() {
@@ -39,7 +39,7 @@ public class ConfigHandler {
 
         if (!file.exists()) {
             file.mkdir();
-            crt = true;
+            first = true;
         }
 
         file = new File("config.json");
@@ -70,8 +70,8 @@ public class ConfigHandler {
         return configuration;
     }
 
-    public boolean isCrt() {
-        return crt;
+    public boolean first() {
+        return first;
     }
 
     public FileFactory getFactory() {

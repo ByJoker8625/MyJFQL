@@ -16,10 +16,10 @@ import java.util.Map;
  */
 
 
-public class UsrCommand extends Command {
+public class UserCommand extends Command {
 
-    public UsrCommand() {
-        super("USR", List.of("COMMAND", "CREATE", "PASSWORD", "DELETE", "ADD", "REMOVE", "DISPLAY", "PERMISSION"), List.of("USER"));
+    public UserCommand() {
+        super("USER", List.of("COMMAND", "CREATE", "PASSWORD", "DELETE", "ADD", "REMOVE", "DISPLAY", "PERMISSION"), List.of("USR"));
     }
 
     @Override
