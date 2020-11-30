@@ -11,7 +11,7 @@ import de.jokergames.jfql.database.DatabaseHandler;
 import de.jokergames.jfql.database.Table;
 import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.user.User;
-import de.jokergames.jfql.util.ColumnSorter;
+import de.jokergames.jfql.util.Sorter;
 import de.jokergames.jfql.util.TablePrinter;
 
 import java.io.FileNotFoundException;
@@ -63,8 +63,8 @@ public class SelectCommand extends Command {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
                 int limit = -1;
 
-                ColumnSorter.Type sort = ColumnSorter.Type.CREATION;
-                ColumnSorter.Order order = ColumnSorter.Order.ASC;
+                Sorter.Type sort = Sorter.Type.CREATION;
+                Sorter.Order order = Sorter.Order.ASC;
                 String sorter = null;
 
                 if (arguments.containsKey("LIMIT")) {
@@ -93,7 +93,7 @@ public class SelectCommand extends Command {
                         return true;
                     }
 
-                    sort = ColumnSorter.Type.CUSTOM;
+                    sort = Sorter.Type.CUSTOM;
                 }
 
                 if (arguments.containsKey("ORDER") && !arguments.containsKey("SORT")) {
@@ -104,7 +104,7 @@ public class SelectCommand extends Command {
                 if (arguments.containsKey("ORDER")) {
 
                     try {
-                        order = ColumnSorter.Order.valueOf(JFQL.getInstance().getFormatter().formatString(arguments.get("ORDER")).toUpperCase());
+                        order = Sorter.Order.valueOf(JFQL.getInstance().getFormatter().formatString(arguments.get("ORDER")).toUpperCase());
                     } catch (Exception ex) {
                         remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown order type (DES, ASC)!")));
                         return true;
@@ -287,8 +287,8 @@ public class SelectCommand extends Command {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
                 int limit = -1;
 
-                ColumnSorter.Type sort = ColumnSorter.Type.CREATION;
-                ColumnSorter.Order order = ColumnSorter.Order.ASC;
+                Sorter.Type sort = Sorter.Type.CREATION;
+                Sorter.Order order = Sorter.Order.ASC;
                 String sorter = null;
 
                 if (arguments.containsKey("LIMIT")) {
@@ -318,7 +318,7 @@ public class SelectCommand extends Command {
                         return true;
                     }
 
-                    sort = ColumnSorter.Type.CUSTOM;
+                    sort = Sorter.Type.CUSTOM;
                 }
 
                 if (arguments.containsKey("ORDER") && !arguments.containsKey("SORT")) {
@@ -329,7 +329,7 @@ public class SelectCommand extends Command {
                 if (arguments.containsKey("ORDER")) {
 
                     try {
-                        order = ColumnSorter.Order.valueOf(JFQL.getInstance().getFormatter().formatString(arguments.get("ORDER")).toUpperCase());
+                        order = Sorter.Order.valueOf(JFQL.getInstance().getFormatter().formatString(arguments.get("ORDER")).toUpperCase());
                     } catch (Exception ex) {
                         JFQL.getInstance().getConsole().logError("Unknown order! Orders: ASC, DEC");
                         return true;

@@ -53,7 +53,7 @@ public final class JFQL {
     public JFQL() {
         instance = this;
 
-        this.version = "1.2.3-BETA";
+        this.version = "1.2.3";
         this.console = new Console();
         this.connection = new Connection();
         this.downloader = new Downloader(connection);

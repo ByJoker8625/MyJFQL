@@ -10,16 +10,16 @@ import java.util.List;
  * @author Janick
  */
 
-public class ColumnSorter {
+public class Sorter {
 
-    public List<Column> sort(String key, List<Column> columns, Order order) {
+    public List<Column> sortColumns(String key, List<Column> columns, Order order) {
         final List<Column> list = new ArrayList<>();
 
         List<Column> numbers = new ArrayList<>();
         List<Column> letters = new ArrayList<>();
         List<Column> unknowns = new ArrayList<>();
 
-        for (Column column : sort(columns)) {
+        for (Column column : sortColumns(columns)) {
 
             if (column.getContent(key) == null) {
                 unknowns.add(column);
@@ -56,7 +56,50 @@ public class ColumnSorter {
         return list;
     }
 
-    public List<Column> sort(List<Column> columns) {
+    public List<String> sortList(List<String> strings, Order order) {
+        final List<String> list = new ArrayList<>();
+
+        List<String> numbers = new ArrayList<>();
+        List<String> letters = new ArrayList<>();
+        List<String> unknowns = new ArrayList<>();
+
+        for (String s : strings) {
+
+            if (s == null) {
+                unknowns.add("null");
+            } else {
+                boolean number = true;
+
+                try {
+                    Integer.parseInt(s);
+                } catch (Exception ex) {
+                    number = false;
+                }
+
+                if (number) {
+                    numbers.add(s);
+                } else {
+                    letters.add(s);
+                }
+            }
+        }
+
+        if (order == Order.ASC) {
+            numbers.sort(Comparator.comparingInt(Integer::parseInt));
+            letters.sort((o1, o2) -> String.valueOf(o1).compareTo(o2));
+        } else if (order == Order.DEC) {
+            numbers.sort((o1, o2) -> -Integer.compare(Integer.parseInt(o1), Integer.parseInt(o2)));
+            letters.sort((o1, o2) -> -String.valueOf(o1).compareTo(o2));
+        }
+
+        list.addAll(numbers);
+        list.addAll(letters);
+        list.addAll(unknowns);
+
+        return list;
+    }
+
+    public List<Column> sortColumns(List<Column> columns) {
         List<Column> list = new ArrayList<>(columns);
         list.sort(Comparator.comparingLong(Column::getCreation));
         return list;

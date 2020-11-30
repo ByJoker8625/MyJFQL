@@ -1,6 +1,6 @@
 package de.jokergames.jfql.database;
 
-import de.jokergames.jfql.util.ColumnSorter;
+import de.jokergames.jfql.util.Sorter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,19 +57,19 @@ public class Table {
     }
 
     public List<Column> getColumns() {
-        return getColumns(ColumnSorter.Type.CREATION, ColumnSorter.Order.ASC);
+        return getColumns(Sorter.Type.CREATION, Sorter.Order.ASC);
     }
 
     public void setColumns(List<Column> columns) {
         this.columns = columns;
     }
 
-    public List<Column> getColumns(ColumnSorter.Type type, ColumnSorter.Order order, String... strings) {
+    public List<Column> getColumns(Sorter.Type type, Sorter.Order order, String... strings) {
         switch (type) {
             case CREATION:
-                return new ColumnSorter().sort(columns);
+                return new Sorter().sortColumns(columns);
             case CUSTOM:
-                return new ColumnSorter().sort(strings[0], columns, order);
+                return new Sorter().sortColumns(strings[0], columns, order);
         }
 
         return columns;

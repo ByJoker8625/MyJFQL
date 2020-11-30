@@ -11,11 +11,13 @@ import de.jokergames.jfql.database.Table;
 import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.user.User;
 import de.jokergames.jfql.user.UserHandler;
+import de.jokergames.jfql.util.Sorter;
 import de.jokergames.jfql.util.TablePrinter;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author Janick
@@ -24,7 +26,7 @@ import java.util.stream.Collectors;
 public class ListCommand extends Command {
 
     public ListCommand() {
-        super("LIST", List.of("COMMAND", "DATABASES", "TABLES", "USERS", "FROM", "SCRIPTS"));
+        super("LIST", List.of("COMMAND", "LIMIT", "ORDER", "DATABASES", "TABLES", "USERS", "FROM", "SCRIPTS"));
     }
 
     @Override
@@ -32,6 +34,7 @@ public class ListCommand extends Command {
         final DatabaseHandler dataBaseHandler = JFQL.getInstance().getDataBaseHandler();
         final UserHandler userHandler = JFQL.getInstance().getUserHandler();
         final ScriptService scriptService = JFQL.getInstance().getScriptService();
+        final Sorter sorter = new Sorter();
 
         if (executor instanceof RemoteExecutor) {
             RemoteExecutor remote = (RemoteExecutor) executor;
@@ -40,13 +43,41 @@ public class ListCommand extends Command {
                 return false;
             }
 
+            Sorter.Order order = Sorter.Order.ASC;
+            int limit = -1;
+
+            if (arguments.containsKey("LIMIT")) {
+                limit = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LIMIT"));
+
+                if (limit <= -1) {
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Limit can't be smaller than 0!")));
+                    return true;
+                }
+            }
+
+            if (arguments.containsKey("ORDER")) {
+
+                try {
+                    order = Sorter.Order.valueOf(JFQL.getInstance().getFormatter().formatString(arguments.get("ORDER")).toUpperCase());
+                } catch (Exception ex) {
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildBadMethod(new CommandException("Unknown order type (DES, ASC)!")));
+                    return true;
+                }
+
+            }
+
             if (arguments.containsKey("DATABASES")) {
                 if (!user.hasPermission("execute.list.database")) {
                     return false;
                 }
 
                 List<String> strings = dataBaseHandler.getDataBases().stream().map(Database::getName).collect(Collectors.toList());
-                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(strings, List.of("Databases")));
+
+                if (limit != -1) {
+                    strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
+                }
+
+                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(sorter.sortList(strings, order), List.of("Databases")));
                 return true;
             }
             if (arguments.containsKey("TABLES")) {
@@ -63,10 +94,19 @@ public class ListCommand extends Command {
                     }
 
                     final Database database = dataBaseHandler.getDataBase(name);
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(database.getTables().stream().map(Table::getName).collect(Collectors.toList()), List.of("Tables")));
+                    List<String> strings = database.getTables().stream().map(Table::getName).collect(Collectors.toList());
+                    if (limit != -1) {
+                        strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
+                    }
+
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(sorter.sortList(strings, order), List.of("Tables")));
                 } else {
                     List<String> strings = dataBaseHandler.getDataBases().stream().flatMap(dataBase -> dataBase.getTables().stream()).map(Table::getName).collect(Collectors.toList());
-                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(strings, List.of("Tables")));
+                    if (limit != -1) {
+                        strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
+                    }
+
+                    remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(sorter.sortList(strings, order), List.of("Tables")));
                 }
 
                 return true;
@@ -77,7 +117,11 @@ public class ListCommand extends Command {
                 }
 
                 List<String> strings = userHandler.getUsers().stream().map(User::getName).collect(Collectors.toList());
-                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(strings, List.of("Users")));
+                if (limit != -1) {
+                    strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
+                }
+
+                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(sorter.sortList(strings, order), List.of("Users")));
                 return true;
             }
             if (arguments.containsKey("SCRIPTS")) {
@@ -86,18 +130,48 @@ public class ListCommand extends Command {
                 }
 
                 List<String> strings = scriptService.getScripts().stream().map(Script::getName).collect(Collectors.toList());
-                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(strings, List.of("Scripts")));
+                if (limit != -1) {
+                    strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
+                }
+
+                remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildAnswer(sorter.sortList(strings, order), List.of("Scripts")));
                 return true;
             }
 
             remote.send(JFQL.getInstance().getJavalinService().getResponseBuilder().buildSyntax());
         } else {
+            Sorter.Order order = Sorter.Order.ASC;
+            int limit = -1;
+
+            if (arguments.containsKey("LIMIT")) {
+                limit = JFQL.getInstance().getFormatter().formatInteger(arguments.get("LIMIT"));
+
+                if (limit <= -1) {
+                    JFQL.getInstance().getConsole().logError("Limit can't be smaller than 0!");
+                    return true;
+                }
+            }
+
+            if (arguments.containsKey("ORDER")) {
+
+                try {
+                    order = Sorter.Order.valueOf(JFQL.getInstance().getFormatter().formatString(arguments.get("ORDER")).toUpperCase());
+                } catch (Exception ex) {
+                    JFQL.getInstance().getConsole().logError("Unknown order! Orders: ASC, DEC");
+                    return true;
+                }
+
+            }
 
             if (arguments.containsKey("DATABASES")) {
                 List<String> strings = dataBaseHandler.getDataBases().stream().map(Database::getName).collect(Collectors.toList());
                 TablePrinter tablePrinter = new TablePrinter(1, "Databases");
 
-                for (String string : strings) {
+                if (limit != -1) {
+                    strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
+                }
+
+                for (String string : sorter.sortList(strings, order)) {
                     tablePrinter.addRow(string);
                 }
 
@@ -119,13 +193,21 @@ public class ListCommand extends Command {
                     final Database database = dataBaseHandler.getDataBase(name);
                     List<String> strings1 = database.getTables().stream().map(Table::getName).collect(Collectors.toList());
 
-                    for (String string : strings1) {
+                    if (limit != -1) {
+                        strings1 = IntStream.range(0, limit).mapToObj(strings1::get).collect(Collectors.toList());
+                    }
+
+                    for (String string : sorter.sortList(strings1, order)) {
                         tablePrinter.addRow(string);
                     }
 
                 } else {
 
-                    for (String string : strings) {
+                    if (limit != -1) {
+                        strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
+                    }
+
+                    for (String string : sorter.sortList(strings, order)) {
                         tablePrinter.addRow(string);
                     }
                 }
@@ -136,7 +218,11 @@ public class ListCommand extends Command {
                 List<String> strings = userHandler.getUsers().stream().map(User::getName).collect(Collectors.toList());
                 TablePrinter tablePrinter = new TablePrinter(1, "Users");
 
-                for (String string : strings) {
+                if (limit != -1) {
+                    strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
+                }
+
+                for (String string : sorter.sortList(strings, order)) {
                     tablePrinter.addRow(string);
                 }
 
@@ -147,7 +233,11 @@ public class ListCommand extends Command {
                 List<String> strings = scriptService.getScripts().stream().map(Script::getName).collect(Collectors.toList());
                 TablePrinter tablePrinter = new TablePrinter(1, "Scripts");
 
-                for (String string : strings) {
+                if (limit != -1) {
+                    strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
+                }
+
+                for (String string : sorter.sortList(strings, order)) {
                     tablePrinter.addRow(string);
                 }
 

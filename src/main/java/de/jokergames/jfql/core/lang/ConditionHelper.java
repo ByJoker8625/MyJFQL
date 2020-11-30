@@ -3,7 +3,7 @@ package de.jokergames.jfql.core.lang;
 import de.jokergames.jfql.core.JFQL;
 import de.jokergames.jfql.database.Column;
 import de.jokergames.jfql.database.Table;
-import de.jokergames.jfql.util.ColumnSorter;
+import de.jokergames.jfql.util.Sorter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +15,10 @@ import java.util.List;
 public class ConditionHelper {
 
     public List<Column> getRequiredColumns(Table table, List<String> argument) {
-        return getRequiredColumns(table, argument, ColumnSorter.Type.CREATION, null, ColumnSorter.Order.ASC);
+        return getRequiredColumns(table, argument, Sorter.Type.CREATION, null, Sorter.Order.ASC);
     }
 
-    public List<Column> getRequiredColumns(Table table, List<String> argument, ColumnSorter.Type sort, String sorter, ColumnSorter.Order order) {
+    public List<Column> getRequiredColumns(Table table, List<String> argument, Sorter.Type sort, String sorter, Sorter.Order order) {
         List<Column> columns = new ArrayList<>();
 
         final String[] where = JFQL.getInstance().getFormatter().formatString(argument).replace(" or ", " OR ").split(" OR ");
@@ -47,7 +47,7 @@ public class ConditionHelper {
 
         List<Column> cols = new ArrayList<>();
 
-        if (sort == ColumnSorter.Type.CREATION || sorter == null) {
+        if (sort == Sorter.Type.CREATION || sorter == null) {
             cols = table.getColumns();
         } else {
             cols = table.getColumns(sort, order, sorter);
