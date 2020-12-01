@@ -11,11 +11,11 @@ import java.util.List;
  * @author Janick
  */
 
-public class UserHandler {
+public class UserService {
 
     private final FileFactory fileFactory;
 
-    public UserHandler(FileFactory fileFactory) {
+    public UserService(FileFactory fileFactory) {
         this.fileFactory = fileFactory;
     }
 

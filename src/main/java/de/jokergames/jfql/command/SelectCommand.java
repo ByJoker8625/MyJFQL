@@ -8,7 +8,7 @@ import de.jokergames.jfql.core.script.Script;
 import de.jokergames.jfql.core.script.ScriptService;
 import de.jokergames.jfql.database.Column;
 import de.jokergames.jfql.database.Database;
-import de.jokergames.jfql.database.DatabaseHandler;
+import de.jokergames.jfql.database.DatabaseService;
 import de.jokergames.jfql.database.Table;
 import de.jokergames.jfql.user.User;
 import de.jokergames.jfql.util.Sorter;
@@ -31,7 +31,7 @@ public class SelectCommand extends Command {
 
     @Override
     public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
-        final DatabaseHandler dataBaseHandler = JFQL.getInstance().getDataBaseHandler();
+        final DatabaseService dataBaseService = JFQL.getInstance().getDatabaseService();
         final ScriptService scriptService = JFQL.getInstance().getScriptService();
 
         if (executor instanceof RemoteExecutor) {
@@ -75,7 +75,7 @@ public class SelectCommand extends Command {
                     }
                 }
 
-                final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
+                final Database dataBase = dataBaseService.getDataBase(JFQL.getInstance().getDBSession().get(user.getName()));
 
                 if (dataBase.getTable(name) == null) {
                     remote.sendError("Database doesn't exists!");
@@ -302,7 +302,7 @@ public class SelectCommand extends Command {
                 }
 
 
-                final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
+                final Database dataBase = dataBaseService.getDataBase(JFQL.getInstance().getDBSession().get(user.getName()));
 
                 if (dataBase.getTable(name) == null) {
                     console.sendError("Table '" + name + "' doesn't exists!");

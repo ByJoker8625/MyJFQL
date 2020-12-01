@@ -33,15 +33,15 @@ public class DBSession {
     }
 
     public String get(String key) {
-        final DatabaseHandler dataBaseHandler = JFQL.getInstance().getDataBaseHandler();
+        final DatabaseService dataBaseService = JFQL.getInstance().getDatabaseService();
 
         if (!directories.containsKey(key)) {
-            if (dataBaseHandler.getDataBases().size() == 0)
+            if (dataBaseService.getDataBases().size() == 0)
                 throw new FileException("No database exists!");
-            else if (dataBaseHandler.getDataBase("test") != null)
+            else if (dataBaseService.getDataBase("test") != null)
                 return "test";
             else
-                return dataBaseHandler.getDataBases().get(0).getName();
+                return dataBaseService.getDataBases().get(0).getName();
         }
 
         return directories.get(key);

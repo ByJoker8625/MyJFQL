@@ -1,4 +1,4 @@
-package de.jokergames.jfql.jvl.controller;
+package de.jokergames.jfql.server.controller;
 
 /**
  * @author Janick

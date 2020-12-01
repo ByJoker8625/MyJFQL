@@ -6,7 +6,7 @@ import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
 import de.jokergames.jfql.core.script.Script;
 import de.jokergames.jfql.database.Database;
-import de.jokergames.jfql.database.DatabaseHandler;
+import de.jokergames.jfql.database.DatabaseService;
 import de.jokergames.jfql.database.Table;
 import de.jokergames.jfql.user.User;
 
@@ -27,7 +27,7 @@ public class CreateCommand extends Command {
 
     @Override
     public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
-        final DatabaseHandler dataBaseHandler = JFQL.getInstance().getDataBaseHandler();
+        final DatabaseService dataBaseService = JFQL.getInstance().getDatabaseService();
 
         if (executor instanceof RemoteExecutor) {
             RemoteExecutor remote = (RemoteExecutor) executor;
@@ -61,12 +61,12 @@ public class CreateCommand extends Command {
                     return false;
                 }
 
-                if (dataBaseHandler.getDataBase(name) != null) {
+                if (dataBaseService.getDataBase(name) != null) {
                     remote.sendError("Database already exists!");
                     return true;
                 }
 
-                dataBaseHandler.saveDataBase(new Database(name));
+                dataBaseService.saveDataBase(new Database(name));
                 remote.sendSuccess();
                 return true;
             }
@@ -90,7 +90,7 @@ public class CreateCommand extends Command {
                 if (arguments.containsKey("INTO")) {
                     base = JFQL.getInstance().getFormatter().formatString(arguments.get("INTO"));
                 } else {
-                    base = JFQL.getInstance().getDbSession().get(user.getName());
+                    base = JFQL.getInstance().getDBSession().get(user.getName());
                 }
 
                 if (arguments.containsKey("PRIMARY-KEY")) {
@@ -99,12 +99,12 @@ public class CreateCommand extends Command {
                     primaryKey = structure.get(0);
                 }
 
-                if (dataBaseHandler.getDataBase(base) == null) {
+                if (dataBaseService.getDataBase(base) == null) {
                     remote.sendError("Database doesn't exists!");
                     return true;
                 }
 
-                final Database dataBase = dataBaseHandler.getDataBase(base);
+                final Database dataBase = dataBaseService.getDataBase(base);
 
                 if (dataBase.getTable(name) != null) {
                     remote.sendError("Table already exists!");
@@ -114,7 +114,7 @@ public class CreateCommand extends Command {
 
                 remote.sendSuccess();
                 dataBase.addTable(new Table(name, structure, primaryKey));
-                dataBaseHandler.saveDataBase(dataBase);
+                dataBaseService.saveDataBase(dataBase);
                 return true;
             }
 
@@ -161,12 +161,12 @@ public class CreateCommand extends Command {
             if (arguments.containsKey("DATABASE")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("DATABASE"));
 
-                if (dataBaseHandler.getDataBase(name) != null) {
+                if (dataBaseService.getDataBase(name) != null) {
                     console.sendError("Database '" + name + "' was not found!");
                     return true;
                 }
 
-                dataBaseHandler.saveDataBase(new Database(name));
+                dataBaseService.saveDataBase(new Database(name));
                 console.sendInfo("Database '" + name + "' was created.");
                 return true;
             }
@@ -185,7 +185,7 @@ public class CreateCommand extends Command {
                 if (arguments.containsKey("INTO")) {
                     base = JFQL.getInstance().getFormatter().formatString(arguments.get("INTO"));
                 } else {
-                    base = JFQL.getInstance().getDbSession().get(user.getName());
+                    base = JFQL.getInstance().getDBSession().get(user.getName());
                 }
 
                 if (arguments.containsKey("PRIMARY-KEY")) {
@@ -194,12 +194,12 @@ public class CreateCommand extends Command {
                     primaryKey = structure.get(0);
                 }
 
-                if (dataBaseHandler.getDataBase(base) == null) {
+                if (dataBaseService.getDataBase(base) == null) {
                     console.sendError("Database '" + name + "' was not found!");
                     return true;
                 }
 
-                final Database dataBase = dataBaseHandler.getDataBase(base);
+                final Database dataBase = dataBaseService.getDataBase(base);
 
                 if (dataBase.getTable(name) != null) {
                     console.sendError("Table '" + name + "' already exists!");
@@ -209,7 +209,7 @@ public class CreateCommand extends Command {
 
                 console.sendInfo("Table '" + name + "' was created.");
                 dataBase.addTable(new Table(name, structure, primaryKey));
-                dataBaseHandler.saveDataBase(dataBase);
+                dataBaseService.saveDataBase(dataBase);
                 return true;
             }
 

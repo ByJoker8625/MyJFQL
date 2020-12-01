@@ -6,7 +6,7 @@ import de.jokergames.jfql.core.lang.Formatter;
 import de.jokergames.jfql.core.script.Script;
 import de.jokergames.jfql.core.script.ScriptService;
 import de.jokergames.jfql.database.DBSession;
-import de.jokergames.jfql.database.DatabaseHandler;
+import de.jokergames.jfql.database.DatabaseService;
 import de.jokergames.jfql.event.ClientLoginEvent;
 import de.jokergames.jfql.event.CommandExecuteEvent;
 import de.jokergames.jfql.event.EventService;
@@ -15,11 +15,11 @@ import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.exception.EventException;
 import de.jokergames.jfql.exception.ModuleException;
 import de.jokergames.jfql.exception.NetworkException;
-import de.jokergames.jfql.jvl.JavalinService;
-import de.jokergames.jfql.module.ModuleHandler;
+import de.jokergames.jfql.module.ModuleService;
+import de.jokergames.jfql.server.Server;
 import de.jokergames.jfql.user.ConsoleUser;
-import de.jokergames.jfql.user.UserHandler;
-import de.jokergames.jfql.util.ConfigHandler;
+import de.jokergames.jfql.user.UserService;
+import de.jokergames.jfql.util.ConfigService;
 import de.jokergames.jfql.util.Connection;
 import de.jokergames.jfql.util.Console;
 import de.jokergames.jfql.util.Downloader;
@@ -35,20 +35,20 @@ public final class JFQL {
 
     private final Console console;
     private final CommandService commandService;
-    private final ConfigHandler configHandler;
+    private final ConfigService configService;
     private final Formatter formatter;
     private final String version;
     private final Downloader downloader;
     private final Connection connection;
     private final JSONObject configuration;
-    private final DatabaseHandler dataBaseHandler;
-    private final UserHandler userHandler;
+    private final DatabaseService dataBaseService;
+    private final UserService userService;
     private final DBSession dbSession;
     private final ScriptService scriptService;
-    private final ModuleHandler moduleHandler;
+    private final ModuleService moduleService;
     private final EventService eventService;
     private final ConditionHelper conditionHelper;
-    private JavalinService javalinService;
+    private Server server;
 
     public JFQL() {
         instance = this;
@@ -58,16 +58,16 @@ public final class JFQL {
         this.connection = new Connection();
         this.downloader = new Downloader(connection);
         this.formatter = new Formatter();
-        this.configHandler = new ConfigHandler();
+        this.configService = new ConfigService();
         this.eventService = new EventService();
-        this.moduleHandler = new ModuleHandler();
+        this.moduleService = new ModuleService();
         this.conditionHelper = new ConditionHelper();
         this.commandService = new CommandService();
         this.dbSession = new DBSession();
-        this.scriptService = new ScriptService(configHandler.getFactory());
-        this.dataBaseHandler = new DatabaseHandler(configHandler.getFactory());
-        this.configuration = configHandler.getConfig();
-        this.userHandler = new UserHandler(configHandler.getFactory());
+        this.scriptService = new ScriptService(configService.getFactory());
+        this.dataBaseService = new DatabaseService(configService.getFactory());
+        this.configuration = configService.getConfig();
+        this.userService = new UserService(configService.getFactory());
     }
 
     public static JFQL getInstance() {
@@ -115,8 +115,8 @@ public final class JFQL {
         }
 
         {
-            if (userHandler.getUser("Console") == null)
-                userHandler.saveUser(new ConsoleUser());
+            if (userService.getUser("Console") == null)
+                userService.saveUser(new ConsoleUser());
         }
 
         try {
@@ -144,23 +144,23 @@ public final class JFQL {
         }
 
         try {
-            moduleHandler.enableModules();
+            moduleService.enableModules();
         } catch (Exception ex) {
             throw new ModuleException("Can't load modules!");
         }
 
-        if (moduleHandler.getModules().size() != 0) {
+        if (moduleService.getModules().size() != 0) {
             console.clean();
         }
 
         try {
-            javalinService = new JavalinService();
+            server = new Server();
         } catch (Exception ex) {
             throw new NetworkException("Can't start javalin server");
         }
 
         {
-            if (configHandler.first()) {
+            if (configService.first()) {
                 scriptService.saveScript(new Script("create_default_db", "create database test", "use database test"));
                 scriptService.invokeScript("create_default_db", getConsoleUser(), false);
             }
@@ -174,20 +174,20 @@ public final class JFQL {
     }
 
     public void shutdown() {
-        moduleHandler.disableModules();
+        moduleService.disableModules();
         System.exit(0);
     }
 
     public ConsoleUser getConsoleUser() {
-        return (ConsoleUser) userHandler.getUser("Console");
+        return (ConsoleUser) userService.getUser("Console");
     }
 
-    public ModuleHandler getModuleHandler() {
-        return moduleHandler;
+    public ModuleService getModuleService() {
+        return moduleService;
     }
 
-    public ConfigHandler getConfigHandler() {
-        return configHandler;
+    public ConfigService getConfigService() {
+        return configService;
     }
 
     public Formatter getFormatter() {
@@ -210,15 +210,15 @@ public final class JFQL {
         return connection;
     }
 
-    public DatabaseHandler getDataBaseHandler() {
-        return dataBaseHandler;
+    public DatabaseService getDatabaseService() {
+        return dataBaseService;
     }
 
-    public UserHandler getUserHandler() {
-        return userHandler;
+    public UserService getUserService() {
+        return userService;
     }
 
-    public DBSession getDbSession() {
+    public DBSession getDBSession() {
         return dbSession;
     }
 
@@ -242,8 +242,8 @@ public final class JFQL {
         return downloader;
     }
 
-    public JavalinService getJavalinService() {
-        return javalinService;
+    public Server getServer() {
+        return server;
     }
 
     public Console getConsole() {

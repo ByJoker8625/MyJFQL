@@ -8,14 +8,14 @@ import java.io.File;
  * @author Janick
  */
 
-public class ConfigHandler {
+public class ConfigService {
 
     private final FileFactory factory;
     private final JSONObject configuration;
     private boolean first = false;
 
 
-    public ConfigHandler() {
+    public ConfigService() {
         File file = new File("database");
         this.factory = new FileFactory();
 

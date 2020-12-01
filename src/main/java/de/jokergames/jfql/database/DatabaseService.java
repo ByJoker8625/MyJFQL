@@ -12,11 +12,11 @@ import java.util.List;
  * @author Janick
  */
 
-public class DatabaseHandler {
+public class DatabaseService {
 
     private FileFactory fileFactory;
 
-    public DatabaseHandler(FileFactory fileFactory) {
+    public DatabaseService(FileFactory fileFactory) {
         this.fileFactory = fileFactory;
     }
 

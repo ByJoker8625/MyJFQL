@@ -4,7 +4,7 @@ import de.jokergames.jfql.command.executor.ConsoleExecutor;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
-import de.jokergames.jfql.database.DatabaseHandler;
+import de.jokergames.jfql.database.DatabaseService;
 import de.jokergames.jfql.user.User;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class UseCommand extends Command {
 
     @Override
     public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
-        final DatabaseHandler dataBaseHandler = JFQL.getInstance().getDataBaseHandler();
+        final DatabaseService dataBaseService = JFQL.getInstance().getDatabaseService();
 
         if (executor instanceof RemoteExecutor) {
             RemoteExecutor remote = (RemoteExecutor) executor;
@@ -38,12 +38,12 @@ public class UseCommand extends Command {
                     return false;
                 }
 
-                if (dataBaseHandler.getDataBase(name) == null) {
+                if (dataBaseService.getDataBase(name) == null) {
                     remote.sendError("Database doesn't exists!");
                     return true;
                 }
 
-                JFQL.getInstance().getDbSession().put(user.getName(), name);
+                JFQL.getInstance().getDBSession().put(user.getName(), name);
                 remote.sendSuccess();
                 return true;
             }
@@ -55,12 +55,12 @@ public class UseCommand extends Command {
             if (arguments.containsKey("DATABASE")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("DATABASE"));
 
-                if (dataBaseHandler.getDataBase(name) == null) {
+                if (dataBaseService.getDataBase(name) == null) {
                     console.sendError("Database '" + name + "' doesn't exists!");
                     return true;
                 }
 
-                JFQL.getInstance().getDbSession().put(user.getName(), name);
+                JFQL.getInstance().getDBSession().put(user.getName(), name);
                 console.sendInfo("Change database to '" + name + "'.");
                 return true;
             }

@@ -6,7 +6,7 @@ import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
 import de.jokergames.jfql.database.Column;
 import de.jokergames.jfql.database.Database;
-import de.jokergames.jfql.database.DatabaseHandler;
+import de.jokergames.jfql.database.DatabaseService;
 import de.jokergames.jfql.database.Table;
 import de.jokergames.jfql.user.User;
 
@@ -27,7 +27,7 @@ public class RemoveCommand extends Command {
 
     @Override
     public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
-        final DatabaseHandler dataBaseHandler = JFQL.getInstance().getDataBaseHandler();
+        final DatabaseService dataBaseService = JFQL.getInstance().getDatabaseService();
 
         if (executor instanceof RemoteExecutor) {
             RemoteExecutor remote = (RemoteExecutor) executor;
@@ -40,7 +40,7 @@ public class RemoveCommand extends Command {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
                 String column = JFQL.getInstance().getFormatter().formatString(arguments.get("COLUMN"));
 
-                final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
+                final Database dataBase = dataBaseService.getDataBase(JFQL.getInstance().getDBSession().get(user.getName()));
 
                 if (dataBase.getTable(name) == null) {
                     remote.sendError("Table doesn't exists!");
@@ -79,7 +79,7 @@ public class RemoveCommand extends Command {
 
                     remote.sendSuccess();
                     dataBase.addTable(table);
-                    dataBaseHandler.saveDataBase(dataBase);
+                    dataBaseService.saveDataBase(dataBase);
                 } else {
                     List<Column> columns;
 
@@ -95,7 +95,7 @@ public class RemoveCommand extends Command {
 
                     remote.sendSuccess();
                     dataBase.addTable(table);
-                    dataBaseHandler.saveDataBase(dataBase);
+                    dataBaseService.saveDataBase(dataBase);
                 }
 
                 return true;
@@ -109,7 +109,7 @@ public class RemoveCommand extends Command {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
                 String column = JFQL.getInstance().getFormatter().formatString(arguments.get("COLUMN"));
 
-                final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
+                final Database dataBase = dataBaseService.getDataBase(JFQL.getInstance().getDBSession().get(user.getName()));
 
                 if (dataBase.getTable(name) == null) {
                     console.sendError("Table '" + name + "' doesn't exists!");
@@ -144,7 +144,7 @@ public class RemoveCommand extends Command {
 
                     console.sendInfo("Column/s was removed.");
                     dataBase.addTable(table);
-                    dataBaseHandler.saveDataBase(dataBase);
+                    dataBaseService.saveDataBase(dataBase);
                 } else {
                     List<Column> columns;
 
@@ -160,7 +160,7 @@ public class RemoveCommand extends Command {
 
                     console.sendInfo("Column/s was removed.");
                     dataBase.addTable(table);
-                    dataBaseHandler.saveDataBase(dataBase);
+                    dataBaseService.saveDataBase(dataBase);
                 }
 
                 return true;

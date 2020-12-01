@@ -1,4 +1,4 @@
-package de.jokergames.jfql.jvl.util;
+package de.jokergames.jfql.server.util;
 
 import org.json.JSONObject;
 

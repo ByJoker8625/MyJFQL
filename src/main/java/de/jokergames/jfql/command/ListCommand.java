@@ -7,10 +7,10 @@ import de.jokergames.jfql.core.JFQL;
 import de.jokergames.jfql.core.script.Script;
 import de.jokergames.jfql.core.script.ScriptService;
 import de.jokergames.jfql.database.Database;
-import de.jokergames.jfql.database.DatabaseHandler;
+import de.jokergames.jfql.database.DatabaseService;
 import de.jokergames.jfql.database.Table;
 import de.jokergames.jfql.user.User;
-import de.jokergames.jfql.user.UserHandler;
+import de.jokergames.jfql.user.UserService;
 import de.jokergames.jfql.util.Sorter;
 import de.jokergames.jfql.util.TablePrinter;
 
@@ -31,8 +31,8 @@ public class ListCommand extends Command {
 
     @Override
     public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
-        final DatabaseHandler dataBaseHandler = JFQL.getInstance().getDataBaseHandler();
-        final UserHandler userHandler = JFQL.getInstance().getUserHandler();
+        final DatabaseService dataBaseService = JFQL.getInstance().getDatabaseService();
+        final UserService userService = JFQL.getInstance().getUserService();
         final ScriptService scriptService = JFQL.getInstance().getScriptService();
         final Sorter sorter = new Sorter();
 
@@ -71,7 +71,7 @@ public class ListCommand extends Command {
                     return false;
                 }
 
-                List<String> strings = dataBaseHandler.getDataBases().stream().map(Database::getName).collect(Collectors.toList());
+                List<String> strings = dataBaseService.getDataBases().stream().map(Database::getName).collect(Collectors.toList());
 
                 if (limit != -1) {
                     strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
@@ -88,12 +88,12 @@ public class ListCommand extends Command {
                 if (arguments.containsKey("FROM")) {
                     String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
 
-                    if (dataBaseHandler.getDataBase(name) == null) {
+                    if (dataBaseService.getDataBase(name) == null) {
                         remote.sendError("Database doesn't exists!");
                         return true;
                     }
 
-                    final Database database = dataBaseHandler.getDataBase(name);
+                    final Database database = dataBaseService.getDataBase(name);
                     List<String> strings = database.getTables().stream().map(Table::getName).collect(Collectors.toList());
                     if (limit != -1) {
                         strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
@@ -101,7 +101,7 @@ public class ListCommand extends Command {
 
                     remote.sendAnswer(sorter.sortList(strings, order), List.of("Tables"));
                 } else {
-                    List<String> strings = dataBaseHandler.getDataBases().stream().flatMap(dataBase -> dataBase.getTables().stream()).map(Table::getName).collect(Collectors.toList());
+                    List<String> strings = dataBaseService.getDataBases().stream().flatMap(dataBase -> dataBase.getTables().stream()).map(Table::getName).collect(Collectors.toList());
                     if (limit != -1) {
                         strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
                     }
@@ -116,7 +116,7 @@ public class ListCommand extends Command {
                     return false;
                 }
 
-                List<String> strings = userHandler.getUsers().stream().map(User::getName).collect(Collectors.toList());
+                List<String> strings = userService.getUsers().stream().map(User::getName).collect(Collectors.toList());
                 if (limit != -1) {
                     strings = IntStream.range(0, limit).mapToObj(strings::get).collect(Collectors.toList());
                 }
@@ -166,7 +166,7 @@ public class ListCommand extends Command {
             }
 
             if (arguments.containsKey("DATABASES")) {
-                List<String> strings = dataBaseHandler.getDataBases().stream().map(Database::getName).collect(Collectors.toList());
+                List<String> strings = dataBaseService.getDataBases().stream().map(Database::getName).collect(Collectors.toList());
                 TablePrinter tablePrinter = new TablePrinter(1, "Databases");
 
                 if (limit != -1) {
@@ -181,18 +181,18 @@ public class ListCommand extends Command {
                 return true;
             }
             if (arguments.containsKey("TABLES")) {
-                List<String> strings = dataBaseHandler.getDataBases().stream().flatMap(dataBase -> dataBase.getTables().stream()).map(Table::getName).collect(Collectors.toList());
+                List<String> strings = dataBaseService.getDataBases().stream().flatMap(dataBase -> dataBase.getTables().stream()).map(Table::getName).collect(Collectors.toList());
                 TablePrinter tablePrinter = new TablePrinter(1, "Tables");
 
                 if (arguments.containsKey("FROM")) {
                     String name = JFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
 
-                    if (dataBaseHandler.getDataBase(name) == null) {
+                    if (dataBaseService.getDataBase(name) == null) {
                         console.sendError("Database doesn't exists!");
                         return true;
                     }
 
-                    final Database database = dataBaseHandler.getDataBase(name);
+                    final Database database = dataBaseService.getDataBase(name);
                     List<String> strings1 = database.getTables().stream().map(Table::getName).collect(Collectors.toList());
 
                     if (limit != -1) {
@@ -217,7 +217,7 @@ public class ListCommand extends Command {
                 return true;
             }
             if (arguments.containsKey("USERS")) {
-                List<String> strings = userHandler.getUsers().stream().map(User::getName).collect(Collectors.toList());
+                List<String> strings = userService.getUsers().stream().map(User::getName).collect(Collectors.toList());
                 TablePrinter tablePrinter = new TablePrinter(1, "Users");
 
                 if (limit != -1) {

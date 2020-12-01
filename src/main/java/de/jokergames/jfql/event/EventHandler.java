@@ -1,6 +1,4 @@
-package de.jokergames.jfql.jvl.controller;
-
-import de.jokergames.jfql.jvl.util.Method;
+package de.jokergames.jfql.event;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,10 +12,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 
-public @interface ControllerDeclarer {
+public @interface EventHandler {
 
-    Method method() default Method.GET;
-
-    String path();
+    String type();
 
 }

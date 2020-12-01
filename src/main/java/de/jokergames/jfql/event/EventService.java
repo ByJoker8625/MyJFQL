@@ -37,32 +37,32 @@ public class EventService {
         listeners.remove(listener);
     }
 
-    public List<EventDeclarer> getDeclarersByListener(Listener listener) {
-        final List<EventDeclarer> declarers = new ArrayList<>();
+    public List<EventHandler> getDeclarersByListener(Listener listener) {
+        final List<EventHandler> declarers = new ArrayList<>();
         Class<?> clazz = listener.getClass();
 
         for (Method method : clazz.getMethods()) {
 
-            if (method.isAnnotationPresent(EventDeclarer.class)) {
-                EventDeclarer eventDeclarer = method.getAnnotation(EventDeclarer.class);
-                declarers.add(eventDeclarer);
+            if (method.isAnnotationPresent(EventHandler.class)) {
+                EventHandler eventHandler = method.getAnnotation(EventHandler.class);
+                declarers.add(eventHandler);
             }
         }
 
         return declarers;
     }
 
-    public List<EventDeclarer> getDeclarersByEvent(Event event) {
+    public List<EventHandler> getDeclarersByEvent(Event event) {
         return getDeclarersByType(event.getName());
     }
 
-    public List<EventDeclarer> getDeclarersByType(String type) {
-        List<EventDeclarer> declarers = new ArrayList<>();
+    public List<EventHandler> getDeclarersByType(String type) {
+        List<EventHandler> declarers = new ArrayList<>();
 
         for (Listener listener : listeners) {
-            List<EventDeclarer> eventDeclarers = getDeclarersByListener(listener);
+            List<EventHandler> eventHandlers = getDeclarersByListener(listener);
 
-            for (EventDeclarer declarer : eventDeclarers) {
+            for (EventHandler declarer : eventHandlers) {
                 if (declarer.type().equals(type)) {
                     declarers.add(declarer);
                 }
@@ -83,10 +83,10 @@ public class EventService {
 
             for (Method method : clazz.getMethods()) {
 
-                if (method.isAnnotationPresent(EventDeclarer.class)) {
-                    EventDeclarer eventDeclarer = method.getAnnotation(EventDeclarer.class);
+                if (method.isAnnotationPresent(EventHandler.class)) {
+                    EventHandler eventHandler = method.getAnnotation(EventHandler.class);
 
-                    if (eventDeclarer.type().equals(type)) {
+                    if (eventHandler.type().equals(type)) {
                         try {
                             method.invoke(listener, event);
                         } catch (Exception ex) {

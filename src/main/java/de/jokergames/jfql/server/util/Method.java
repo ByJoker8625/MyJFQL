@@ -1,4 +1,4 @@
-package de.jokergames.jfql.jvl.util;
+package de.jokergames.jfql.server.util;
 
 /**
  * @author Janick
@@ -7,6 +7,7 @@ package de.jokergames.jfql.jvl.util;
 public enum Method {
 
     POST,
-    GET
+    GET,
+    STATUS,
 
 }

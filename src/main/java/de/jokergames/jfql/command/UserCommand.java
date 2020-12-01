@@ -5,7 +5,7 @@ import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
 import de.jokergames.jfql.user.RemoteUser;
 import de.jokergames.jfql.user.User;
-import de.jokergames.jfql.user.UserHandler;
+import de.jokergames.jfql.user.UserService;
 
 import java.util.List;
 import java.util.Map;
@@ -28,18 +28,18 @@ public class UserCommand extends Command {
             return false;
         }
 
-        final UserHandler userHandler = JFQL.getInstance().getUserHandler();
+        final UserService userService = JFQL.getInstance().getUserService();
 
         if (arguments.containsKey("CREATE") && arguments.containsKey("PASSWORD")) {
             String name = JFQL.getInstance().getFormatter().formatString(arguments.get("CREATE"));
             String password = JFQL.getInstance().getFormatter().formatString(arguments.get("PASSWORD"));
 
-            if (userHandler.getUser(name) != null) {
+            if (userService.getUser(name) != null) {
                 JFQL.getInstance().getConsole().logError("User '" + name + "' already exists!");
                 return true;
             }
 
-            userHandler.saveUser(new RemoteUser(name, password));
+            userService.saveUser(new RemoteUser(name, password));
             JFQL.getInstance().getConsole().logInfo("User '" + name + "' was created.");
             return true;
         }
@@ -47,12 +47,12 @@ public class UserCommand extends Command {
         if (arguments.containsKey("DELETE")) {
             String name = JFQL.getInstance().getFormatter().formatString(arguments.get("DELETE"));
 
-            if (userHandler.getUser(name) == null) {
+            if (userService.getUser(name) == null) {
                 JFQL.getInstance().getConsole().logError("User '" + name + "' doesn't exists!");
                 return true;
             }
 
-            final User usr = userHandler.getUser(name);
+            final User usr = userService.getUser(name);
 
             if (usr.is(User.Property.NO_DELETE)) {
                 JFQL.getInstance().getConsole().logError("Can't delete user '" + usr.getName() + "'!");
@@ -67,12 +67,12 @@ public class UserCommand extends Command {
         if (arguments.containsKey("DISPLAY")) {
             String name = JFQL.getInstance().getFormatter().formatString(arguments.get("DISPLAY"));
 
-            if (userHandler.getUser(name) == null) {
+            if (userService.getUser(name) == null) {
                 JFQL.getInstance().getConsole().logError("User '" + name + "' doesn't exists!");
                 return true;
             }
 
-            final User usr = userHandler.getUser(name);
+            final User usr = userService.getUser(name);
             JFQL.getInstance().getConsole().log(usr.toString());
             return true;
         }
@@ -81,12 +81,12 @@ public class UserCommand extends Command {
             String name = JFQL.getInstance().getFormatter().formatString(arguments.get("ADD"));
             String permission = JFQL.getInstance().getFormatter().formatString(arguments.get("PERMISSION")).toLowerCase();
 
-            if (userHandler.getUser(name) == null) {
+            if (userService.getUser(name) == null) {
                 JFQL.getInstance().getConsole().logError("User '" + name + "' doesn't exists!");
                 return true;
             }
 
-            final User usr = userHandler.getUser(name);
+            final User usr = userService.getUser(name);
 
             if (usr.is(User.Property.NO_EDIT)) {
                 JFQL.getInstance().getConsole().logError("Can't edit user '" + usr.getName() + "'!");
@@ -95,7 +95,7 @@ public class UserCommand extends Command {
 
             JFQL.getInstance().getConsole().logInfo("Add permission '" + permission + "' to user '" + user.getName() + "'.");
             usr.getPermissions().add(permission);
-            userHandler.saveUser(usr);
+            userService.saveUser(usr);
             return true;
         }
 
@@ -103,12 +103,12 @@ public class UserCommand extends Command {
             String name = JFQL.getInstance().getFormatter().formatString(arguments.get("REMOVE"));
             String permission = JFQL.getInstance().getFormatter().formatString(arguments.get("PERMISSION")).toLowerCase();
 
-            if (userHandler.getUser(name) == null) {
+            if (userService.getUser(name) == null) {
                 JFQL.getInstance().getConsole().logError("User '" + name + "' doesn't exists!");
                 return true;
             }
 
-            final User usr = userHandler.getUser(name);
+            final User usr = userService.getUser(name);
 
             if (usr.is(User.Property.NO_EDIT)) {
                 JFQL.getInstance().getConsole().logError("Can't edit user '" + usr.getName() + "'!");
@@ -117,7 +117,7 @@ public class UserCommand extends Command {
 
             JFQL.getInstance().getConsole().logInfo("Remove permission '" + permission + "' to user '" + user.getName() + "'.");
             usr.getPermissions().remove(permission);
-            userHandler.saveUser(usr);
+            userService.saveUser(usr);
             return true;
         }
 

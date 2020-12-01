@@ -6,7 +6,7 @@ import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
 import de.jokergames.jfql.core.script.ScriptService;
 import de.jokergames.jfql.user.User;
-import de.jokergames.jfql.user.UserHandler;
+import de.jokergames.jfql.user.UserService;
 
 import java.util.List;
 import java.util.Map;
@@ -24,7 +24,7 @@ public class InvokeCommand extends Command {
     @Override
     public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
         final ScriptService scriptService = JFQL.getInstance().getScriptService();
-        final UserHandler userHandler = JFQL.getInstance().getUserHandler();
+        final UserService userService = JFQL.getInstance().getUserService();
 
         if (executor instanceof RemoteExecutor) {
             RemoteExecutor remote = (RemoteExecutor) executor;
@@ -67,12 +67,12 @@ public class InvokeCommand extends Command {
                 if (arguments.containsKey("AS")) {
                     String as = JFQL.getInstance().getFormatter().formatString(arguments.get("AS"));
 
-                    if (userHandler.getUser(as) == null) {
+                    if (userService.getUser(as) == null) {
                         console.sendError("User '" + as + "' doesn't exists!");
                         return true;
                     }
 
-                    usr = userHandler.getUser(as);
+                    usr = userService.getUser(as);
                 }
 
                 console.sendInfo("Invoking script '" + name + "'...");

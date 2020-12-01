@@ -3,7 +3,7 @@ package de.jokergames.jfql.command.executor;
 import de.jokergames.jfql.core.JFQL;
 import de.jokergames.jfql.exception.CommandException;
 import de.jokergames.jfql.exception.NetworkException;
-import de.jokergames.jfql.jvl.util.ResponseBuilder;
+import de.jokergames.jfql.server.util.ResponseBuilder;
 import io.javalin.http.Context;
 import org.json.JSONObject;
 
@@ -21,7 +21,7 @@ public class RemoteExecutor extends Executor {
     public RemoteExecutor(String name, Context context) {
         super(name);
         this.context = context;
-        this.builder = JFQL.getInstance().getJavalinService().getResponseBuilder();
+        this.builder = JFQL.getInstance().getServer().getResponseBuilder();
     }
 
     public void sendError(String s) {

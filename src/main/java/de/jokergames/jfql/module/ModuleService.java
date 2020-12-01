@@ -13,12 +13,12 @@ import java.util.List;
  * @author Janick
  */
 
-public class ModuleHandler {
+public class ModuleService {
 
     private final List<Module> modules;
     private final ModuleLoader moduleLoader;
 
-    public ModuleHandler() {
+    public ModuleService() {
         this.modules = new ArrayList<>();
         this.moduleLoader = new ModuleLoader();
     }

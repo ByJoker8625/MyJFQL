@@ -6,7 +6,7 @@ import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
 import de.jokergames.jfql.database.Column;
 import de.jokergames.jfql.database.Database;
-import de.jokergames.jfql.database.DatabaseHandler;
+import de.jokergames.jfql.database.DatabaseService;
 import de.jokergames.jfql.database.Table;
 import de.jokergames.jfql.user.User;
 
@@ -27,8 +27,8 @@ public class InsertCommand extends Command {
 
     @Override
     public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
-        final DatabaseHandler dataBaseHandler = JFQL.getInstance().getDataBaseHandler();
-        final Database dataBase = dataBaseHandler.getDataBase(JFQL.getInstance().getDbSession().get(user.getName()));
+        final DatabaseService dataBaseService = JFQL.getInstance().getDatabaseService();
+        final Database dataBase = dataBaseService.getDataBase(JFQL.getInstance().getDBSession().get(user.getName()));
 
         if (executor instanceof RemoteExecutor) {
             RemoteExecutor remote = (RemoteExecutor) executor;
@@ -119,7 +119,7 @@ public class InsertCommand extends Command {
 
                     table.addColumn(column);
                     dataBase.addTable(table);
-                    dataBaseHandler.saveDataBase(dataBase);
+                    dataBaseService.saveDataBase(dataBase);
 
                     remote.sendSuccess();
                 } else if (arguments.containsKey("WHERE")) {
@@ -160,7 +160,7 @@ public class InsertCommand extends Command {
                     }
 
                     dataBase.addTable(table);
-                    dataBaseHandler.saveDataBase(dataBase);
+                    dataBaseService.saveDataBase(dataBase);
 
                     remote.sendSuccess();
                 } else {
@@ -193,7 +193,7 @@ public class InsertCommand extends Command {
 
                     table.addColumn(column);
                     dataBase.addTable(table);
-                    dataBaseHandler.saveDataBase(dataBase);
+                    dataBaseService.saveDataBase(dataBase);
 
                     remote.sendSuccess();
                 }
@@ -289,7 +289,7 @@ public class InsertCommand extends Command {
 
                     table.addColumn(column);
                     dataBase.addTable(table);
-                    dataBaseHandler.saveDataBase(dataBase);
+                    dataBaseService.saveDataBase(dataBase);
 
                     console.sendInfo("Insert values into '" + name + "'.");
                 } else if (arguments.containsKey("WHERE")) {
@@ -330,7 +330,7 @@ public class InsertCommand extends Command {
                     }
 
                     dataBase.addTable(table);
-                    dataBaseHandler.saveDataBase(dataBase);
+                    dataBaseService.saveDataBase(dataBase);
 
                     console.sendInfo("Insert values into '" + name + "'.");
                 } else {
@@ -370,7 +370,7 @@ public class InsertCommand extends Command {
 
                     table.addColumn(column);
                     dataBase.addTable(table);
-                    dataBaseHandler.saveDataBase(dataBase);
+                    dataBaseService.saveDataBase(dataBase);
 
                     console.sendInfo("Insert values into '" + name + "'.");
                 }
