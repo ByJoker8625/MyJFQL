@@ -6,7 +6,7 @@
 
     <groupId>de.jokergames</groupId>
     <artifactId>MyJFQL</artifactId>
-    <version>1.2</version>
+    <version>1.2.3</version>
 
     <build>
         <plugins>

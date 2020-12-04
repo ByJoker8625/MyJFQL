@@ -100,7 +100,7 @@ public class ConditionHelper {
                             if (value.equalsIgnoreCase("null")) {
                                 if (!col.getContent().containsKey(s)) {
                                     finished++;
-                                    break;
+                                    //break;
                                 }
                             } else {
                                 if (col.getContent().containsKey(s)) {
@@ -118,50 +118,28 @@ public class ConditionHelper {
                                 }
                             }
                         }
-
-                        /*
-                        for (Object val : col.getContent().values()) {
-                            if (val.toString().equals(value)) {
-                                finished++;
-                                break;
-                            } else if (val.toString().equalsIgnoreCase("null") && value.equalsIgnoreCase("null")) {
-                                finished++;
-                                break;
-                            }
-                        }*/
                     } else {
                         if (value.equalsIgnoreCase("null")) {
-                            if (!col.getContent().containsKey(key)) {
+                            if (!col.getContent().containsKey(key) || col.getContent(key) == null) {
                                 finished++;
-                                break;
+                                //break;
                             }
                         } else {
                             if (col.getContent().containsKey(key)) {
                                 if (value.startsWith("$") && value.endsWith("$")) {
                                     if (col.getContent(key).toString().contains(value.replace("$", ""))) {
                                         finished++;
-                                        break;
+                                        //break;
                                     }
                                 } else {
                                     if (col.getContent(key).toString().equals(value)) {
                                         finished++;
-                                        break;
+                                        //break;
                                     }
                                 }
                             }
                         }
-
-                        /*if (col.getContent().containsKey(key)) {
-                        if (col.getContent(key).toString().equals(value)) {
-                            finished++;
-                        } else if (col.getContent(key) == null && value.equalsIgnoreCase("null")) {
-                            finished++;
-                        }
-                    } else if (value.equalsIgnoreCase("null")) {
-                        finished++;
-                    }*/
                     }
-
                 }
 
                 if (finished == requirements.size()) {
