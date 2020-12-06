@@ -29,7 +29,7 @@ public class InvokeCommand extends Command {
         if (executor instanceof RemoteExecutor) {
             RemoteExecutor remote = (RemoteExecutor) executor;
 
-            if (!user.hasPermission("execute.invoke.script")) {
+            if (!user.hasPermission("execute.invoke")) {
                 return false;
             }
 

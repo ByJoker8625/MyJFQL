@@ -93,7 +93,7 @@ public class UserCommand extends Command {
                 return true;
             }
 
-            JFQL.getInstance().getConsole().logInfo("Add permission '" + permission + "' to user '" + user.getName() + "'.");
+            JFQL.getInstance().getConsole().logInfo("Add permission '" + permission + "' to user '" + usr.getName() + "'.");
             usr.getPermissions().add(permission);
             userService.saveUser(usr);
             return true;
@@ -115,7 +115,7 @@ public class UserCommand extends Command {
                 return true;
             }
 
-            JFQL.getInstance().getConsole().logInfo("Remove permission '" + permission + "' to user '" + user.getName() + "'.");
+            JFQL.getInstance().getConsole().logInfo("Remove permission '" + permission + "' to user '" + usr.getName() + "'.");
             usr.getPermissions().remove(permission);
             userService.saveUser(usr);
             return true;

@@ -44,7 +44,6 @@ public class CreateCommand extends Command {
                     return false;
                 }
 
-
                 final Script script = new Script(name);
                 script.formatCommands(src);
 
@@ -91,6 +90,10 @@ public class CreateCommand extends Command {
                     base = JFQL.getInstance().getFormatter().formatString(arguments.get("INTO"));
                 } else {
                     base = JFQL.getInstance().getDBSession().get(user.getName());
+                }
+
+                if (!user.hasPermission("execute.use.*") && !user.hasPermission("execute.use." + base)) {
+                    return false;
                 }
 
                 if (arguments.containsKey("PRIMARY-KEY")) {

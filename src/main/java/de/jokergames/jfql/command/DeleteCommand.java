@@ -82,6 +82,10 @@ public class DeleteCommand extends Command {
                     base = JFQL.getInstance().getDBSession().get(user.getName());
                 }
 
+                if (!user.hasPermission("execute.use.database.*") && !user.hasPermission("execute.use.database." + base)) {
+                    return false;
+                }
+
                 if (dataBaseService.getDataBase(base) == null) {
                     remote.sendError("Database doesn't exists!");
                     return true;
