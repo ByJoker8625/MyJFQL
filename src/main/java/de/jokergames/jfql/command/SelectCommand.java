@@ -433,7 +433,6 @@ public class SelectCommand extends Command {
                         columns = JFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"), sort, sorter, order);
                     } catch (Exception ex) {
                         console.sendError("Unknown error!");
-                        ex.printStackTrace();
                         return true;
                     }
 

@@ -33,7 +33,7 @@ public class TablePrinter {
     private boolean ucode;
     private Comparator<String[]> comparator;
     private int spacing;
-    private EnumAlignment aligns[];
+    private Alignment aligns[];
 
     public TablePrinter(String... descriptions) {
         this(descriptions.length, descriptions);
@@ -51,10 +51,10 @@ public class TablePrinter {
         this.updateSizes(descriptions);
         this.ucode = System.getProperty("os.name").equalsIgnoreCase("Linux");
         this.spacing = 1;
-        this.aligns = new EnumAlignment[columns];
+        this.aligns = new Alignment[columns];
         this.comparator = null;
         for (int i = 0; i < aligns.length; i++) {
-            aligns[i] = EnumAlignment.LEFT;
+            aligns[i] = Alignment.LEFT;
         }
     }
 
@@ -77,7 +77,7 @@ public class TablePrinter {
         return this.compareWith((o1, o2) -> o1[column].compareTo(o2[column]));
     }
 
-    public TablePrinter align(int column, EnumAlignment align) {
+    public TablePrinter align(int column, Alignment align) {
         aligns[column] = align;
         return this;
     }
@@ -275,7 +275,7 @@ public class TablePrinter {
         return src[ucode ? 1 : 0];
     }
 
-    public static enum EnumAlignment {
+    public static enum Alignment {
         LEFT, CENTER, RIGHT
     }
 
