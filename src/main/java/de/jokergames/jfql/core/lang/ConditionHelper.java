@@ -46,7 +46,6 @@ public class ConditionHelper {
                 }
 
                 strings[1] = strings[1].replace("'", "");
-                System.out.println(strings[0]);
 
                 if (!table.getStructure().contains(strings[0]) && !strings[0].equals("?") && !strings[0].equals("*")) {
                     return null;
