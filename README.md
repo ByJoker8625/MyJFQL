@@ -17,5 +17,5 @@ but is very simplified.
 Download the file and make sure Java 11 is installed. Then execute the following command:
 
 ```bash
-java -Xmx2G -Xms2G -jar OpenChat.jar
+java -Xmx2G -Xms2G -jar MyJFQL.jar
 ```
