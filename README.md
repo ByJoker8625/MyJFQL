@@ -7,8 +7,8 @@ but is very simplified.
 
 ### Features
 
-* MySQL is very fast and resource saving as it was written in java
-* You can write modules for MySQL with which you can completely customize the DBMS
+* MyJFQL is very fast and resource saving as it was written in java
+* You can write modules for MyJFQL with which you can completely customize the DBMS
 * There is support for many languages such as JavaScript, Java and Python
 * If your language is not directly supported, you can simply write your own connector with an HTTP client and Json.
 
