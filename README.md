@@ -19,3 +19,8 @@ Download the file and make sure Java 11 is installed. Then execute the following
 ```bash
 java -Xmx2G -Xms2G -jar OpenChat.jar
 ```
+
+### License:
+
+Copyright (c) [JokerGames](http://jokergames.ddnss.de). All rights reserved.
+
