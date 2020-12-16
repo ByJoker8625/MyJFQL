@@ -14,7 +14,8 @@ but is very simplified.
 
 ### Installation
 
-[Download](http://jokergames.ddnss.de/lib/download/MyJFQL.jar) the file and make sure Java 11 is installed. Then execute the following command:
+[Download](http://jokergames.ddnss.de/lib/download/MyJFQL.jar) the file and make sure Java 11 is installed. Then execute
+the following command:
 
 ```bash
 java -Xmx2G -Xms2G -jar MyJFQL.jar
