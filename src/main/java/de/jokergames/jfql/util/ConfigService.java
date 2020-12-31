@@ -1,8 +1,10 @@
 package de.jokergames.jfql.util;
 
+import de.jokergames.jfql.core.JFQL;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.time.LocalDate;
 
 /**
  * @author Janick
@@ -53,7 +55,9 @@ public class ConfigService {
             factory.save(file, jsonObject);
         }
 
-        this.configuration = factory.load(new File("config.json"));
+        this.build();
+
+        this.configuration = factory.loadJoin(new File("config.json"), new File("build.txt"));
 
         if (configuration.opt("AutoUpdate") == null)
             configuration.put("AutoUpdate", true);
@@ -64,6 +68,18 @@ public class ConfigService {
         if (configuration.opt("Server") == null)
             configuration.put("Server", "http://jokergames.ddnss.de/lib/myjfql/rest.json");
 
+    }
+
+    public void build(){
+        File file = new File("build.txt");
+
+        if(!file.exists()){
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("Build", JFQL.getInstance().getVersion());
+            jsonObject.put("Date", LocalDate.now());
+
+            factory.save(file, jsonObject);
+        }
     }
 
     public JSONObject getConfig() {

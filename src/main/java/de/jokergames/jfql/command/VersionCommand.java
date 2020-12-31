@@ -28,7 +28,7 @@ public class VersionCommand extends Command {
         }
 
         if (arguments.containsKey("DISPLAY")) {
-            JFQL.getInstance().getConsole().logInfo("Current version: " + JFQL.getInstance().getVersion());
+            JFQL.getInstance().getConsole().logInfo("Current version: " + JFQL.getInstance().getVersion() + " DOWNLOADED (" + JFQL.getInstance().getConfiguration().getString("Date") + ")");
             return true;
         }
 
