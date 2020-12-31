@@ -1,4 +1,4 @@
-package de.jokergames.jfql.core.lang;
+package de.jokergames.jfql.util;
 
 import java.util.Arrays;
 
@@ -34,6 +34,8 @@ public class Requirement {
 
     public enum Type {
         POSITIVE,
-        NEGATIVE
+        NEGATIVE,
+        BIGGER,
+        SMALLER
     }
 }

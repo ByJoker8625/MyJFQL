@@ -332,7 +332,7 @@ public class SelectCommand extends Command {
                     try {
                         order = Sorter.Order.valueOf(JFQL.getInstance().getFormatter().formatString(arguments.get("ORDER")).toUpperCase());
                     } catch (Exception ex) {
-                        console.sendError("Unknown order! Orders: ASC, DEC");
+                        console.sendError("Unknown order! Orders: ASC, DESC");
                         return true;
                     }
 

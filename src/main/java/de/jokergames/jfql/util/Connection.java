@@ -37,7 +37,13 @@ public class Connection {
         if (jsonObject == null)
             return true;
 
-        return jsonObject.getString("Version").equals(JFQL.getInstance().getVersion());
+        final String version = jsonObject.getString("Version");
+        final String current = JFQL.getInstance().getVersion();
+
+        if (current.compareTo(version) == 1)
+            return true;
+        else
+            return version.equals(current);
     }
 
     public boolean isMaintenance() {

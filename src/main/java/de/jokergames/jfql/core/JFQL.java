@@ -1,7 +1,6 @@
 package de.jokergames.jfql.core;
 
 import de.jokergames.jfql.command.*;
-import de.jokergames.jfql.core.lang.ConditionHelper;
 import de.jokergames.jfql.core.lang.Formatter;
 import de.jokergames.jfql.core.script.Script;
 import de.jokergames.jfql.core.script.ScriptService;
@@ -19,10 +18,7 @@ import de.jokergames.jfql.module.ModuleService;
 import de.jokergames.jfql.server.Server;
 import de.jokergames.jfql.user.ConsoleUser;
 import de.jokergames.jfql.user.UserService;
-import de.jokergames.jfql.util.ConfigService;
-import de.jokergames.jfql.util.Connection;
-import de.jokergames.jfql.util.Console;
-import de.jokergames.jfql.util.Downloader;
+import de.jokergames.jfql.util.*;
 import org.json.JSONObject;
 
 /**
@@ -53,7 +49,7 @@ public final class JFQL {
     public JFQL() {
         instance = this;
 
-        this.version = "1.2.4";
+        this.version = "1.2.5";
         this.console = new Console();
         this.connection = new Connection();
         this.downloader = new Downloader(connection);

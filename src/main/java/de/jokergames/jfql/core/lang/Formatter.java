@@ -48,10 +48,10 @@ public class Formatter {
 
         }
 
-        List<String> keyWords;
+        List<String> keys;
 
         try {
-            keyWords = JFQL.getInstance().getCommandService().getCommand(strings.get(1)).getSyntax();
+            keys = JFQL.getInstance().getCommandService().getCommand(strings.get(1)).getSyntax();
         } catch (Exception ex) {
             return null;
         }
@@ -67,7 +67,7 @@ public class Formatter {
         String selection = null;
 
         for (String current : args) {
-            if (keyWords.contains(current.toUpperCase())) {
+            if (keys.contains(current.toUpperCase())) {
                 selection = current.toUpperCase();
                 arguments.put(selection, new ArrayList<>());
             } else {

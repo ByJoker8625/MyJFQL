@@ -42,10 +42,10 @@ public class Sorter {
             }
         }
 
-        if (order == Order.ASC) {
+        if (order == Order.DESC) {
             numbers.sort(Comparator.comparingInt(o -> Integer.parseInt(o.getContent(key).toString())));
             letters.sort((o1, o2) -> String.valueOf(o1.getContent(key)).compareTo(o2.getContent(key).toString()));
-        } else if (order == Order.DEC) {
+        } else if (order == Order.ASC) {
             numbers.sort((o1, o2) -> -Integer.compare(Integer.parseInt(o1.getContent(key).toString()), Integer.parseInt(o2.getContent(key).toString())));
             letters.sort((o1, o2) -> -String.valueOf(o1.getContent(key)).compareTo(o2.getContent(key).toString()));
         }
@@ -84,10 +84,10 @@ public class Sorter {
             }
         }
 
-        if (order == Order.ASC) {
+        if (order == Order.DESC) {
             numbers.sort(Comparator.comparingInt(Integer::parseInt));
             letters.sort((o1, o2) -> String.valueOf(o1).compareTo(o2));
-        } else if (order == Order.DEC) {
+        } else if (order == Order.ASC) {
             numbers.sort((o1, o2) -> -Integer.compare(Integer.parseInt(o1), Integer.parseInt(o2)));
             letters.sort((o1, o2) -> -String.valueOf(o1).compareTo(o2));
         }
@@ -106,7 +106,7 @@ public class Sorter {
     }
 
     public static enum Order {
-        DEC,
+        DESC,
         ASC
     }
 
