@@ -57,7 +57,7 @@ public class ConfigService {
 
         this.build();
 
-        this.configuration = factory.loadJoin(new File("config.json"), new File("build.txt"));
+        this.configuration = factory.loadJoin(new File("config.json"), new File("build.json"));
 
         if (configuration.opt("AutoUpdate") == null)
             configuration.put("AutoUpdate", true);
@@ -70,10 +70,10 @@ public class ConfigService {
 
     }
 
-    public void build(){
-        File file = new File("build.txt");
+    public void build() {
+        File file = new File("build.json");
 
-        if(!file.exists()){
+        if (!file.exists()) {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("Build", JFQL.getInstance().getVersion());
             jsonObject.put("Date", LocalDate.now());

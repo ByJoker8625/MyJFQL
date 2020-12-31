@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Arrays;
-import java.util.Map;
 
 /**
  * @author Janick
@@ -34,7 +33,7 @@ public class FileFactory {
         }
     }
 
-    public JSONObject loadJoin(File... files){
+    public JSONObject loadJoin(File... files) {
         JSONObject jsonObject = new JSONObject();
 
         Arrays.stream(files).map(file -> load(file).toMap()).forEach(map -> map.keySet().forEach(key -> jsonObject.put(key, map.get(key))));

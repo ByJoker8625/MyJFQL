@@ -76,7 +76,7 @@ public abstract class User {
                 '}';
     }
 
-    public static enum Property {
+    public enum Property {
         CONSOLE,
         NO_DELETE,
         NO_EDIT

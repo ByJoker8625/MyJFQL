@@ -3,6 +3,8 @@ package de.jokergames.jfql.command;
 import de.jokergames.jfql.command.executor.Executor;
 import de.jokergames.jfql.command.executor.RemoteExecutor;
 import de.jokergames.jfql.core.JFQL;
+import de.jokergames.jfql.database.Database;
+import de.jokergames.jfql.database.DatabaseService;
 import de.jokergames.jfql.user.RemoteUser;
 import de.jokergames.jfql.user.User;
 import de.jokergames.jfql.user.UserService;
@@ -19,7 +21,7 @@ import java.util.Map;
 public class UserCommand extends Command {
 
     public UserCommand() {
-        super("USER", List.of("COMMAND", "CREATE", "PASSWORD", "DELETE", "ADD", "REMOVE", "DISPLAY", "PERMISSION"), List.of("USR"));
+        super("USER", List.of("COMMAND", "CREATE", "DATABASE", "PASSWORD", "DELETE", "ADD", "REMOVE", "DISPLAY", "PERMISSION"), List.of("USR"));
     }
 
     @Override
@@ -29,6 +31,7 @@ public class UserCommand extends Command {
         }
 
         final UserService userService = JFQL.getInstance().getUserService();
+        final DatabaseService databaseService = JFQL.getInstance().getDatabaseService();
 
         if (arguments.containsKey("CREATE") && arguments.containsKey("PASSWORD")) {
             String name = JFQL.getInstance().getFormatter().formatString(arguments.get("CREATE"));
@@ -39,7 +42,39 @@ public class UserCommand extends Command {
                 return true;
             }
 
-            userService.saveUser(new RemoteUser(name, password));
+            final User usr = new RemoteUser(name, password);
+
+            if (arguments.containsKey("DATABASE")) {
+                if (databaseService.getDataBase(usr.getName()) != null) {
+                    JFQL.getInstance().getConsole().logError("A database with name '" + user.getName() + "' already exists!");
+                    return true;
+                }
+
+                final Database database = new Database(usr.getName());
+
+                {
+                    usr.getPermissions().add("execute.create");
+                    usr.getPermissions().add("execute.delete");
+                    usr.getPermissions().add("execute.remove");
+                    usr.getPermissions().add("execute.insert");
+                    usr.getPermissions().add("execute.select");
+                    usr.getPermissions().add("execute.list");
+                    usr.getPermissions().add("execute.use");
+
+                    usr.getPermissions().add("execute.create.table.*");
+                    usr.getPermissions().add("execute.delete.database." + database.getName());
+                    usr.getPermissions().add("execute.delete.table.*");
+                    usr.getPermissions().add("execute.remove.database." + database.getName() + ".*");
+                    usr.getPermissions().add("execute.insert.database." + database.getName() + ".*");
+                    usr.getPermissions().add("execute.select.database." + database.getName() + ".*");
+                    usr.getPermissions().add("execute.list.tables");
+                    usr.getPermissions().add("execute.use.database." + database.getName());
+                }
+
+                databaseService.saveDataBase(database);
+            }
+
+            userService.saveUser(usr);
             JFQL.getInstance().getConsole().logInfo("User '" + name + "' was created.");
             return true;
         }
