@@ -67,7 +67,7 @@ public class ListCommand extends Command {
             }
 
             if (arguments.containsKey("DATABASES")) {
-                if (!user.hasPermission("execute.list.database")) {
+                if (!user.hasPermission("execute.list.databases")) {
                     return false;
                 }
 

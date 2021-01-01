@@ -68,7 +68,8 @@ public class UserCommand extends Command {
                     usr.getPermissions().add("execute.insert.database." + database.getName() + ".*");
                     usr.getPermissions().add("execute.select.database." + database.getName() + ".*");
                     usr.getPermissions().add("execute.list.tables");
-                    usr.getPermissions().add("execute.use.database." + database.getName());
+                    usr.getPermissions().add("execute.list.databases");
+                    usr.getPermissions().add("execute.use." + database.getName());
                 }
 
                 databaseService.saveDataBase(database);
