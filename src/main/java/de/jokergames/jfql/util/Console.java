@@ -19,12 +19,16 @@ public class Console {
         this.scanner = new Scanner(System.in);
     }
 
-    public void clean(String s) {
+    public void println(String s) {
         System.out.println(s);
     }
 
+    public void print(String s) {
+        System.out.print(s);
+    }
+
     public void clean() {
-        clean("");
+        println("");
     }
 
     public String read() {
@@ -32,19 +36,19 @@ public class Console {
     }
 
     public void logInfo(String s) {
-        clean("[" + getTime() + "] INFO: " + s);
+        println("[" + getTime() + "] INFO: " + s);
     }
 
     public void logError(String s) {
-        clean("[" + getTime() + "] ERROR: " + s);
+        println("[" + getTime() + "] ERROR: " + s);
     }
 
     public void log(String s) {
-        clean("[" + getTime() + "] " + s);
+        println("[" + getTime() + "] " + s);
     }
 
     public void logWarning(String s) {
-        clean("[" + getTime() + "] WARNING: " + s);
+        println("[" + getTime() + "] WARNING: " + s);
     }
 
     public Scanner getScanner() {

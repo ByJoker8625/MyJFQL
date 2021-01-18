@@ -129,6 +129,19 @@ public class CreateCommand extends Command {
             if (arguments.containsKey("SCRIPT")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
 
+                if (name.equals("")) {
+                    console.sendError("Bad script name!");
+                    return true;
+                }
+
+                if (JFQL.getInstance().getScriptService().getScript(name) != null) {
+                    System.out.print("[" + JFQL.getInstance().getConsole().getTime() + "] WARNING: Script already exists. Do you want to overwrite it [y/n]: ");
+
+                    if (!JFQL.getInstance().getConsole().read().equals("y")) {
+                        return true;
+                    }
+                }
+
                 final Script script = new Script(name);
 
                 if (arguments.containsKey("SRC")) {

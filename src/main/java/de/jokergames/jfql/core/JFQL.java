@@ -49,7 +49,7 @@ public final class JFQL {
     public JFQL() {
         instance = this;
 
-        this.version = "1.2.5";
+        this.version = "1.2.6";
         this.console = new Console();
         this.connection = new Connection();
         this.downloader = new Downloader(connection);
@@ -71,7 +71,7 @@ public final class JFQL {
     }
 
     public void start() {
-        console.clean("      _                  ______ _ _       ____                        _                                                    \n" +
+        console.println("      _                  ______ _ _       ____                        _                                                    \n" +
                 "     | |                |  ____(_) |     / __ \\                      | |                                                   \n" +
                 "     | | __ ___   ____ _| |__   _| | ___| |  | |_   _  ___ _ __ _   _| |     __ _ _ __   __ _ _   _  __ _ _ __   __ _  ___ \n" +
                 " _   | |/ _` \\ \\ / / _` |  __| | | |/ _ \\ |  | | | | |/ _ \\ '__| | | | |    / _` | '_ \\ / _` | | | |/ _` | '_ \\ / _` |/ _ \\\n" +

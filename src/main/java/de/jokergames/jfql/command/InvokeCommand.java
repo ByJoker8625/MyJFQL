@@ -18,7 +18,7 @@ import java.util.Map;
 public class InvokeCommand extends Command {
 
     public InvokeCommand() {
-        super("INVOKE", List.of("COMMAND", "SCRIPT", "AS"), List.of("INV"));
+        super("INVOKE", List.of("COMMAND", "SCRIPT", "AS", "DISPLAY"), List.of("INV"));
     }
 
     @Override
@@ -56,6 +56,7 @@ public class InvokeCommand extends Command {
 
             if (arguments.containsKey("SCRIPT")) {
                 String name = JFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
+                boolean display = false;
 
                 if (scriptService.getScript(name) == null) {
                     console.sendError("Script '" + name + "' doesn't exists!");
@@ -75,8 +76,12 @@ public class InvokeCommand extends Command {
                     usr = userService.getUser(as);
                 }
 
+                if (arguments.containsKey("DISPLAY")) {
+                    display = JFQL.getInstance().getFormatter().formatBoolean(arguments.get("DISPLAY"));
+                }
+
                 console.sendInfo("Invoking script '" + name + "'...");
-                scriptService.invokeScript(name, usr, false);
+                scriptService.invokeScript(name, usr, display);
                 console.sendInfo("Script successful executed.");
                 return true;
             }

@@ -56,29 +56,21 @@ public class Formatter {
             return null;
         }
 
-        String[] args = new String[strings.size()];
-        int index = 0;
+        String section = null;
 
-        for (String s : strings) {
-            args[index] = s;
-            index++;
-        }
-
-        String selection = null;
-
-        for (String current : args) {
+        for (String current : strings) {
             if (keys.contains(current.toUpperCase())) {
-                selection = current.toUpperCase();
-                arguments.put(selection, new ArrayList<>());
+                section = current.toUpperCase();
+                arguments.put(section, new ArrayList<>());
             } else {
-                if (selection == null) {
+                if (section == null) {
                     throw new RuntimeException();
                 }
 
-                if (!arguments.containsKey(selection)) {
-                    arguments.put(selection, Collections.singletonList(current));
+                if (!arguments.containsKey(section)) {
+                    arguments.put(section, Collections.singletonList(current));
                 } else {
-                    arguments.get(selection).add(current);
+                    arguments.get(section).add(current);
                 }
 
             }
@@ -112,6 +104,19 @@ public class Formatter {
         }
 
         return Integer.parseInt(string.replace("'", ""));
+    }
+
+    public boolean formatBoolean(List<String> strings) {
+        if (strings.size() == 0)
+            return false;
+
+        String string = strings.get(0);
+
+        for (int i = 1; i < strings.size(); i++) {
+            string += " " + strings.get(i);
+        }
+
+        return Boolean.parseBoolean(string);
     }
 
     public double formatDouble(List<String> strings) {
