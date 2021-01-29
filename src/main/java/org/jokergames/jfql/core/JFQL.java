@@ -1,6 +1,5 @@
 package org.jokergames.jfql.core;
 
-import de.jokergames.jfql.command.*;
 import org.jokergames.jfql.command.*;
 import org.jokergames.jfql.core.lang.Formatter;
 import org.jokergames.jfql.core.script.Script;
@@ -19,7 +18,6 @@ import org.jokergames.jfql.module.ModuleService;
 import org.jokergames.jfql.server.Server;
 import org.jokergames.jfql.user.ConsoleUser;
 import org.jokergames.jfql.user.UserService;
-import de.jokergames.jfql.util.*;
 import org.jokergames.jfql.util.*;
 import org.json.JSONObject;
 
@@ -51,7 +49,7 @@ public final class JFQL {
     public JFQL() {
         instance = this;
 
-        this.version = "1.2.6";
+        this.version = "1.2.7";
         this.console = new Console();
         this.connection = new Connection();
         this.downloader = new Downloader(connection);
@@ -85,10 +83,10 @@ public final class JFQL {
         console.logInfo("Version » " + version);
         console.clean();
 
-        console.logInfo("Connecting to " + configuration.getString("Server") + "...");
+        console.logInfo("Connecting to " + configuration.getString("UpdateServer") + "...");
 
         try {
-            connection.connect(configuration.getString("Server"));
+            connection.connect(configuration.getString("UpdateServer"));
 
             if (connection.isMaintenance()) {
                 console.logWarning("Database is currently in maintenance!");

@@ -1,10 +1,10 @@
 package org.jokergames.jfql.command.executor;
 
+import io.javalin.http.Context;
 import org.jokergames.jfql.core.JFQL;
 import org.jokergames.jfql.exception.CommandException;
 import org.jokergames.jfql.exception.NetworkException;
 import org.jokergames.jfql.server.util.ResponseBuilder;
-import io.javalin.http.Context;
 import org.json.JSONObject;
 
 import java.util.List;

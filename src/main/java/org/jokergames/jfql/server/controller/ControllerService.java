@@ -1,7 +1,7 @@
 package org.jokergames.jfql.server.controller;
 
-import org.jokergames.jfql.exception.NetworkException;
 import io.javalin.http.Context;
+import org.jokergames.jfql.exception.NetworkException;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

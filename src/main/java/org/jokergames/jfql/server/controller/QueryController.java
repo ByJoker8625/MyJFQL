@@ -1,5 +1,6 @@
 package org.jokergames.jfql.server.controller;
 
+import io.javalin.http.Context;
 import org.jokergames.jfql.command.executor.RemoteExecutor;
 import org.jokergames.jfql.core.JFQL;
 import org.jokergames.jfql.event.ClientLoginEvent;
@@ -7,7 +8,6 @@ import org.jokergames.jfql.server.util.Method;
 import org.jokergames.jfql.server.util.RequestReader;
 import org.jokergames.jfql.user.User;
 import org.jokergames.jfql.user.UserService;
-import io.javalin.http.Context;
 import org.json.JSONObject;
 
 /**

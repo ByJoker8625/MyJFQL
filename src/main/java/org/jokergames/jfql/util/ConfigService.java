@@ -50,7 +50,7 @@ public class ConfigService {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("AutoUpdate", true);
             jsonObject.put("Port", 2291);
-            jsonObject.put("Server", "https://joker-games.org/lib/myjfql/rest.json");
+            jsonObject.put("UpdateServer", "https://joker-games.org/lib/myjfql/rest.json");
 
             factory.save(file, jsonObject);
         }
@@ -65,8 +65,8 @@ public class ConfigService {
         if (configuration.opt("Port") == null)
             configuration.put("Port", 2291);
 
-        if (configuration.opt("Server") == null)
-            configuration.put("Server", "https://joker-games.org/lib/myjfql/rest.json");
+        if (configuration.opt("UpdateServer") == null)
+            configuration.put("UpdateServer", "https://joker-games.org/lib/myjfql/rest.json");
 
     }
 

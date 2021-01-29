@@ -1,11 +1,9 @@
 package org.jokergames.jfql.server;
 
-import org.jokergames.jfql.core.JFQL;
-import de.jokergames.jfql.server.controller.*;
-import org.jokergames.jfql.server.util.ResponseBuilder;
 import io.javalin.Javalin;
+import org.jokergames.jfql.core.JFQL;
 import org.jokergames.jfql.server.controller.*;
-import org.jokergames.jfql.server.util.Method;
+import org.jokergames.jfql.server.util.ResponseBuilder;
 
 import java.util.List;
 
@@ -35,13 +33,13 @@ public class Server {
 
             for (ControllerHandler declarer : declarers) {
                 switch (declarer.method()) {
-                    case Method.STATUS:
+                    case STATUS:
                         app.error(declarer.status(), context -> controllerService.invokeMethodsByDeclarerAndController(controller, declarer, context));
                         break;
-                    case Method.GET:
+                    case GET:
                         app.get(declarer.path(), context -> controllerService.invokeMethodsByDeclarerAndController(controller, declarer, context));
                         break;
-                    case Method.POST:
+                    case POST:
                         app.post(declarer.path(), context -> controllerService.invokeMethodsByDeclarerAndController(controller, declarer, context));
                         break;
                 }

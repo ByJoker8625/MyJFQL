@@ -1,8 +1,8 @@
 package org.jokergames.jfql.server.controller;
 
+import io.javalin.http.Context;
 import org.jokergames.jfql.core.JFQL;
 import org.jokergames.jfql.server.util.Method;
-import io.javalin.http.Context;
 
 /**
  * @author Janick
