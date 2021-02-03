@@ -14,6 +14,10 @@ public class Formatter {
 
 
     public Map<String, List<String>> formatCommand(String command) {
+        if (command.startsWith("#")) {
+            return Map.of("COMMAND", List.of("#"));
+        }
+
         Map<String, List<String>> arguments = new HashMap<>();
 
         String[] cmd = command.split(" ");
