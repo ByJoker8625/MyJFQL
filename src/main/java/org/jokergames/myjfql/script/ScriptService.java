@@ -57,6 +57,14 @@ public class ScriptService {
             MyJFQL.getInstance().getCommandService().execute(user, executor, MyJFQL.getInstance().getFormatter().formatCommand(command));
     }
 
+    public void deleteScript(String name) {
+        deleteScript(new Script(name));
+    }
+
+    public void deleteScript(Script script) {
+        scripts.remove(script);
+    }
+
     public void saveScript(Script script) {
         for (int i = 0, scriptsSize = scripts.size(); i < scriptsSize; i++) {
             if (scripts.get(i).getName().equals(script.getName())) {

@@ -33,6 +33,15 @@ public class DatabaseService {
         databases.add(database);
     }
 
+    public void deleteDatabase(String name) {
+        deleteDatabase(new Database(name));
+    }
+
+
+    public void deleteDatabase(Database database) {
+        databases.remove(database);
+    }
+
     public Database getDataBase(String name) {
         return databases.stream().filter(database -> database.getName().equals(name)).findFirst().orElse(null);
     }

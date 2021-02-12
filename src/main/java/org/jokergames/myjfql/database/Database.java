@@ -3,6 +3,7 @@ package org.jokergames.myjfql.database;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Janick
@@ -53,6 +54,19 @@ public class Database {
         }
 
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Database database = (Database) o;
+        return Objects.equals(name, database.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 
     @Override
