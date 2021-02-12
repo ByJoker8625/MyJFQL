@@ -62,7 +62,12 @@ public class ScriptService {
     }
 
     public void deleteScript(Script script) {
-        scripts.remove(script);
+        for (int i = 0, scriptsSize = scripts.size(); i < scriptsSize; i++) {
+            if (scripts.get(i).getName().equals(script.getName())) {
+                scripts.remove(i);
+                return;
+            }
+        }
     }
 
     public void saveScript(Script script) {

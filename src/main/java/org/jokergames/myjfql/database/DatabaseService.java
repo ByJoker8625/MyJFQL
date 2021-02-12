@@ -39,7 +39,11 @@ public class DatabaseService {
 
 
     public void deleteDatabase(Database database) {
-        databases.remove(database);
+        for (int i = 0, databasesSize = databases.size(); i < databasesSize; i++) {
+            if (databases.get(i).getName().equals(database.getName())) {
+                databases.remove(i);
+            }
+        }
     }
 
     public Database getDataBase(String name) {
