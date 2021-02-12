@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: org.jokergames.jfql.core.boot.Boot
+Main-Class: org.jokergames.myjfql.core.boot.Boot
 
