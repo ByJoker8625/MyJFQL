@@ -72,6 +72,10 @@ public class UserService {
     }
 
     public void update() {
+        for (File file : new File("user").listFiles()) {
+            file.delete();
+        }
+
         for (User user : users) {
             final File file = new File("user/" + user.getName() + ".json");
 

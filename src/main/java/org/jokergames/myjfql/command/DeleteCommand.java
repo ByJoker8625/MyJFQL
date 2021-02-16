@@ -117,7 +117,7 @@ public class DeleteCommand extends Command {
                 }
 
                 console.sendInfo("Delete script '" + name + "'.");
-                scriptService.getScript(name).getFile().delete();
+                scriptService.deleteScript(name);
                 return true;
             }
 
@@ -130,7 +130,7 @@ public class DeleteCommand extends Command {
                 }
 
                 console.sendInfo("Database '" + name + "' was deleted.");
-                dataBaseService.getDataBase(name).getFile().delete();
+                dataBaseService.deleteDatabase(name);
                 return true;
             }
 

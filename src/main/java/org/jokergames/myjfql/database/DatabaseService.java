@@ -95,6 +95,10 @@ public class DatabaseService {
     }
 
     public void update() {
+        for (File file : new File("database").listFiles()) {
+            file.delete();
+        }
+
         for (Database database : databases) {
             final File file = new File("database/" + database.getName() + ".json");
 
@@ -104,6 +108,7 @@ public class DatabaseService {
 
             fileFactory.save(file, jsonObject);
         }
+
     }
 
 }
