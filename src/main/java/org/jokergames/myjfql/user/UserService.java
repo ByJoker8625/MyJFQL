@@ -22,7 +22,7 @@ public class UserService {
     }
 
     public void saveUser(User user) {
-        for (int i = 0, scriptsSize = users.size(); i < scriptsSize; i++) {
+        for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getName().equals(user.getName())) {
                 users.set(i, user);
                 return;

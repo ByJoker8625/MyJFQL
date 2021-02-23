@@ -39,9 +39,9 @@ public class DatabaseService {
 
 
     public void deleteDatabase(Database database) {
-        for (int i = 0, databasesSize = databases.size(); i < databasesSize; i++) {
+        for (int i = 0; i < databases.size(); i++) {
             if (databases.get(i).getName().equals(database.getName())) {
-                databases.remove(i);
+                databases.remove(databases.get(i));
             }
         }
     }
