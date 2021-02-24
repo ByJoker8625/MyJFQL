@@ -61,15 +61,15 @@ public class UserCommand extends Command {
                     usr.getPermissions().add("execute.list");
                     usr.getPermissions().add("execute.use");
 
-                    usr.getPermissions().add("execute.create.table.*");
-                    usr.getPermissions().add("execute.delete.database." + database.getName());
-                    usr.getPermissions().add("execute.delete.table.*");
-                    usr.getPermissions().add("execute.remove.database." + database.getName() + ".*");
-                    usr.getPermissions().add("execute.insert.database." + database.getName() + ".*");
-                    usr.getPermissions().add("execute.select.database." + database.getName() + ".*");
-                    usr.getPermissions().add("execute.list.tables");
-                    usr.getPermissions().add("execute.list.databases");
-                    usr.getPermissions().add("execute.use." + database.getName());
+                    usr.getPermissions().add("execute.create.table.*".toLowerCase());
+                    usr.getPermissions().add("execute.delete.database." + database.getName().toLowerCase());
+                    usr.getPermissions().add("execute.delete.table.*".toLowerCase());
+                    usr.getPermissions().add("execute.remove.database." + database.getName() + ".*".toLowerCase());
+                    usr.getPermissions().add("execute.insert.database." + database.getName() + ".*".toLowerCase());
+                    usr.getPermissions().add("execute.select.database." + database.getName() + ".*".toLowerCase());
+                    usr.getPermissions().add("execute.list.tables".toLowerCase());
+                    usr.getPermissions().add("execute.list.databases".toLowerCase());
+                    usr.getPermissions().add("execute.use." + database.getName().toLowerCase());
                 }
 
                 databaseService.saveDataBase(database);
@@ -96,7 +96,7 @@ public class UserCommand extends Command {
             }
 
             MyJFQL.getInstance().getConsole().logInfo("User '" + name + "' was deleted.");
-            usr.getFile().delete();
+            userService.deleteUser(usr);
             return true;
         }
 

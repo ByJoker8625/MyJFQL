@@ -40,6 +40,19 @@ public class UserService {
         return users;
     }
 
+
+    public void deleteUser(User user) {
+        deleteUser(user.getName());
+    }
+
+    public void deleteUser(String name) {
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getName().equals(name)) {
+                users.remove(users.get(i));
+            }
+        }
+    }
+
     public void init() {
         for (File file : new File("user").listFiles()) {
             final JSONObject jsonObject = fileFactory.load(file);
