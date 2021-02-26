@@ -1,8 +1,16 @@
 package org.jokergames.myjfql.util;
 
-import java.io.PrintStream;
+import jline.console.ConsoleReader;
+import jline.console.completer.StringsCompleter;
+import org.jokergames.myjfql.command.Command;
+import org.jokergames.myjfql.core.MyJFQL;
+
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -11,20 +19,50 @@ import java.util.Scanner;
 
 public class Console {
 
-    private final PrintStream printStream;
-    private final Scanner scanner;
+    private PrintWriter writer;
+    private ConsoleReader reader;
+    private boolean input;
 
     public Console() {
-        this.printStream = System.out;
-        this.scanner = new Scanner(System.in);
+        input = true;
+
+        try {
+            this.reader = new ConsoleReader();
+            this.writer = new PrintWriter(reader.getOutput());
+
+            reader.setPrompt("> ");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
+
     public void println(String s) {
-        System.out.println(s);
+        writer.println(s);
+
+        if (!input) {
+            try {
+                reader.redrawLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        writer.flush();
     }
 
     public void print(String s) {
-        System.out.print(s);
+        writer.print(s);
+
+        if (!input) {
+            try {
+                reader.redrawLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        writer.flush();
     }
 
     public void clean() {
@@ -32,7 +70,39 @@ public class Console {
     }
 
     public String read() {
-        return scanner.nextLine();
+        try {
+            return reader.readLine();
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    public void clear() {
+        try {
+            reader.clearScreen();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void completer() {
+        List<String> nativeCommands = new ArrayList<>();
+        List<String> lowerCommands = new ArrayList<>();
+
+
+        for (Command command : MyJFQL.getInstance().getCommandService().getCommands()) {
+            nativeCommands.add(command.getName());
+            lowerCommands.add(command.getName().toLowerCase());
+
+            for (String alias : command.getAliases()) {
+                nativeCommands.add(alias);
+                lowerCommands.add(alias.toLowerCase());
+            }
+
+        }
+
+        reader.addCompleter(new StringsCompleter(nativeCommands));
+        reader.addCompleter(new StringsCompleter(lowerCommands));
     }
 
     public void logInfo(String s) {
@@ -51,17 +121,29 @@ public class Console {
         println("[" + getTime() + "] WARNING: " + s);
     }
 
-    public Scanner getScanner() {
-        return scanner;
+    public ConsoleReader getReader() {
+        return reader;
     }
 
-    public PrintStream getPrintStream() {
-        return printStream;
+    public Scanner getScanner() {
+        return new Scanner(System.in);
+    }
+
+    public PrintWriter getWriter() {
+        return writer;
     }
 
     public String getTime() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return simpleDateFormat.format(new Date());
+    }
+
+    public boolean isInput() {
+        return input;
+    }
+
+    public void setInput(boolean input) {
+        this.input = input;
     }
 
 }

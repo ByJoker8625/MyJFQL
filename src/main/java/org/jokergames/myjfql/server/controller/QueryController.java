@@ -57,12 +57,13 @@ public class QueryController implements Controller {
             }
 
             MyJFQL.getInstance().getEventService().callEvent(ClientLoginEvent.TYPE, new ClientLoginEvent(executor, true));
+            MyJFQL.getInstance().getConsole().setInput(false);
             MyJFQL.getInstance().getConsole().logInfo("[" + executor.getName() + "/" + user.getName() + "] queried ('" + jsonObject.getString("query") + "').");
+            MyJFQL.getInstance().getConsole().setInput(true);
 
             boolean exec = MyJFQL.getInstance().getCommandService().execute(user, executor, MyJFQL.getInstance().getFormatter().formatCommand(jsonObject.getString("query")));
 
             if (!exec) {
-                System.out.println("forbidden");
                 executor.sendForbidden();
             }
 

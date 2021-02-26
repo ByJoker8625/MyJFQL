@@ -49,7 +49,7 @@ public final class MyJFQL {
     public MyJFQL() {
         instance = this;
 
-        this.version = "1.2.8";
+        this.version = "1.2.9";
         this.console = new Console();
         this.connection = new Connection();
         this.downloader = new Downloader(connection);
@@ -133,6 +133,7 @@ public final class MyJFQL {
 
         try {
             commandService.registerCommand(new ShutdownCommand());
+            commandService.registerCommand(new ClearCommand());
             commandService.registerCommand(new UserCommand());
             commandService.registerCommand(new VersionCommand());
             commandService.registerCommand(new ListCommand());
@@ -184,6 +185,9 @@ public final class MyJFQL {
         } catch (Exception ex) {
             throw new InternalException("Can't update database cache!");
         }
+
+        console.setInput(true);
+        console.completer();
 
         while (true) {
             commandService.execute(formatter.formatCommand(console.read()));
