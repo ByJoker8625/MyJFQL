@@ -17,7 +17,7 @@ public class VersionCommand extends Command {
 
 
     public VersionCommand() {
-        super("VERSION", List.of("COMMAND", "DISPLAY", "UPDATE"), List.of("VER"));
+        super("VERSION", List.of("COMMAND", "DISPLAY", "UPDATE"));
     }
 
     @Override

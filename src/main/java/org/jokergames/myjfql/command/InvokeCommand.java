@@ -18,7 +18,7 @@ import java.util.Map;
 public class InvokeCommand extends Command {
 
     public InvokeCommand() {
-        super("INVOKE", List.of("COMMAND", "SCRIPT", "AS", "DISPLAY"), List.of("INV"));
+        super("INVOKE", List.of("COMMAND", "SCRIPT", "AS", "DISPLAY"));
     }
 
     @Override

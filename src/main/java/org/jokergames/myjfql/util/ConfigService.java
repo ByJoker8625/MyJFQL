@@ -49,6 +49,7 @@ public class ConfigService {
         if (!file.exists()) {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("AutoUpdate", true);
+            jsonObject.put("Uppercase", false);
             jsonObject.put("Port", 2291);
             jsonObject.put("UpdateServer", "https://joker-games.org/lib/myjfql/rest.json");
 
@@ -61,6 +62,9 @@ public class ConfigService {
 
         if (configuration.opt("AutoUpdate") == null)
             configuration.put("AutoUpdate", true);
+
+        if (configuration.opt("Uppercase") == null)
+            configuration.put("Uppercase", false);
 
         if (configuration.opt("Port") == null)
             configuration.put("Port", 2291);

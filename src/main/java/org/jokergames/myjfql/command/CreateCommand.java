@@ -22,7 +22,7 @@ import java.util.Scanner;
 public class CreateCommand extends Command {
 
     public CreateCommand() {
-        super("CREATE", List.of("COMMAND", "SCRIPT", "DATABASE", "TABLE", "STRUCTURE", "INTO", "PRIMARY-KEY", "SRC"), List.of("CRE"));
+        super("CREATE", List.of("COMMAND", "SCRIPT", "DATABASE", "TABLE", "STRUCTURE", "INTO", "PRIMARY-KEY", "SRC"));
     }
 
     @Override

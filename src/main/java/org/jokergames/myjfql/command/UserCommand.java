@@ -21,7 +21,7 @@ import java.util.Map;
 public class UserCommand extends Command {
 
     public UserCommand() {
-        super("USER", List.of("COMMAND", "CREATE", "DATABASE", "PASSWORD", "DELETE", "ADD", "REMOVE", "DISPLAY", "PERMISSION"), List.of("USR"));
+        super("USER", List.of("COMMAND", "CREATE", "DATABASE", "PASSWORD", "DELETE", "ADD", "REMOVE", "DISPLAY", "PERMISSION"));
     }
 
     @Override

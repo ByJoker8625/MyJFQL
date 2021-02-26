@@ -8,10 +8,15 @@ import org.jokergames.myjfql.user.User;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Janick
+ * @language This commands is not a JFQL query. It is only for the DBMS management.
+ */
+
 public class ClearCommand extends Command {
 
     public ClearCommand() {
-        super("CLEAR", List.of("COMMAND"), List.of("CLS"));
+        super("CLEAR", List.of("COMMAND"));
     }
 
     @Override

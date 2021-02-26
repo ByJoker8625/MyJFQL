@@ -101,8 +101,14 @@ public class Console {
 
         }
 
-        reader.addCompleter(new StringsCompleter(nativeCommands));
-        reader.addCompleter(new StringsCompleter(lowerCommands));
+        if (MyJFQL.getInstance().getConfiguration().getBoolean("Uppercase")) {
+            reader.addCompleter(new StringsCompleter(nativeCommands));
+            reader.addCompleter(new StringsCompleter(lowerCommands));
+        } else {
+            reader.addCompleter(new StringsCompleter(lowerCommands));
+            reader.addCompleter(new StringsCompleter(nativeCommands));
+        }
+
     }
 
     public void logInfo(String s) {

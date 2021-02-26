@@ -19,7 +19,7 @@ import java.util.Map;
 public class DeleteCommand extends Command {
 
     public DeleteCommand() {
-        super("DELETE", List.of("COMMAND", "SCRIPT", "TABLE", "DATABASE", "FROM"), List.of("DEL"));
+        super("DELETE", List.of("COMMAND", "SCRIPT", "TABLE", "DATABASE", "FROM"));
     }
 
     @Override

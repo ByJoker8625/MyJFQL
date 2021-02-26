@@ -26,7 +26,7 @@ public class SelectCommand extends Command {
 
 
     public SelectCommand() {
-        super("SELECT", List.of("COMMAND", "SCRIPT", "WHERE", "FROM", "VALUE", "PRIMARY-KEY", "LIMIT", "SORT", "ORDER"), List.of("SEL"));
+        super("SELECT", List.of("COMMAND", "SCRIPT", "WHERE", "FROM", "VALUE", "PRIMARY-KEY", "LIMIT", "SORT", "ORDER"));
     }
 
     @Override
