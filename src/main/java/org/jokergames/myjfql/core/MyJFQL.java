@@ -187,7 +187,8 @@ public final class MyJFQL {
         }
 
         console.setInput(true);
-        console.completer();
+
+        console.stc();
 
         while (true) {
             commandService.execute(formatter.formatCommand(console.read()));

@@ -85,7 +85,7 @@ public class Console {
         }
     }
 
-    public void completer() {
+    public void stc() {
         List<String> nativeCommands = new ArrayList<>();
         List<String> lowerCommands = new ArrayList<>();
 

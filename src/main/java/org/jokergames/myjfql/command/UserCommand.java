@@ -5,6 +5,7 @@ import org.jokergames.myjfql.command.executor.RemoteExecutor;
 import org.jokergames.myjfql.core.MyJFQL;
 import org.jokergames.myjfql.database.Database;
 import org.jokergames.myjfql.database.DatabaseService;
+import org.jokergames.myjfql.user.ConsoleUser;
 import org.jokergames.myjfql.user.RemoteUser;
 import org.jokergames.myjfql.user.User;
 import org.jokergames.myjfql.user.UserService;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class UserCommand extends Command {
 
     public UserCommand() {
-        super("USER", List.of("COMMAND", "CREATE", "DATABASE", "PASSWORD", "DELETE", "ADD", "REMOVE", "DISPLAY", "PERMISSION"));
+        super("USER", List.of("COMMAND", "CREATE", "DATABASE", "PASSWORD", "DELETE", "ADD", "REMOVE", "DISPLAY", "PERMISSION", "UPDATE"));
     }
 
     @Override
@@ -39,6 +40,11 @@ public class UserCommand extends Command {
 
             if (userService.getUser(name) != null) {
                 MyJFQL.getInstance().getConsole().logError("User '" + name + "' already exists!");
+                return true;
+            }
+
+            if (password.isEmpty()) {
+                MyJFQL.getInstance().getConsole().logError("Enter a password!");
                 return true;
             }
 
@@ -77,6 +83,34 @@ public class UserCommand extends Command {
 
             userService.saveUser(usr);
             MyJFQL.getInstance().getConsole().logInfo("User '" + name + "' was created.");
+            return true;
+        }
+
+        if (arguments.containsKey("UPDATE") && arguments.containsKey("PASSWORD")) {
+            String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("UPDATE"));
+            String password = MyJFQL.getInstance().getFormatter().formatString(arguments.get("PASSWORD"));
+
+            if (userService.getUser(name) == null) {
+                MyJFQL.getInstance().getConsole().logError("User '" + name + "' doesn't exists!");
+                return true;
+            }
+
+            User usr = userService.getUser(name);
+
+            if (usr instanceof ConsoleUser) {
+                MyJFQL.getInstance().getConsole().logError("Can't update user 'Console'!");
+                return true;
+            }
+
+            if (password.isEmpty()) {
+                MyJFQL.getInstance().getConsole().logError("Enter a password!");
+                return true;
+            }
+
+            usr.setPassword(password);
+            userService.saveUser(usr);
+
+            MyJFQL.getInstance().getConsole().logInfo("User '" + name + "' was updated.");
             return true;
         }
 
