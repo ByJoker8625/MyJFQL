@@ -80,7 +80,7 @@ public final class MyJFQL {
                 "                                                                 __/ |                   __/ |                   __/ |     \n" +
                 "                                                                |___/                   |___/                   |___/      ");
         console.logInfo("Developers » joker-games.org");
-        console.logInfo("Version » " + version);
+        console.logInfo("Version » " + version + " (" + configuration.getString("Date") + ")");
         console.clean();
 
         console.logInfo("Connecting to " + configuration.getString("UpdateServer") + "...");

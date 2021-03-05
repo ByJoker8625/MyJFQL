@@ -56,7 +56,7 @@ public class ConfigService {
             factory.save(file, jsonObject);
         }
 
-        this.build();
+        this.build(false);
 
         this.configuration = factory.loadJoin(new File("config.json"), new File("build.json"));
 
@@ -74,16 +74,22 @@ public class ConfigService {
 
     }
 
-    public void build() {
+    public void build(boolean overwrite) {
         File file = new File("build.json");
+        JSONObject jsonObject = new JSONObject();
 
-        if (!file.exists()) {
-            JSONObject jsonObject = new JSONObject();
+
+        if (overwrite) {
+            jsonObject.put("Build", MyJFQL.getInstance().getVersion());
+            jsonObject.put("Date", LocalDate.now());
+        } else if (!file.exists()) {
             jsonObject.put("Build", MyJFQL.getInstance().getVersion());
             jsonObject.put("Date", LocalDate.now());
 
-            factory.save(file, jsonObject);
         }
+
+        factory.save(file, jsonObject);
+
     }
 
     public JSONObject getConfig() {

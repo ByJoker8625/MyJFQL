@@ -47,7 +47,7 @@ public class Downloader {
             inputStream.close();
 
             MyJFQL.getInstance().getConsole().logInfo("Download completed.");
-            MyJFQL.getInstance().getConfigService().build();
+            MyJFQL.getInstance().getConfigService().build(true);
             System.exit(0);
         } catch (Exception ex) {
             throw new NetworkException("Download failed!");
