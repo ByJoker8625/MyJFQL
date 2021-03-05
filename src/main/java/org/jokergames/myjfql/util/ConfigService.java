@@ -82,13 +82,12 @@ public class ConfigService {
         if (overwrite) {
             jsonObject.put("Build", MyJFQL.getInstance().getVersion());
             jsonObject.put("Date", LocalDate.now());
+            factory.save(file, jsonObject);
         } else if (!file.exists()) {
             jsonObject.put("Build", MyJFQL.getInstance().getVersion());
             jsonObject.put("Date", LocalDate.now());
-
+            factory.save(file, jsonObject);
         }
-
-        factory.save(file, jsonObject);
 
     }
 
