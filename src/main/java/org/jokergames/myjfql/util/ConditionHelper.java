@@ -27,8 +27,8 @@ public class ConditionHelper {
                 .split(" OR ");
         final List<List<Requirement>> conditions = new ArrayList<>();
 
-        for (int j = 0; j < where.length; j++) {
-            String[] args = where[j]
+        for (String s : where) {
+            String[] args = s
                     .replace(" and ", " AND ")
                     .replace("not smaller ", "BIGGER ")
                     .replace(" not smaller ", " BIGGER ")
@@ -48,8 +48,8 @@ public class ConditionHelper {
 
             List<Requirement> list1 = new ArrayList<>();
 
-            for (int i = 0; i < args.length; i++) {
-                String[] strings = args[i].split(" = ");
+            for (String arg : args) {
+                String[] strings = arg.split(" = ");
                 Requirement.Type type = Requirement.Type.POSITIVE;
 
                 strings[0] = strings[0].replace("'", "");
@@ -105,15 +105,9 @@ public class ConditionHelper {
         }
 
         for (Column col : cols) {
-
-            for (List<Requirement> requirements : conditions) {
-
-                if (handleRequirement(requirements, table, col) == requirements.size()) {
-                    columns.add(col);
-                    break;
-                }
+            if (conditions.stream().anyMatch(requirements -> handleRequirement(requirements, table, col) == requirements.size())) {
+                columns.add(col);
             }
-
         }
 
         return columns;

@@ -4,6 +4,7 @@ import org.jokergames.myjfql.util.Sorter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Janick
@@ -45,15 +46,8 @@ public class Table {
         columns.removeIf(col -> col.getContent().get(primary).toString().equals(key));
     }
 
-
     public Column getColumn(String key) {
-        for (Column col : columns) {
-            if (col.getContent().get(primary).toString().equals(key)) {
-                return col;
-            }
-        }
-
-        return null;
+        return columns.stream().filter(col -> col.getContent().get(primary).toString().equals(key)).findFirst().orElse(null);
     }
 
     public List<Column> getColumns() {
@@ -93,6 +87,21 @@ public class Table {
 
     public void setPrimary(String primary) {
         this.primary = primary;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Table table = (Table) o;
+        return Objects.equals(name, table.name) &&
+                Objects.equals(structure, table.structure) &&
+                Objects.equals(primary, table.primary);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, structure, primary);
     }
 
     @Override

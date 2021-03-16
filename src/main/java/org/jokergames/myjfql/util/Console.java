@@ -2,7 +2,6 @@ package org.jokergames.myjfql.util;
 
 import jline.console.ConsoleReader;
 import jline.console.completer.StringsCompleter;
-import org.jokergames.myjfql.command.Command;
 import org.jokergames.myjfql.core.MyJFQL;
 
 import java.io.IOException;
@@ -90,16 +89,14 @@ public class Console {
         List<String> lowerCommands = new ArrayList<>();
 
 
-        for (Command command : MyJFQL.getInstance().getCommandService().getCommands()) {
+        MyJFQL.getInstance().getCommandService().getCommands().forEach(command -> {
             nativeCommands.add(command.getName());
             lowerCommands.add(command.getName().toLowerCase());
-
             for (String alias : command.getAliases()) {
                 nativeCommands.add(alias);
                 lowerCommands.add(alias.toLowerCase());
             }
-
-        }
+        });
 
         if (MyJFQL.getInstance().getConfiguration().getBoolean("Uppercase")) {
             reader.addCompleter(new StringsCompleter(nativeCommands));

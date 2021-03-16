@@ -16,8 +16,8 @@ public class FileFactory {
 
     public JSONObject load(File file) {
         try {
-            var reader = new FileReader(file);
-            var builder = new StringBuilder();
+            FileReader reader = new FileReader(file);
+            StringBuilder builder = new StringBuilder();
 
             int read;
 
@@ -42,7 +42,7 @@ public class FileFactory {
 
     public void save(File file, JSONObject jsonObject) {
         try {
-            var writer = new FileWriter(file);
+            FileWriter writer = new FileWriter(file);
             writer.write(jsonObject.toString());
             writer.close();
         } catch (Exception ex) {

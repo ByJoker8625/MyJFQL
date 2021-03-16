@@ -30,7 +30,8 @@ public class Connection {
     }
 
     public boolean latestIsBeta() {
-        return jsonObject.getString("Version").endsWith("-BETA") || jsonObject.getString("Version").endsWith("-SNAPSHOT");
+        return jsonObject.getString("Version").endsWith("-BETA")
+                || jsonObject.getString("Version").endsWith("-SNAPSHOT");
     }
 
     public boolean isLatest() {
@@ -40,7 +41,7 @@ public class Connection {
         final String version = jsonObject.getString("Version");
         final String current = MyJFQL.getInstance().getVersion();
 
-        if (current.compareTo(version) == 1)
+        if (current.compareTo(version) > 0)
             return true;
         else
             return version.equals(current);

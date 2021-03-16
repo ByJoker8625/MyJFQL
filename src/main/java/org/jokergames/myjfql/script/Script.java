@@ -60,14 +60,12 @@ public class Script {
 
     @Override
     public String toString() {
-        String s = "Script: \"" + name + "\" {\n";
+        StringBuilder builder = new StringBuilder("Script: \"" + name + "\" {\n");
 
         for (String command : commands) {
-            s += ": " + command + "\n";
+            builder.append(": ").append(command).append("\n");
         }
 
-        s += "}";
-
-        return s;
+        return builder.append("}").toString();
     }
 }

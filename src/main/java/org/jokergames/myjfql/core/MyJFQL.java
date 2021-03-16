@@ -165,7 +165,7 @@ public final class MyJFQL {
         }
 
         {
-            if (configService.first()) {
+            if (configService.isFirstStart()) {
                 scriptService.saveScript(new Script("create_default_db", "create database test", "use database test"));
                 scriptService.invokeScript("create_default_db", getConsoleUser(), false);
             }

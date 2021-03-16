@@ -31,7 +31,6 @@ public class Database {
         this.tables = tables;
     }
 
-
     public void addTable(Table table) {
         removeTable(table.getName());
         tables.add(table);
@@ -41,19 +40,12 @@ public class Database {
         tables.removeIf(table -> table.getName().equals(name));
     }
 
-
     public File getFile() {
         return new File("database/" + name + ".json");
     }
 
     public Table getTable(String name) {
-        for (Table table : tables) {
-            if (table.getName().equals(name)) {
-                return table;
-            }
-        }
-
-        return null;
+        return tables.stream().filter(table -> table.getName().equals(name)).findFirst().orElse(null);
     }
 
     @Override

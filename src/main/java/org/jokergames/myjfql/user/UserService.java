@@ -5,7 +5,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Janick
@@ -40,33 +42,24 @@ public class UserService {
         return users;
     }
 
-
     public void deleteUser(User user) {
         deleteUser(user.getName());
     }
 
     public void deleteUser(String name) {
-        for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getName().equals(name)) {
-                users.remove(users.get(i));
-            }
-        }
+        users.removeIf(user -> user.getName().equals(name));
     }
 
     public void init() {
-        for (File file : new File("user").listFiles()) {
-            final JSONObject jsonObject = fileFactory.load(file);
+        Arrays.stream(Objects.requireNonNull(new File("user").listFiles())).map(fileFactory::load).forEach(jsonObject -> {
             List<User.Property> properties = new ArrayList<>();
             List<String> permissions = new ArrayList<>();
-
             for (Object prop : jsonObject.getJSONArray("properties").toList()) {
                 properties.add(User.Property.valueOf(prop.toString()));
             }
-
             for (Object perms : jsonObject.getJSONArray("permissions").toList()) {
                 permissions.add(perms.toString().toLowerCase());
             }
-
             if (!properties.contains(User.Property.CONSOLE)) {
                 RemoteUser remoteUser = new RemoteUser(jsonObject.getString("name"), jsonObject.getString("password"));
                 remoteUser.setProperties(properties);
@@ -80,26 +73,22 @@ public class UserService {
 
                 users.add(consoleUser);
             }
-        }
+        });
 
     }
 
     public void update() {
-        for (File file : new File("user").listFiles()) {
-            file.delete();
-        }
+        Arrays.stream(Objects.requireNonNull(new File("user").listFiles())).forEach(File::delete);
 
-        for (User user : users) {
+        users.forEach(user -> {
             final File file = new File("user/" + user.getName() + ".json");
-
             final JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", user.getName());
             jsonObject.put("password", user.getPassword());
             jsonObject.put("permissions", user.getPermissions());
             jsonObject.put("properties", user.getProperties());
-
             fileFactory.save(file, jsonObject);
-        }
+        });
     }
 
 }

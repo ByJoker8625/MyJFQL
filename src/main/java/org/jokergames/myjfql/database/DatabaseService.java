@@ -7,6 +7,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.IntStream;
 
 /**
  * @author Janick
@@ -39,11 +41,7 @@ public class DatabaseService {
 
 
     public void deleteDatabase(Database database) {
-        for (int i = 0; i < databases.size(); i++) {
-            if (databases.get(i).getName().equals(database.getName())) {
-                databases.remove(databases.get(i));
-            }
-        }
+        databases.removeIf(database1 -> database1.getName().equals(database.getName()));
     }
 
     public Database getDataBase(String name) {
@@ -55,7 +53,7 @@ public class DatabaseService {
     }
 
     public void init() {
-        for (File file : new File("database").listFiles()) {
+        for (File file : Objects.requireNonNull(new File("database").listFiles())) {
             final JSONObject jsonObject = fileFactory.load(file);
             final JSONArray jsonArray = jsonObject.getJSONArray("tables");
 
@@ -76,15 +74,12 @@ public class DatabaseService {
 
                 JSONArray currentArray = currentObject.getJSONArray("columns");
 
-                for (int i = 0; i < currentArray.length(); i++) {
-                    final JSONObject curObject = currentArray.getJSONObject(i);
-
+                IntStream.range(0, currentArray.length()).mapToObj(currentArray::getJSONObject).forEach(curObject -> {
                     Column column = new Column();
                     column.setCreation(curObject.getLong("creation"));
                     column.setContent(curObject.getJSONObject("content").toMap());
-
                     table.addColumn(column);
-                }
+                });
 
                 dataBase.getTables().add(table);
             }
@@ -95,20 +90,17 @@ public class DatabaseService {
     }
 
     public void update() {
-        for (File file : new File("database").listFiles()) {
+        for (File file : Objects.requireNonNull(new File("database").listFiles())) {
             file.delete();
         }
 
-        for (Database database : databases) {
+        databases.forEach(database -> {
             final File file = new File("database/" + database.getName() + ".json");
-
             final JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", database.getName());
             jsonObject.put("tables", database.getTables());
-
             fileFactory.save(file, jsonObject);
-        }
-
+        });
     }
 
 }

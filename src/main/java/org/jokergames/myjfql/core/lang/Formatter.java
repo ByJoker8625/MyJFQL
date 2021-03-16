@@ -1,6 +1,7 @@
 package org.jokergames.myjfql.core.lang;
 
 import org.jokergames.myjfql.core.MyJFQL;
+import org.jokergames.myjfql.exception.CommandException;
 
 import java.util.*;
 
@@ -23,7 +24,7 @@ public class Formatter {
         String[] cmd = command.split(" ");
 
         List<String> strings = new ArrayList<>();
-        String string = null;
+        StringBuilder builder = null;
 
         for (int i = 0; i < cmd.length; i++) {
             String current = cmd[i];
@@ -35,16 +36,18 @@ public class Formatter {
                 if (current.startsWith("'") && current.endsWith("'")) {
                     strings.add(current);
                 } else if (current.startsWith("'") && !current.endsWith("'")) {
-                    string = current;
+                    builder = new StringBuilder(current);
                 } else if (!current.startsWith("'") && current.endsWith("'")) {
-                    string += " " + current;
-                    strings.add(string);
-                    string = null;
+                    assert builder != null;
+
+                    builder.append(" ").append(current);
+                    strings.add(builder.toString());
+                    builder = null;
                 } else {
-                    if (string == null) {
+                    if (builder == null) {
                         strings.add(current);
                     } else {
-                        string += " " + current;
+                        builder.append(" ").append(current);
                     }
                 }
 
@@ -68,7 +71,7 @@ public class Formatter {
                 arguments.put(section, new ArrayList<>());
             } else {
                 if (section == null) {
-                    throw new RuntimeException();
+                    throw new CommandException();
                 }
 
                 if (!arguments.containsKey(section)) {
@@ -88,52 +91,52 @@ public class Formatter {
         if (strings.size() == 0)
             return null;
 
-        String string = strings.get(0);
+        StringBuilder builder = new StringBuilder(strings.get(0));
 
         for (int i = 1; i < strings.size(); i++) {
-            string += " " + strings.get(i);
+            builder.append(" ").append(strings.get(i));
         }
 
-        return string.replace("'", "");
+        return builder.toString().replace("'", "");
     }
 
     public int formatInteger(List<String> strings) {
         if (strings.size() == 0)
             return -1;
 
-        String string = strings.get(0);
+        StringBuilder builder = new StringBuilder(strings.get(0));
 
         for (int i = 1; i < strings.size(); i++) {
-            string += " " + strings.get(i);
+            builder.append(" ").append(strings.get(i));
         }
 
-        return Integer.parseInt(string.replace("'", ""));
+        return Integer.parseInt(builder.toString().replace("'", ""));
     }
 
     public boolean formatBoolean(List<String> strings) {
         if (strings.size() == 0)
             return false;
 
-        String string = strings.get(0);
+        StringBuilder builder = new StringBuilder(strings.get(0));
 
         for (int i = 1; i < strings.size(); i++) {
-            string += " " + strings.get(i);
+            builder.append(" ").append(strings.get(i));
         }
 
-        return Boolean.parseBoolean(string);
+        return Boolean.parseBoolean(builder.toString());
     }
 
     public double formatDouble(List<String> strings) {
         if (strings.size() == 0)
             return -1.0;
 
-        String string = strings.get(0);
+        StringBuilder builder = new StringBuilder(strings.get(0));
 
         for (int i = 1; i < strings.size(); i++) {
-            string += " " + strings.get(i);
+            builder.append(" ").append(strings.get(i));
         }
 
-        return Double.parseDouble(string.replace("'", ""));
+        return Double.parseDouble(builder.toString().replace("'", ""));
     }
 
 }

@@ -1,5 +1,7 @@
 package org.jokergames.myjfql.server.util;
 
+import java.util.Arrays;
+
 /**
  * @author Janick
  */
@@ -20,14 +22,7 @@ public enum ResponseType {
     }
 
     public static ResponseType byRCode(int rCode) {
-
-        for (ResponseType type : ResponseType.values()) {
-            if (type.rCode == rCode) {
-                return type;
-            }
-        }
-
-        return null;
+        return Arrays.stream(ResponseType.values()).filter(type -> type.rCode == rCode).findFirst().orElse(null);
     }
 
     public int getRCode() {

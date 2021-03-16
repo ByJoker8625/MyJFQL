@@ -11,9 +11,7 @@ import org.jokergames.myjfql.util.FileFactory;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Janick
@@ -62,12 +60,7 @@ public class ScriptService {
     }
 
     public void deleteScript(Script script) {
-        for (int i = 0, scriptsSize = scripts.size(); i < scriptsSize; i++) {
-            if (scripts.get(i).getName().equals(script.getName())) {
-                scripts.remove(i);
-                return;
-            }
-        }
+        scripts.removeIf(script1 -> script1.getName().equals(script.getName()));
     }
 
     public void saveScript(Script script) {
@@ -90,31 +83,25 @@ public class ScriptService {
     }
 
     public void init() {
-        for (File file : new File("script").listFiles()) {
-            final JSONObject jsonObject = fileFactory.load(file);
-
+        Arrays.stream(Objects.requireNonNull(new File("script").listFiles())).map(fileFactory::load).forEach(jsonObject -> {
             Script script = new Script(jsonObject.getString("name"));
             List<String> commands = new ArrayList<>();
-
             for (Object o : jsonObject.getJSONArray("commands").toList()) {
                 commands.add(o.toString());
             }
-
             script.setCommands(commands);
             scripts.add(script);
-        }
+        });
     }
 
     public void update() {
-        for (Script script : scripts) {
+        scripts.forEach(script -> {
             final File file = new File("script/" + script.getName() + ".json");
-
             final JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", script.getName());
             jsonObject.put("commands", script.getCommands());
-
             fileFactory.save(file, jsonObject);
-        }
+        });
     }
 
 }

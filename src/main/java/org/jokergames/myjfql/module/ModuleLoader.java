@@ -8,9 +8,11 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author Janick
@@ -61,7 +63,7 @@ public class ModuleLoader {
     public ModuleInfo[] loadDirectory(File file) throws Exception {
         final File[] files = file.listFiles();
 
-        List<File> plugins = Arrays.stream(files).filter(current -> current.getName().endsWith(".jar")).collect(Collectors.toList());
+        List<File> plugins = Arrays.stream(Objects.requireNonNull(files)).filter(current -> current.getName().endsWith(".jar")).collect(Collectors.toList());
         int length = plugins.size();
 
         File[] jars = new File[length];
@@ -74,15 +76,14 @@ public class ModuleLoader {
 
         ModuleInfo[] moduleInfos = new ModuleInfo[length];
 
-        for (int j = 0; j < jars.length; j++) {
+        IntStream.range(0, jars.length).forEach(j -> {
             final File current = jars[j];
-
             try {
                 moduleInfos[j] = loadFile(current);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }
+        });
 
         return moduleInfos;
     }

@@ -4,8 +4,10 @@ import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Janick
@@ -24,25 +26,13 @@ public class RequestReader {
         StringBuilder builder = new StringBuilder();
 
         int read;
-
-        while ((read = reader.read()) != -1) {
-            builder.append((char) read);
-        }
+        while ((read = reader.read()) != -1) builder.append((char) read);
 
         return builder.toString();
     }
 
     public Map<String, String> mapRequest() throws Exception {
-        final Map<String, String> map = new HashMap<>();
-
-        for (String string : stringRequest().split("&")) {
-            final String[] strings = string.split("=");
-
-            if (strings[1] != null)
-                map.put(strings[0], strings[1]);
-        }
-
-        return map;
+        return Arrays.stream(stringRequest().split("&")).map(string -> string.split("=")).filter(strings -> strings[1] != null).collect(Collectors.toMap(strings -> strings[0], strings -> strings[1], (a, b) -> b));
     }
 
     public JSONObject jsonRequest() throws Exception {

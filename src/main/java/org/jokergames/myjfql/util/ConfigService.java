@@ -40,8 +40,8 @@ public class ConfigService {
         file = new File("script");
 
         if (!file.exists()) {
-            file.mkdir();
             first = true;
+            file.mkdir();
         }
 
         file = new File("config.json");
@@ -78,24 +78,19 @@ public class ConfigService {
         File file = new File("build.json");
         JSONObject jsonObject = new JSONObject();
 
-
-        if (overwrite) {
-            jsonObject.put("Build", MyJFQL.getInstance().getVersion());
-            jsonObject.put("Date", LocalDate.now());
-            factory.save(file, jsonObject);
-        } else if (!file.exists()) {
+        if (!file.exists()
+                || overwrite) {
             jsonObject.put("Build", MyJFQL.getInstance().getVersion());
             jsonObject.put("Date", LocalDate.now());
             factory.save(file, jsonObject);
         }
-
     }
 
     public JSONObject getConfig() {
         return configuration;
     }
 
-    public boolean first() {
+    public boolean isFirstStart() {
         return first;
     }
 

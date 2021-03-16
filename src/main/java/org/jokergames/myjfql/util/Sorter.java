@@ -105,12 +105,12 @@ public class Sorter {
         return list;
     }
 
-    public static enum Order {
+    public enum Order {
         DESC,
         ASC
     }
 
-    public static enum Type {
+    public enum Type {
         CREATION,
         CUSTOM
     }

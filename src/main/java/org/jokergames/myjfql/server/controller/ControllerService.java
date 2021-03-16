@@ -3,9 +3,10 @@ package org.jokergames.myjfql.server.controller;
 import io.javalin.http.Context;
 import org.jokergames.myjfql.exception.NetworkException;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Janick
@@ -28,22 +29,16 @@ public class ControllerService {
     }
 
     public void invokeMethodsByDeclarerAndController(Controller controller, ControllerHandler declarer, Context context) {
-        final Class<?> clazz = controller.getClass();
-
-        for (Method method : clazz.getMethods()) {
-            if (method.isAnnotationPresent(ControllerHandler.class)) {
-                final ControllerHandler controllerHandler = method.getAnnotation(ControllerHandler.class);
-
-                if (controllerHandler.method() == declarer.method() && controllerHandler.path().equals(declarer.path())) {
-                    try {
-                        method.invoke(controller, context);
-                    } catch (Exception ex) {
-                        new NetworkException(ex).printStackTrace();
-                    }
+        Arrays.stream(controller.getClass().getMethods()).filter(method -> method.isAnnotationPresent(ControllerHandler.class)).forEach(method -> {
+            final ControllerHandler controllerHandler = method.getAnnotation(ControllerHandler.class);
+            if (controllerHandler.method() == declarer.method() && controllerHandler.path().equals(declarer.path())) {
+                try {
+                    method.invoke(controller, context);
+                } catch (Exception ex) {
+                    new NetworkException(ex).printStackTrace();
                 }
             }
-        }
-
+        });
     }
 
     public void invokeMethodByDeclarer(ControllerHandler declarer, Context context) {
@@ -57,64 +52,16 @@ public class ControllerService {
     }
 
     public List<ControllerHandler> getControllerDeclarerByPath(String path) {
-        List<ControllerHandler> declarers = new ArrayList<>();
-
-        for (Controller controller : controllers) {
-            Class<?> clazz = controller.getClass();
-
-            for (Method method : clazz.getMethods()) {
-
-                if (method.isAnnotationPresent(ControllerHandler.class)) {
-                    ControllerHandler controllerHandler = method.getAnnotation(ControllerHandler.class);
-
-                    if (controllerHandler.path().equals(path)) {
-                        declarers.add(controllerHandler);
-                    }
-                }
-            }
-        }
-
-        return declarers;
+        return controllers.stream().map(Controller::getClass).flatMap(clazz -> Arrays.stream(clazz.getMethods())).filter(method -> method.isAnnotationPresent(ControllerHandler.class)).map(method -> method.getAnnotation(ControllerHandler.class)).filter(controllerHandler -> controllerHandler.path().equals(path)).collect(Collectors.toList());
     }
 
     public List<ControllerHandler> getControllerDeclarerByController(Controller controller) {
-        List<ControllerHandler> declarers = new ArrayList<>();
-
-        {
-            Class<?> clazz = controller.getClass();
-
-            for (Method current : clazz.getMethods()) {
-
-                if (current.isAnnotationPresent(ControllerHandler.class)) {
-                    ControllerHandler controllerHandler = current.getAnnotation(ControllerHandler.class);
-                    declarers.add(controllerHandler);
-                }
-            }
-        }
-
-        return declarers;
+        return Arrays.stream(controller.getClass().getMethods()).filter(current -> current.isAnnotationPresent(ControllerHandler.class)).map(current -> current.getAnnotation(ControllerHandler.class)).collect(Collectors.toList());
     }
 
 
     public List<ControllerHandler> getControllerDeclarerByMethod(org.jokergames.myjfql.server.util.Method method) {
-        List<ControllerHandler> declarers = new ArrayList<>();
-
-        for (Controller controller : controllers) {
-            Class<?> clazz = controller.getClass();
-
-            for (Method current : clazz.getMethods()) {
-
-                if (current.isAnnotationPresent(ControllerHandler.class)) {
-                    ControllerHandler controllerHandler = current.getAnnotation(ControllerHandler.class);
-
-                    if (controllerHandler.method() == method) {
-                        declarers.add(controllerHandler);
-                    }
-                }
-            }
-        }
-
-        return declarers;
+        return controllers.stream().map(Controller::getClass).flatMap(clazz -> Arrays.stream(clazz.getMethods())).filter(current -> current.isAnnotationPresent(ControllerHandler.class)).map(current -> current.getAnnotation(ControllerHandler.class)).filter(controllerHandler -> controllerHandler.method() == method).collect(Collectors.toList());
     }
 
     public List<Controller> getControllers() {

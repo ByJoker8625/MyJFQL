@@ -28,9 +28,8 @@ public class Server {
 
         app.start(MyJFQL.getInstance().getConfiguration().getInt("Port"));
 
-        for (Controller controller : controllerService.getControllers()) {
+        controllerService.getControllers().forEach(controller -> {
             final List<ControllerHandler> declarers = controllerService.getControllerDeclarerByController(controller);
-
             for (ControllerHandler declarer : declarers) {
                 switch (declarer.method()) {
                     case STATUS:
@@ -45,8 +44,7 @@ public class Server {
                 }
 
             }
-
-        }
+        });
     }
 
     @Deprecated
