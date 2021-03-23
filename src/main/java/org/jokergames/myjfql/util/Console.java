@@ -3,14 +3,13 @@ package org.jokergames.myjfql.util;
 import jline.console.ConsoleReader;
 import jline.console.completer.StringsCompleter;
 import org.jokergames.myjfql.core.MyJFQL;
+import org.jokergames.myjfql.exception.FileException;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * @author Janick
@@ -37,6 +36,7 @@ public class Console {
 
 
     public void println(String s) {
+        logIntoFile(s + "\n");
         writer.println(s);
 
         if (!input) {
@@ -51,6 +51,7 @@ public class Console {
     }
 
     public void print(String s) {
+        logIntoFile(s + "\n");
         writer.print(s);
 
         if (!input) {
@@ -112,24 +113,74 @@ public class Console {
         println("[" + getTime() + "] INFO: " + s);
     }
 
+    public void printInfo(String s) {
+        print("[" + getTime() + "] INFO: " + s);
+    }
+
     public void logError(String s) {
         println("[" + getTime() + "] ERROR: " + s);
     }
 
-    public void log(String s) {
-        println("[" + getTime() + "] " + s);
+    public void printError(String s) {
+        print("[" + getTime() + "] ERROR: " + s);
     }
 
     public void logWarning(String s) {
         println("[" + getTime() + "] WARNING: " + s);
     }
 
-    public ConsoleReader getReader() {
-        return reader;
+    public void printWarning(String s) {
+        print("[" + getTime() + "] WARNING: " + s);
     }
 
-    public Scanner getScanner() {
-        return new Scanner(System.in);
+    public void log(String s) {
+        println("[" + getTime() + "] " + s);
+    }
+
+    public void logServerError(String name, String s) {
+        logIntoFile("[" + getTime() + "] ERROR: [SERVER/" + name + "] " + s + "\n");
+    }
+
+    public void logServerInfo(String name, String s) {
+        logIntoFile("[" + getTime() + "] INFO: [SERVER/" + name + "] " + s + "\n");
+    }
+
+    public void logServerWarning(String name, String s) {
+        logIntoFile("[" + getTime() + "] WARNING: [SERVER/" + name + "] " + s + "\n");
+    }
+
+    private void logIntoFile(String s) {
+        try {
+            final File file = new File("log.txt");
+            String logged = "";
+
+            {
+                FileReader reader = new FileReader(file);
+                StringBuilder builder = new StringBuilder();
+
+                int i;
+
+                while ((i = reader.read()) != -1) {
+                    builder.append((char) i);
+                }
+
+                logged = builder.toString();
+            }
+
+            logged += s;
+
+            {
+                FileWriter writer = new FileWriter(file);
+                writer.write(logged);
+                writer.close();
+            }
+        } catch (Exception ex) {
+            throw new FileException("Can't access file!");
+        }
+    }
+
+    public ConsoleReader getReader() {
+        return reader;
     }
 
     public PrintWriter getWriter() {

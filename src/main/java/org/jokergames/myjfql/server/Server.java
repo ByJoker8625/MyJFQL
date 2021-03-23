@@ -2,7 +2,10 @@ package org.jokergames.myjfql.server;
 
 import io.javalin.Javalin;
 import org.jokergames.myjfql.core.MyJFQL;
-import org.jokergames.myjfql.server.controller.*;
+import org.jokergames.myjfql.server.controller.ControllerHandler;
+import org.jokergames.myjfql.server.controller.ControllerService;
+import org.jokergames.myjfql.server.controller.ErrorController;
+import org.jokergames.myjfql.server.controller.QueryController;
 import org.jokergames.myjfql.server.util.ResponseBuilder;
 
 import java.util.List;

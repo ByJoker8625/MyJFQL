@@ -25,7 +25,7 @@ public class RemoteExecutor extends Executor {
     }
 
     public void sendError(String s) {
-        send(builder.buildBadMethod(new CommandException(s)));
+        sendError(new CommandException(s));
     }
 
     public void sendError(Exception e) {
@@ -79,6 +79,22 @@ public class RemoteExecutor extends Executor {
             context.header("Access-Control-Allow-Headers", "*");
             context.header("Access-Control-Allow-Credentials", "true");
             context.header("Access-Control-Allow-Credentials-Header", "*");
+
+            {
+
+                switch (response.getInt("rCode")) {
+                    case 500:
+                        MyJFQL.getInstance().getConsole().logServerError(getName(), response.get("exception").toString());
+                        break;
+                    case 401:
+                        MyJFQL.getInstance().getConsole().logServerWarning(getName(), response.get("exception").toString());
+                        break;
+                    default:
+                        MyJFQL.getInstance().getConsole().logServerInfo(getName(), response.toString());
+                        break;
+                }
+
+            }
 
             context.result(response.toString()).status(response.getInt("rCode"));
         } catch (Exception ex) {

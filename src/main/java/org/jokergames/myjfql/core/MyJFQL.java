@@ -1,5 +1,6 @@
 package org.jokergames.myjfql.core;
 
+import org.jetbrains.annotations.Nullable;
 import org.jokergames.myjfql.command.*;
 import org.jokergames.myjfql.core.lang.Formatter;
 import org.jokergames.myjfql.database.DBSession;
@@ -18,6 +19,7 @@ import org.jokergames.myjfql.user.UserService;
 import org.jokergames.myjfql.util.*;
 import org.json.JSONObject;
 
+import java.io.PrintStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -49,7 +51,7 @@ public final class MyJFQL {
     public MyJFQL() {
         instance = this;
 
-        this.version = "1.2.9";
+        this.version = "1.3.1";
         this.console = new Console();
         this.connection = new Connection();
         this.downloader = new Downloader(connection);
@@ -64,6 +66,18 @@ public final class MyJFQL {
         this.dataBaseService = new DatabaseService(configService.getFactory());
         this.configuration = configService.getConfig();
         this.userService = new UserService(configService.getFactory());
+
+        System.setErr(new PrintStream(System.err) {
+            @Override
+            public void print(@Nullable String s) {
+                console.printError(s);
+            }
+
+            @Override
+            public void println(String s) {
+                console.logError(s);
+            }
+        });
     }
 
     public static MyJFQL getInstance() {
@@ -187,7 +201,6 @@ public final class MyJFQL {
         }
 
         console.setInput(true);
-
         console.stc();
 
         while (true) {
@@ -196,6 +209,8 @@ public final class MyJFQL {
     }
 
     public void shutdown() {
+        console.logInfo("Shutdown server...");
+
         userService.update();
         dataBaseService.update();
         scriptService.update();

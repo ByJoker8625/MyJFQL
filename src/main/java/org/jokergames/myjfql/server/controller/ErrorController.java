@@ -12,8 +12,7 @@ public class ErrorController implements Controller {
 
     @ControllerHandler(path = "$handle.status", status = 404, method = Method.STATUS)
     public void handle404(Context context) {
-        if (context.req.getAuthType().equalsIgnoreCase("POST"))
-            context.result(MyJFQL.getInstance().getServer().getResponseBuilder().buildNotFound().toString()).status(404);
+        context.result(MyJFQL.getInstance().getServer().getResponseBuilder().buildNotFound().toString()).status(404);
     }
 
 }

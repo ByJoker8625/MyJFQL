@@ -13,7 +13,6 @@ import org.jokergames.myjfql.user.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 /**
  * @author Janick
@@ -126,7 +125,7 @@ public class CreateCommand extends Command {
         } else {
             ConsoleExecutor console = (ConsoleExecutor) executor;
 
-            if (arguments.containsKey("SCRIPT")) {
+            if (arguments.containsKey("SCRIPT") && arguments.containsKey("SRC")) {
                 String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
 
                 if (name.equals("")) {
@@ -143,30 +142,8 @@ public class CreateCommand extends Command {
                 }
 
                 final Script script = new Script(name);
+                script.formatCommands(MyJFQL.getInstance().getFormatter().formatString(arguments.get("SRC")));
 
-                if (arguments.containsKey("SRC")) {
-                    script.formatCommands(MyJFQL.getInstance().getFormatter().formatString(arguments.get("SRC")));
-                } else {
-                    StringBuilder builder = new StringBuilder();
-
-                    MyJFQL.getInstance().getConsole().log("Script: \"" + name + "\" {");
-                    System.out.print(": ");
-
-                    final Scanner scanner = MyJFQL.getInstance().getConsole().getScanner();
-                    {
-                        String scanned;
-
-                        while (!(scanned = scanner.nextLine()).equals("}")) {
-                            if (!scanned.endsWith(";")) {
-                                scanned += ";";
-                            }
-
-                            builder.append(scanned);
-                            System.out.print(": ");
-                        }
-                    }
-                    script.formatCommands(builder.toString());
-                }
 
                 console.sendInfo("Script '" + name + "' was created.");
                 console.sendInfo("To invoke this enter: 'INVOKE SCRIPT " + name + "'");

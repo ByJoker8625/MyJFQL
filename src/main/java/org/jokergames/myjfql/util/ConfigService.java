@@ -1,9 +1,11 @@
 package org.jokergames.myjfql.util;
 
 import org.jokergames.myjfql.core.MyJFQL;
+import org.jokergames.myjfql.exception.FileException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 
 /**
@@ -42,6 +44,16 @@ public class ConfigService {
         if (!file.exists()) {
             first = true;
             file.mkdir();
+        }
+
+        file = new File("log.txt");
+
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                throw new FileException("Can't save file 'log.txt'!");
+            }
         }
 
         file = new File("config.json");

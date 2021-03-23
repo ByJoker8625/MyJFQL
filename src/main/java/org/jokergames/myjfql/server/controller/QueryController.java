@@ -62,7 +62,19 @@ public class QueryController implements Controller {
             MyJFQL.getInstance().getConsole().logInfo("[" + executor.getName() + "/" + user.getName() + "] queried ('" + jsonObject.getString("query") + "').");
             MyJFQL.getInstance().getConsole().setInput(true);
 
-            boolean exec = MyJFQL.getInstance().getCommandService().execute(user, executor, MyJFQL.getInstance().getFormatter().formatCommand(jsonObject.getString("query")));
+            String query = jsonObject.getString("query");
+
+            if (query.split(" ").length == 0) {
+                executor.sendSyntax();
+                return;
+            }
+
+            if (MyJFQL.getInstance().getCommandService().getCommand(query.split(" ")[0]) == null) {
+                executor.sendSyntax();
+                return;
+            }
+
+            boolean exec = MyJFQL.getInstance().getCommandService().execute(user, executor, MyJFQL.getInstance().getFormatter().formatCommand(query));
 
             if (!exec)
                 executor.sendForbidden();

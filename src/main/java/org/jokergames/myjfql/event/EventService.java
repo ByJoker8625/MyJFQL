@@ -3,7 +3,6 @@ package org.jokergames.myjfql.event;
 import org.jokergames.myjfql.event.listener.Listener;
 import org.jokergames.myjfql.exception.EventException;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
