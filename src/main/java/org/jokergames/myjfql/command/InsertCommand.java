@@ -52,6 +52,11 @@ public class InsertCommand extends Command {
                     values.add(str.replace("'", ""));
                 }
 
+                if(dataBase == null){
+                    remote.sendError("Database doesn't exists!");
+                    return true;
+                }
+
                 if (dataBase.getTable(name) == null) {
                     remote.sendError("Table doesn't exists!");
                     return true;
@@ -218,6 +223,11 @@ public class InsertCommand extends Command {
 
                 for (String str : arguments.get("VALUE")) {
                     values.add(str.replace("'", ""));
+                }
+
+                if(dataBase == null){
+                    console.sendError("Database doesn't exists!");
+                    return true;
                 }
 
                 if (dataBase.getTable(name) == null) {

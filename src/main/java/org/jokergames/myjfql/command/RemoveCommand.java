@@ -42,6 +42,11 @@ public class RemoveCommand extends Command {
 
                 final Database dataBase = dataBaseService.getDataBase(MyJFQL.getInstance().getDBSession().get(user.getName()));
 
+                if(dataBase == null){
+                    remote.sendError("Database doesn't exists!");
+                    return true;
+                }
+
                 if (dataBase.getTable(name) == null) {
                     remote.sendError("Table doesn't exists!");
                     return true;
@@ -110,6 +115,11 @@ public class RemoveCommand extends Command {
                 String column = MyJFQL.getInstance().getFormatter().formatString(arguments.get("COLUMN"));
 
                 final Database dataBase = dataBaseService.getDataBase(MyJFQL.getInstance().getDBSession().get(user.getName()));
+
+                if(dataBase == null){
+                    console.sendError("Database doesn't exists!");
+                    return true;
+                }
 
                 if (dataBase.getTable(name) == null) {
                     console.sendError("Table '" + name + "' doesn't exists!");
