@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Random;
 
 /**
  * @author Janick
@@ -16,6 +17,7 @@ public class ConfigService {
 
     private final FileFactory factory;
     private final JSONObject configuration;
+    private final JSONObject encryption;
     private boolean first = false;
 
 
@@ -68,8 +70,33 @@ public class ConfigService {
             factory.save(file, jsonObject);
         }
 
+        file = new File("encryption.json");
+
+        if (!file.exists()) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("default", "None");
+            jsonObject.put("None", "key");
+
+            {
+                final Random random = new Random();
+                int j;
+
+                while ((j = random.nextInt(32)) < 5) ;
+                boolean negative = random.nextBoolean();
+
+                if (negative) {
+                    jsonObject.put("DDP", String.valueOf(-j));
+                } else {
+                    jsonObject.put("DDP", String.valueOf(j));
+                }
+            }
+
+            factory.save(file, jsonObject);
+        }
+
         this.build(false);
 
+        this.encryption = factory.load(new File("encryption.json"));
         this.configuration = factory.loadJoin(new File("config.json"), new File("build.json"));
 
         if (configuration.opt("AutoUpdate") == null)
@@ -100,6 +127,10 @@ public class ConfigService {
 
     public JSONObject getConfig() {
         return configuration;
+    }
+
+    public JSONObject getEncryption() {
+        return encryption;
     }
 
     public boolean isFirstStart() {

@@ -56,15 +56,15 @@ public class ModuleService {
 
     public void disableModules() {
         try {
-            modules.forEach(module -> {
-                try {
-                    disableModule(module);
-                } catch (Exception ex) {
-                    new ModuleException(ex).printStackTrace();
-                }
+            new ArrayList<>(modules).forEach(module -> {
+                if (module != null)
+                    try {
+                        disableModule(module);
+                        MyJFQL.getInstance().getConsole().logInfo("Disabling module " + module.getModuleInfo().getName() + "...");
+                    } catch (Exception ex) {
+                        new ModuleException(ex).printStackTrace();
+                    }
             });
-
-            modules.clear();
         } catch (Exception ex) {
             new ModuleException(ex).printStackTrace();
         }

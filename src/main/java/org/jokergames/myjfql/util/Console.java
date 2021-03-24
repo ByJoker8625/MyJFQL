@@ -2,6 +2,7 @@ package org.jokergames.myjfql.util;
 
 import jline.console.ConsoleReader;
 import jline.console.completer.StringsCompleter;
+import org.jetbrains.annotations.Nullable;
 import org.jokergames.myjfql.core.MyJFQL;
 import org.jokergames.myjfql.exception.FileException;
 
@@ -32,6 +33,28 @@ public class Console {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+        System.setErr(new PrintStream(System.err) {
+            @Override
+            public void print(@Nullable String s) {
+                if (s == null) {
+                    return;
+                }
+
+                if (s.startsWith("[main] INFO "))
+                    MyJFQL.getInstance().getConsole().printInfo(s.replace("[main] INFO ", ""));
+                else
+                    MyJFQL.getInstance().getConsole().printError(s);
+            }
+
+            @Override
+            public void println(String s) {
+                if (s.startsWith("[main] INFO "))
+                    MyJFQL.getInstance().getConsole().logInfo(s.replace("[main] INFO ", ""));
+                else
+                    MyJFQL.getInstance().getConsole().logError(s);
+            }
+        });
     }
 
 

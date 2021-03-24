@@ -77,7 +77,7 @@ public class SelectCommand extends Command {
 
                 final Database dataBase = dataBaseService.getDataBase(MyJFQL.getInstance().getDBSession().get(user.getName()));
 
-                if(dataBase == null){
+                if (dataBase == null) {
                     remote.sendError("Database doesn't exists!");
                     return true;
                 }
@@ -309,7 +309,7 @@ public class SelectCommand extends Command {
 
                 final Database dataBase = dataBaseService.getDataBase(MyJFQL.getInstance().getDBSession().get(user.getName()));
 
-                if(dataBase == null){
+                if (dataBase == null) {
                     console.sendError("Database doesn't exists!");
                     return true;
                 }

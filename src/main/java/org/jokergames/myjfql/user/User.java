@@ -98,6 +98,7 @@ public abstract class User {
     public enum Property {
         CONSOLE,
         NO_DELETE,
-        NO_EDIT
+        NO_EDIT,
+        STATIC_DATABASE
     }
 }

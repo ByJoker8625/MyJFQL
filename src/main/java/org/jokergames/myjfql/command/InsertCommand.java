@@ -52,7 +52,7 @@ public class InsertCommand extends Command {
                     values.add(str.replace("'", ""));
                 }
 
-                if(dataBase == null){
+                if (dataBase == null) {
                     remote.sendError("Database doesn't exists!");
                     return true;
                 }
@@ -225,7 +225,7 @@ public class InsertCommand extends Command {
                     values.add(str.replace("'", ""));
                 }
 
-                if(dataBase == null){
+                if (dataBase == null) {
                     console.sendError("Database doesn't exists!");
                     return true;
                 }

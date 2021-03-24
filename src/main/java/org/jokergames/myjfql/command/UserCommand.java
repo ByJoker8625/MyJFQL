@@ -52,7 +52,7 @@ public class UserCommand extends Command {
 
             if (arguments.containsKey("DATABASE")) {
                 if (databaseService.getDataBase(usr.getName()) != null) {
-                    MyJFQL.getInstance().getConsole().logError("A database with name '" + user.getName() + "' already exists!");
+                    MyJFQL.getInstance().getConsole().logError("A database with name '" + usr.getName() + "' already exists!");
                     return true;
                 }
 

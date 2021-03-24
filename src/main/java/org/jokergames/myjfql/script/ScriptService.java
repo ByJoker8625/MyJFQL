@@ -42,7 +42,7 @@ public class ScriptService {
         if (visible)
             executor = new ConsoleExecutor();
         else
-            executor = new RemoteExecutor(UUID.randomUUID().toString(), null);
+            executor = new RemoteExecutor(UUID.randomUUID().toString(), null, null, null);
 
         List<String> commands = new ArrayList<>();
 
