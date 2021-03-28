@@ -5,396 +5,209 @@ import org.jokergames.myjfql.database.Column;
 import org.jokergames.myjfql.database.Table;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-/**
- * @author Janick
- */
+import java.util.Objects;
 
 public class ConditionHelper {
 
-    public List<Column> getRequiredColumns(Table table, List<String> argument) {
+    public static List<Column> getRequiredColumns(final Table table, final List<String> argument) {
         return getRequiredColumns(table, argument, Sorter.Type.CREATION, null, Sorter.Order.ASC);
     }
 
-    public List<Column> getRequiredColumns(Table table, List<String> argument, Sorter.Type sort, String sorter, Sorter.Order order) {
-        List<Column> columns = new ArrayList<>();
+    public static List<Column> getRequiredColumns(final Table table, final List<String> argument, final Sorter.Type type, final String sorter, final Sorter.Order order) {
+        final List<Column> requiredColumns = new ArrayList<>();
 
-        final String[] where = MyJFQL.getInstance().getFormatter().formatString(argument)
-                .replace(" or ", " OR ")
-                .split(" OR ");
-        final List<List<Requirement>> conditions = new ArrayList<>();
+        if (argument.size() == 0) {
+            return null;
+        }
 
-        for (String s : where) {
-            String[] args = s
-                    .replace(" and ", " AND ")
-                    .replace("not smaller ", "BIGGER ")
-                    .replace(" not smaller ", " BIGGER ")
-                    .replace("not bigger ", "SMALLER ")
-                    .replace(" not bigger ", " SMALLER ")
-                    .replace("smaller ", "SMALLER ")
-                    .replace(" smaller ", " SMALLER ")
-                    .replace("bigger ", "BIGGER ")
-                    .replace(" bigger ", " BIGGER ")
-                    .replace("not ", "NOT ")
-                    .replace(" not ", " NOT ")
-                    .replace("NOT BIGGER ", "SMALLER ")
-                    .replace(" NOT BIGGER ", " SMALLER ")
-                    .replace("NOT SMALLER ", "BIGGER ")
-                    .replace(" NOT SMALLER ", " BIGGER ")
-                    .split(" AND ");
+        try {
+            final String[] where = Objects.requireNonNull(MyJFQL.getInstance().getCommandService().getFormatter().formatString(argument))
+                    .replace(" or ", " OR ")
+                    .split(" OR ");
+            final List<List<Requirement>> conditions = new ArrayList<>();
 
-            List<Requirement> list1 = new ArrayList<>();
+            for (final String require : where) {
+                final String[] args = require
+                        .replace(" and ", " AND ")
+                        .replace(" not ", " NOT ")
+                        .replace(" not not ", "")
+                        .replace("and ", "AND ")
+                        .replace("not ", "NOT ")
+                        .replace("not not ", "")
+                        .split(" AND ");
+                final List<Requirement> requirements = new ArrayList<>();
 
-            for (String arg : args) {
-                String[] strings = arg.split(" = ");
-                Requirement.Type type = Requirement.Type.POSITIVE;
+                for (final String distro : args) {
+                    final String[] strings = distro.split(" = ");
 
-                strings[0] = strings[0].replace("'", "");
+                    {
+                        strings[0] = strings[0].replace("'", "");
+                        strings[1] = strings[1].replace("'", "");
+                    }
 
-                if (strings[0].startsWith(" NOT ")) {
-                    strings[0] = strings[0].replaceFirst(" NOT ", "");
-                    type = Requirement.Type.NEGATIVE;
+                    final String key = strings[0]
+                            .replace("not ", "")
+                            .replace("NOT ", "");
+
+                    if (!table.getStructure().contains(key)
+                            && !key.equals("?")
+                            && !key.equals("*")) {
+                        return null;
+                    }
+
+                    if (strings[0].startsWith("NOT ")) {
+                        strings[0] = key;
+                        requirements.add(new Requirement(strings, Requirement.Type.NEGATIVE));
+                    } else {
+                        requirements.add(new Requirement(strings, Requirement.Type.POSITIVE));
+                    }
                 }
 
-                if (strings[0].startsWith("NOT ")) {
-                    strings[0] = strings[0].replaceFirst("NOT ", "");
-                    type = Requirement.Type.NEGATIVE;
-                }
-
-                if (strings[0].startsWith(" BIGGER ")) {
-                    strings[0] = strings[0].replaceFirst(" BIGGER ", "");
-                    type = Requirement.Type.BIGGER;
-                }
-
-                if (strings[0].startsWith("BIGGER ")) {
-                    strings[0] = strings[0].replaceFirst("BIGGER ", "");
-                    type = Requirement.Type.BIGGER;
-                }
-
-                if (strings[0].startsWith(" SMALLER ")) {
-                    strings[0] = strings[0].replaceFirst(" SMALLER ", "");
-                    type = Requirement.Type.SMALLER;
-                }
-
-                if (strings[0].startsWith("SMALLER ")) {
-                    strings[0] = strings[0].replaceFirst("SMALLER ", "");
-                    type = Requirement.Type.SMALLER;
-                }
-
-                strings[1] = strings[1].replace("'", "");
-
-                if (!table.getStructure().contains(strings[0]) && !strings[0].equals("?") && !strings[0].equals("*")) {
-                    return null;
-                }
-
-                list1.add(new Requirement(strings, type));
+                conditions.add(requirements);
             }
 
-            conditions.add(list1);
-        }
+            List<Column> columns = null;
 
-        List<Column> cols;
-
-        if (sort == Sorter.Type.CREATION || sorter == null) {
-            cols = table.getColumns();
-        } else {
-            cols = table.getColumns(sort, order, sorter);
-        }
-
-        for (Column col : cols) {
-            if (conditions.stream().anyMatch(requirements -> handleRequirement(requirements, table, col) == requirements.size())) {
-                columns.add(col);
+            if (type == Sorter.Type.CREATION) {
+                columns = table.getColumns();
+            } else {
+                columns = table.getColumns(type, order, sorter);
             }
+
+            columns.forEach(column -> {
+                if (conditions.stream().anyMatch(requirements -> handleRequirements(requirements, table, column) == requirements.size())) {
+                    requiredColumns.add(column);
+                }
+            });
+        } catch (Exception ex) {
+            return null;
         }
 
-        return columns;
+        return requiredColumns;
     }
 
-    public int handleRequirement(List<Requirement> requirements, Table table, Column column) {
-        Map<Integer, Boolean> finishedMap = new HashMap<>();
+    private static int handleRequirements(final List<Requirement> requirements, final Table table, final Column column) {
+        final List<Integer> finishedRequirements = new ArrayList<>();
         int finished = 0;
 
+        final List<String> tableStructure = table.getStructure();
+
         for (int j = 0; j < requirements.size(); j++) {
-            Requirement requirement = requirements.get(j);
+            final Requirement requirement = requirements.get(j);
+            final Requirement.Type type = requirement.getType();
 
-            final String key = requirement.getStrings()[0];
-            final String value = requirement.getStrings()[1];
+            final String[] strings = requirement.getStrings();
+            final String key = strings[0];
+            final String value = strings[1];
 
-            if (requirement.getType() == Requirement.Type.BIGGER || requirement.getType() == Requirement.Type.SMALLER) {
+            final Map<String, Object> content = column.getContent();
 
-                if (requirement.getType() == Requirement.Type.BIGGER) {
-                    if (key.equals("*")) {
-                        boolean accept = true;
+            if (key.equals("*")) {
+                boolean accept = true;
 
-                        for (String s : table.getStructure()) {
-                            if (column.getContent().containsKey(s)) {
-                                int compare = isBigger(value, column.getContent(s).toString());
-
-                                if (compare == 1 || compare == -1) {
-                                    accept = false;
-                                    break;
-                                }
-                            } else {
-                                accept = false;
-                                break;
-                            }
-                        }
-
-                        if (accept) {
-                            if (!finishedMap.containsKey(j)) {
-                                finishedMap.put(j, true);
-                                finished++;
-                            }
-                        }
-
-                    } else if (key.equals("?")) {
-                        for (String s : table.getStructure()) {
-                            if (column.getContent().containsKey(s)) {
-                                int compare = isBigger(value, column.getContent(s).toString());
-
-                                if (compare == 0) {
-                                    if (!finishedMap.containsKey(j)) {
-                                        finishedMap.put(j, true);
-                                        finished++;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        if (column.getContent().containsKey(key)) {
-                            int compare = isBigger(value, column.getContent(key).toString());
-
-                            if (compare == 0) {
-                                if (!finishedMap.containsKey(j)) {
-                                    finishedMap.put(j, true);
-                                    finished++;
-                                }
-                            }
-                        }
-                    }
+                if (value.equals("null")) {
+                    accept = tableStructure.stream().noneMatch(str -> content.containsKey(str) && !content.get(str).toString().equals("null"));
                 } else {
-                    if (key.equals("*")) {
-                        boolean accept = true;
+                    for (String cck : tableStructure) {
+                        if (!content.containsKey(cck)) {
+                            accept = false;
+                            break;
+                        }
+                        final String contentValue = content.get(cck).toString();
 
-                        for (String s : table.getStructure()) {
-                            if (column.getContent().containsKey(s)) {
-                                int compare = isSmaller(value, column.getContent(s).toString());
+                        if (value.startsWith("$") && value.endsWith("$")) {
+                            final String crs = value.replace("$", "");
 
-                                if (compare == 1 || compare == -1) {
-                                    accept = false;
-                                    break;
-                                }
-                            } else {
+                            if (!contentValue.contains(crs)) {
                                 accept = false;
                                 break;
                             }
-                        }
-
-                        if (accept) {
-                            if (!finishedMap.containsKey(j)) {
-                                finishedMap.put(j, true);
-                                finished++;
-                            }
-                        }
-
-                    } else if (key.equals("?")) {
-                        for (String s : table.getStructure()) {
-                            if (column.getContent().containsKey(s)) {
-                                int compare = isSmaller(value, column.getContent(s).toString());
-
-                                if (compare == 0) {
-                                    if (!finishedMap.containsKey(j)) {
-                                        finishedMap.put(j, true);
-                                        finished++;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        if (column.getContent().containsKey(key)) {
-                            int compare = isSmaller(value, column.getContent(key).toString());
-
-                            if (compare == 0) {
-                                if (!finishedMap.containsKey(j)) {
-                                    finishedMap.put(j, true);
-                                    finished++;
-                                }
-                            }
+                        } else if (!contentValue.equals(value)) {
+                            accept = false;
+                            break;
                         }
                     }
                 }
 
-            } else {
-
-                if (key.equals("*")) {
-                    boolean accept = true;
-
-                    for (String s : table.getStructure()) {
-                        if (value.equalsIgnoreCase("null")) {
-                            if (column.getContent().containsKey(s)) {
-                                accept = false;
-                                break;
-                            }
-                        } else {
-                            if (column.getContent().containsKey(s)) {
-                                if (value.startsWith("$") && value.endsWith("$")) {
-                                    if (!column.getContent(s).toString().contains(value.replace("$", ""))) {
-                                        accept = false;
-                                        break;
-                                    }
-                                } else {
-                                    if (!column.getContent(s).toString().equals(value)) {
-                                        accept = false;
-                                        break;
-                                    }
-                                }
-                            } else {
-                                accept = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (accept) {
-                        if (!finishedMap.containsKey(j)) {
-                            if (adaptToType(requirement.getType(), true))
-                                finished++;
-                            finishedMap.put(j, true);
-                        }
-                    }
-
-                } else if (key.equals("?")) {
-                    for (String s : table.getStructure()) {
-                        if (value.equalsIgnoreCase("null")) {
-                            if (!column.getContent().containsKey(s)) {
-                                if (!finishedMap.containsKey(j)) {
-                                    if (adaptToType(requirement.getType(), true))
-                                        finished++;
-                                    finishedMap.put(j, true);
-                                }
-                            }
-                        } else {
-                            if (column.getContent().containsKey(s)) {
-                                if (value.startsWith("$") && value.endsWith("$")) {
-                                    if (column.getContent(s).toString().contains(value.replace("$", ""))) {
-                                        if (!finishedMap.containsKey(j)) {
-                                            if (adaptToType(requirement.getType(), true))
-                                                finished++;
-                                            finishedMap.put(j, true);
-                                        }
-                                        break;
-                                    }
-                                } else {
-                                    if (column.getContent(s).toString().equals(value)) {
-                                        if (!finishedMap.containsKey(j)) {
-                                            if (adaptToType(requirement.getType(), true))
-                                                finished++;
-                                            finishedMap.put(j, true);
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    if (value.equalsIgnoreCase("null")) {
-                        if (!column.getContent().containsKey(key)) {
-                            if (!finishedMap.containsKey(j)) {
-                                if (adaptToType(requirement.getType(), true))
-                                    finished++;
-                                finishedMap.put(j, true);
-                            }
-                        }
-                    } else {
-                        if (column.getContent().containsKey(key)) {
-                            if (value.startsWith("$") && value.endsWith("$")) {
-                                if (column.getContent(key).toString().contains(value.replace("$", ""))) {
-                                    if (!finishedMap.containsKey(j)) {
-                                        if (adaptToType(requirement.getType(), true))
-                                            finished++;
-                                        finishedMap.put(j, true);
-                                    }
-                                }
-                            } else {
-                                if (column.getContent(key).toString().equals(value)) {
-                                    if (!finishedMap.containsKey(j)) {
-                                        if (adaptToType(requirement.getType(), true))
-                                            finished++;
-                                        finishedMap.put(j, true);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (!finishedMap.containsKey(j)) {
-                    if (adaptToType(requirement.getType(), false))
+                if (!finishedRequirements.contains(j)) {
+                    if (adaptType(type, accept))
                         finished++;
-                    finishedMap.put(j, true);
+                    finishedRequirements.add(j);
+                }
+            } else if (key.equals("?")) {
+                boolean accept = false;
+
+                if (value.equals("null")) {
+                    accept = tableStructure.stream().anyMatch(str -> !content.containsKey(str) || (content.containsKey(str) && content.get(str).toString().equals("null")));
+                } else {
+                    for (final String cck : tableStructure) {
+                        String contentValue = null;
+
+                        if (!content.containsKey(cck)) {
+                            contentValue = "null";
+                        } else {
+                            contentValue = content.get(cck).toString();
+                        }
+
+                        if (value.startsWith("$") && value.endsWith("$")) {
+                            final String crs = value.replace("$", "");
+
+                            if (contentValue.contains(crs)) {
+                                accept = true;
+                                break;
+                            }
+                        } else if (contentValue.equals(value)) {
+                            accept = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!finishedRequirements.contains(j)) {
+                    if (adaptType(type, accept))
+                        finished++;
+                    finishedRequirements.add(j);
+                }
+            } else {
+                boolean accept = false;
+
+                if (value.equals("null")) {
+                    if (!content.containsKey(key)) {
+                        accept = true;
+                    } else if (content.get(key).toString().equals("null")) {
+                        accept = true;
+                    }
+                } else if (content.containsKey(key)) {
+                    final String contentValue = content.get(key).toString();
+
+                    if (value.startsWith("$") && value.endsWith("$")) {
+                        accept = contentValue.contains(value.replace("$", ""));
+                    } else {
+                        accept = contentValue.equals(value);
+                    }
+                }
+
+                if (!finishedRequirements.contains(j)) {
+                    if (adaptType(type, accept))
+                        finished++;
+                    finishedRequirements.add(j);
                 }
 
             }
+
         }
 
         return finished;
     }
 
-    public boolean adaptToType(Requirement.Type type, boolean b) {
-        switch (type) {
-            case NEGATIVE:
-                return !b;
-            case POSITIVE:
-            default:
-                return b;
-        }
-    }
-
-    public int isBigger(String value, String than) {
-        if (instanceOfNumber(value) && instanceOfNumber(than)) {
-            double v = Double.parseDouble(value);
-            double t = Double.parseDouble(than);
-
-            if (v < t) {
-                return 0;
-            } else {
-                return 1;
-            }
+    private static boolean adaptType(Requirement.Type type, boolean accept) {
+        if (type == Requirement.Type.NEGATIVE) {
+            return !accept;
         }
 
-        return -1;
-    }
-
-
-    public int isSmaller(String value, String than) {
-        if (instanceOfNumber(value) && instanceOfNumber(than)) {
-            double v = Double.parseDouble(value);
-            double t = Double.parseDouble(than);
-
-            if (v < t) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-
-        return -1;
-    }
-
-    public boolean instanceOfNumber(String s) {
-        try {
-            Double.parseDouble(s);
-        } catch (Exception exception) {
-            return false;
-        }
-
-        return true;
+        return accept;
     }
 
 }

@@ -4,26 +4,17 @@ import org.jokergames.myjfql.core.MyJFQL;
 import org.jokergames.myjfql.exception.CommandException;
 
 import java.util.*;
-
-/**
- * @author Janick
- * @language JavaFileQueryLanguage (JFQL)
- * @data 9.11.2020
- */
+import java.util.stream.Collectors;
 
 public class Formatter {
 
+    public Map<String, List<String>> formatCommand(final String command) {
+        if (command == null)
+            return null;
 
-    public Map<String, List<String>> formatCommand(String command) {
-        if (command.startsWith("#")) {
-            return Map.of("COMMAND", List.of("#"));
-        }
+        final String[] cmd = command.split(" ");
 
-        Map<String, List<String>> arguments = new HashMap<>();
-
-        String[] cmd = command.split(" ");
-
-        List<String> strings = new ArrayList<>();
+        final List<String> strings = new ArrayList<>();
         StringBuilder builder = null;
 
         for (int i = 0; i < cmd.length; i++) {
@@ -55,18 +46,19 @@ public class Formatter {
 
         }
 
-        List<String> keys;
+        List<String> syntax = null;
 
         try {
-            keys = MyJFQL.getInstance().getCommandService().getCommand(strings.get(1)).getSyntax();
+            syntax = MyJFQL.getInstance().getCommandService().getCommand(strings.get(1)).getSyntax();
         } catch (Exception ex) {
             return null;
         }
 
+        final Map<String, List<String>> arguments = new HashMap<>();
         String section = null;
 
         for (String current : strings) {
-            if (keys.contains(current.toUpperCase())) {
+            if (syntax.contains(current.toUpperCase())) {
                 section = current.toUpperCase();
                 arguments.put(section, new ArrayList<>());
             } else {
@@ -79,19 +71,17 @@ public class Formatter {
                 } else {
                     arguments.get(section).add(current);
                 }
-
             }
-
         }
 
         return arguments;
     }
 
-    public String formatString(List<String> strings) {
+    public final String formatString(final List<String> strings) {
         if (strings.size() == 0)
             return null;
 
-        StringBuilder builder = new StringBuilder(strings.get(0));
+        final StringBuilder builder = new StringBuilder(strings.get(0));
 
         for (int i = 1; i < strings.size(); i++) {
             builder.append(" ").append(strings.get(i));
@@ -100,11 +90,18 @@ public class Formatter {
         return builder.toString().replace("'", "");
     }
 
-    public int formatInteger(List<String> strings) {
+    public final List<String> formatList(final List<String> strings) {
+        if (strings.size() == 0)
+            return new ArrayList<>();
+
+        return strings.stream().map(s -> s.replace("'", "")).collect(Collectors.toList());
+    }
+
+    public final int formatInteger(final List<String> strings) {
         if (strings.size() == 0)
             return -1;
 
-        StringBuilder builder = new StringBuilder(strings.get(0));
+        final StringBuilder builder = new StringBuilder(strings.get(0));
 
         for (int i = 1; i < strings.size(); i++) {
             builder.append(" ").append(strings.get(i));
@@ -113,11 +110,11 @@ public class Formatter {
         return Integer.parseInt(builder.toString().replace("'", ""));
     }
 
-    public boolean formatBoolean(List<String> strings) {
+    public final boolean formatBoolean(final List<String> strings) {
         if (strings.size() == 0)
             return false;
 
-        StringBuilder builder = new StringBuilder(strings.get(0));
+        final StringBuilder builder = new StringBuilder(strings.get(0));
 
         for (int i = 1; i < strings.size(); i++) {
             builder.append(" ").append(strings.get(i));
@@ -126,11 +123,11 @@ public class Formatter {
         return Boolean.parseBoolean(builder.toString());
     }
 
-    public double formatDouble(List<String> strings) {
+    public final double formatDouble(final List<String> strings) {
         if (strings.size() == 0)
             return -1.0;
 
-        StringBuilder builder = new StringBuilder(strings.get(0));
+        final StringBuilder builder = new StringBuilder(strings.get(0));
 
         for (int i = 1; i < strings.size(); i++) {
             builder.append(" ").append(strings.get(i));
@@ -138,5 +135,6 @@ public class Formatter {
 
         return Double.parseDouble(builder.toString().replace("'", ""));
     }
+
 
 }

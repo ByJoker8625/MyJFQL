@@ -13,18 +13,18 @@ import java.util.Objects;
 public class Table {
 
     private final String name;
+    private List<Column> columns;
     private List<String> structure;
     private String primary;
-    private List<Column> columns;
 
-    public Table(String name, List<String> structure, String primary) {
+    public Table(final String name, final List<String> structure, final String primary) {
         this.name = name;
         this.structure = structure;
         this.primary = primary;
         this.columns = new ArrayList<>();
     }
 
-    public void addColumn(Column column) {
+    public void addColumn(final Column column) {
         if (column.getContent(primary) == null) {
             return;
         }
@@ -42,28 +42,29 @@ public class Table {
         columns.add(column);
     }
 
-    public void removeColumn(String key) {
+    public void removeColumn(final String key) {
         columns.removeIf(col -> col.getContent().get(primary).toString().equals(key));
     }
 
-    public Column getColumn(String key) {
+    public Column getColumn(final String key) {
         return columns.stream().filter(col -> col.getContent().get(primary).toString().equals(key)).findFirst().orElse(null);
     }
+
 
     public List<Column> getColumns() {
         return getColumns(Sorter.Type.CREATION, Sorter.Order.ASC);
     }
 
-    public void setColumns(List<Column> columns) {
+    public void setColumns(final List<Column> columns) {
         this.columns = columns;
     }
 
-    public List<Column> getColumns(Sorter.Type type, Sorter.Order order, String... strings) {
+    public List<Column> getColumns(final Sorter.Type type, final Sorter.Order order, final String... strings) {
         switch (type) {
             case CREATION:
-                return new Sorter().sortColumns(columns);
+                return Sorter.sortColumns(columns);
             case CUSTOM:
-                return new Sorter().sortColumns(strings[0], columns, order);
+                return Sorter.sortColumns(strings[0], columns, order);
         }
 
         return columns;
@@ -77,7 +78,7 @@ public class Table {
         return structure;
     }
 
-    public void setStructure(List<String> structure) {
+    public void setStructure(final List<String> structure) {
         this.structure = structure;
     }
 
@@ -85,7 +86,7 @@ public class Table {
         return primary;
     }
 
-    public void setPrimary(String primary) {
+    public void setPrimary(final String primary) {
         this.primary = primary;
     }
 

@@ -1,74 +1,52 @@
 package org.jokergames.myjfql.command;
 
-import org.jokergames.myjfql.command.executor.ConsoleExecutor;
-import org.jokergames.myjfql.command.executor.Executor;
-import org.jokergames.myjfql.command.executor.RemoteExecutor;
 import org.jokergames.myjfql.core.MyJFQL;
+import org.jokergames.myjfql.database.DBSession;
 import org.jokergames.myjfql.database.DatabaseService;
-import org.jokergames.myjfql.user.User;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Janick
- */
-
 public class UseCommand extends Command {
 
     public UseCommand() {
-        super("USE", List.of("COMMAND", "DATABASE"));
+        super("use", List.of("COMMAND", "DATABASE"));
     }
 
     @Override
-    public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
-        final DatabaseService dataBaseService = MyJFQL.getInstance().getDatabaseService();
+    public void handle(final CommandSender sender, final Map<String, List<String>> args) {
+        final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
+        final DBSession session = MyJFQL.getInstance().getDBSession();
 
-        if (executor instanceof RemoteExecutor) {
-            RemoteExecutor remote = (RemoteExecutor) executor;
-
-            if (!user.hasPermission("execute.use")) {
-                return false;
+        if (args.containsKey("DATABASE")) {
+            if (sender.isStaticDatabase()) {
+                sender.sendError("You can't change your database!");
+                return;
             }
 
-            if (arguments.containsKey("DATABASE")) {
-                String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("DATABASE"));
+            final String name = formatString(args.get("DATABASE"));
 
-                if (!user.hasPermission("execute.use.*") && !user.hasPermission("execute.use." + name)) {
-                    return false;
-                }
-
-                if (dataBaseService.getDataBase(name) == null) {
-                    remote.sendError("Database doesn't exists!");
-                    return true;
-                }
-
-                MyJFQL.getInstance().getDBSession().put(user.getName(), name);
-                remote.sendSuccess();
-                return true;
+            if (name == null) {
+                sender.sendError("Unknown database!");
+                return;
             }
 
-            remote.sendSyntax();
-        } else {
-            ConsoleExecutor console = (ConsoleExecutor) executor;
-
-            if (arguments.containsKey("DATABASE")) {
-                String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("DATABASE"));
-
-                if (dataBaseService.getDataBase(name) == null) {
-                    console.sendError("Database '" + name + "' doesn't exists!");
-                    return true;
-                }
-
-                MyJFQL.getInstance().getDBSession().put(user.getName(), name);
-                console.sendInfo("Change database to '" + name + "'.");
-                return true;
+            if (!databaseService.isCreated(name)) {
+                sender.sendError("Database doesn't exists!");
+                return;
             }
 
-            console.sendError("Unknown syntax!");
+            if (!sender.hasPermission("use.database." + name)
+                    && !sender.hasPermission("use.database.*")) {
+                sender.sendForbidden();
+                return;
+            }
+
+            session.put(sender.getName(), name);
+            sender.sendSuccess();
+            return;
         }
 
-
-        return true;
+        sender.sendSyntax();
     }
 }

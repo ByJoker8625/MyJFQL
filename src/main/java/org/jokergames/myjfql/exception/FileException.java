@@ -1,9 +1,5 @@
 package org.jokergames.myjfql.exception;
 
-/**
- * @author Janick
- */
-
 public class FileException extends RuntimeException {
 
     public FileException() {
@@ -24,4 +20,5 @@ public class FileException extends RuntimeException {
     public FileException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
+
 }

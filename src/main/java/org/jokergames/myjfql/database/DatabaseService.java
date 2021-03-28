@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -24,7 +25,7 @@ public class DatabaseService {
         this.databases = new ArrayList<>();
     }
 
-    public void saveDataBase(Database database) {
+    public void saveDataBase(final Database database) {
         for (int i = 0, databasesSize = databases.size(); i < databasesSize; i++) {
             if (databases.get(i).getName().equals(database.getName())) {
                 databases.set(i, database);
@@ -35,16 +36,15 @@ public class DatabaseService {
         databases.add(database);
     }
 
-    public void deleteDatabase(String name) {
-        deleteDatabase(new Database(name));
+    public boolean isCreated(String name) {
+        return databases.stream().anyMatch(database -> database.getName().equals(name));
     }
 
-
-    public void deleteDatabase(Database database) {
-        databases.removeIf(database1 -> database1.getName().equals(database.getName()));
+    public void deleteDatabase(final String name) {
+        databases.removeIf(database -> database.getName().equals(name));
     }
 
-    public Database getDataBase(String name) {
+    public Database getDataBase(final String name) {
         return databases.stream().filter(database -> database.getName().equals(name)).findFirst().orElse(null);
     }
 
@@ -57,14 +57,13 @@ public class DatabaseService {
             final JSONObject jsonObject = fileFactory.load(file);
             final JSONArray jsonArray = jsonObject.getJSONArray("tables");
 
-            Database dataBase = new Database(jsonObject.getString("name"));
+            final Database dataBase = new Database(jsonObject.getString("name"));
 
             for (int j = 0; j < jsonArray.length(); j++) {
                 final JSONObject currentObject = jsonArray.getJSONObject(j);
 
-                Table table = new Table(currentObject.getString("name"), null, currentObject.getString("primary"));
-
-                List<String> list = new ArrayList<>();
+                final Table table = new Table(currentObject.getString("name"), null, currentObject.getString("primary"));
+                final List<String> list = new ArrayList<>();
 
                 for (Object obj : currentObject.getJSONArray("structure")) {
                     list.add(obj.toString());
@@ -72,7 +71,7 @@ public class DatabaseService {
 
                 table.setStructure(list);
 
-                JSONArray currentArray = currentObject.getJSONArray("columns");
+                final JSONArray currentArray = currentObject.getJSONArray("columns");
 
                 IntStream.range(0, currentArray.length()).mapToObj(currentArray::getJSONObject).forEach(curObject -> {
                     Column column = new Column();
@@ -90,9 +89,7 @@ public class DatabaseService {
     }
 
     public void update() {
-        for (File file : Objects.requireNonNull(new File("database").listFiles())) {
-            file.delete();
-        }
+        Arrays.stream(Objects.requireNonNull(new File("database").listFiles())).forEach(File::delete);
 
         databases.forEach(database -> {
             final File file = new File("database/" + database.getName() + ".json");

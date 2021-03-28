@@ -1,26 +1,56 @@
 package org.jokergames.myjfql.user;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-/**
- * @author Janick
- */
-
-public abstract class User {
+public class User {
 
     private final String name;
-    private List<String> permissions;
-    private List<Property> properties;
     private String password;
+
+    private List<String> permissions;
+    private boolean staticDatabase;
 
     public User(String name, String password) {
         this.name = name;
         this.password = password;
         this.permissions = new ArrayList<>();
-        this.properties = new ArrayList<>();
+        this.staticDatabase = false;
+    }
+
+    public boolean hasPermission(final String permission) {
+        if (permissions.contains("*"))
+            return true;
+
+        return permissions.contains(permission.toLowerCase());
+    }
+
+    public void addPermission(final String permission) {
+        permissions.add(permission.toLowerCase());
+    }
+
+    public void removePermission(final String permission) {
+        permissions.remove(permission.toLowerCase());
+    }
+
+    public List<String> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(final List<String> permissions) {
+        this.permissions = permissions;
+    }
+
+    public boolean isStaticDatabase() {
+        return staticDatabase;
+    }
+
+    public void setStaticDatabase(final boolean staticDatabase) {
+        this.staticDatabase = staticDatabase;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getPassword() {
@@ -31,74 +61,13 @@ public abstract class User {
         this.password = password;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public boolean is(Property property) {
-        return properties.contains(property);
-    }
-
-    public boolean hasPermission(String permission) {
-        if (permissions.contains(("-" + permission).toLowerCase())) {
-            return false;
-        }
-
-        if (permissions.contains("*")) {
-            return true;
-        }
-
-        return permissions.contains(permission.toLowerCase());
-    }
-
-    public List<Property> getProperties() {
-        return properties;
-    }
-
-    public void setProperties(List<Property> properties) {
-        this.properties = properties;
-    }
-
-    public List<String> getPermissions() {
-        return permissions;
-    }
-
-    public void setPermissions(List<String> permissions) {
-        this.permissions = permissions;
-    }
-
-    public File getFile() {
-        return new File("user/" + name + ".json");
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(name, user.name) &&
-                Objects.equals(properties, user.properties);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, properties);
-    }
-
     @Override
     public String toString() {
         return "User{" +
-                "permissions=" + permissions +
-                ", properties=" + properties +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
                 ", password='" + password + '\'' +
+                ", permissions=" + permissions +
+                ", staticDatabase=" + staticDatabase +
                 '}';
-    }
-
-    public enum Property {
-        CONSOLE,
-        NO_DELETE,
-        NO_EDIT,
-        STATIC_DATABASE
     }
 }

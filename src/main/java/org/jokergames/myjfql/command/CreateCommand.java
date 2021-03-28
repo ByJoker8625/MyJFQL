@@ -1,214 +1,123 @@
 package org.jokergames.myjfql.command;
 
-import org.jokergames.myjfql.command.executor.ConsoleExecutor;
-import org.jokergames.myjfql.command.executor.Executor;
-import org.jokergames.myjfql.command.executor.RemoteExecutor;
 import org.jokergames.myjfql.core.MyJFQL;
+import org.jokergames.myjfql.database.DBSession;
 import org.jokergames.myjfql.database.Database;
 import org.jokergames.myjfql.database.DatabaseService;
 import org.jokergames.myjfql.database.Table;
-import org.jokergames.myjfql.script.Script;
-import org.jokergames.myjfql.user.User;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-/**
- * @author Janick
- */
 
 public class CreateCommand extends Command {
 
     public CreateCommand() {
-        super("CREATE", List.of("COMMAND", "SCRIPT", "DATABASE", "TABLE", "STRUCTURE", "INTO", "PRIMARY-KEY", "SRC"));
+        super("create", List.of("COMMAND", "DATABASE", "TABLE", "STRUCTURE", "PRIMARY-KEY", "INTO"));
     }
 
     @Override
-    public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
-        final DatabaseService dataBaseService = MyJFQL.getInstance().getDatabaseService();
+    public void handle(final CommandSender sender, final Map<String, List<String>> args) {
+        final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
+        final DBSession session = MyJFQL.getInstance().getDBSession();
 
-        if (executor instanceof RemoteExecutor) {
-            RemoteExecutor remote = (RemoteExecutor) executor;
+        if (args.containsKey("TABLE") && args.containsKey("STRUCTURE")) {
+            final String name = formatString(args.get("TABLE"));
+            final List<String> structure = args.get("STRUCTURE");
 
-            if (!user.hasPermission("execute.create")) {
-                return false;
+            if (name == null) {
+                sender.sendError("Unknown table!");
+                return;
             }
 
-            if (arguments.containsKey("SCRIPT") && arguments.containsKey("SRC")) {
-                String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
-                String src = MyJFQL.getInstance().getFormatter().formatString(arguments.get("SRC"));
-
-                if (!user.hasPermission("execute.create.script.*") && !user.hasPermission("execute.create.script." + name)) {
-                    return false;
-                }
-
-                final Script script = new Script(name);
-                script.formatCommands(src);
-
-                remote.sendSuccess();
-                MyJFQL.getInstance().getScriptService().saveScript(script);
-                return true;
+            if (structure.size() == 0) {
+                sender.sendError("Unknown structure!");
+                return;
             }
 
+            String databaseName = session.get(sender.getName());
+            String primaryKey = structure.get(0);
 
-            if (arguments.containsKey("DATABASE")) {
-                String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("DATABASE"));
-
-                if (!user.hasPermission("execute.create.database.*") && !user.hasPermission("execute.create.database." + name)) {
-                    return false;
-                }
-
-                if (dataBaseService.getDataBase(name) != null) {
-                    remote.sendError("Database already exists!");
-                    return true;
-                }
-
-                dataBaseService.saveDataBase(new Database(name));
-                remote.sendSuccess();
-                return true;
+            if (name == null) {
+                sender.sendError("Name can't be null!");
+                return;
             }
 
-            if (arguments.containsKey("TABLE") && arguments.containsKey("STRUCTURE")) {
-                String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("TABLE"));
+            if (args.containsKey("PRIMARY-KEY")) {
+                final String string = formatString(args.get("PRIMARY-KEY"));
 
-                if (!user.hasPermission("execute.create.table.*") && !user.hasPermission("execute.create.table." + name)) {
-                    return false;
+                if (string == null) {
+                    sender.sendError("Key can't be null!");
+                    return;
                 }
 
-                List<String> structure = new ArrayList<>();
-
-                for (String str : arguments.get("STRUCTURE")) {
-                    structure.add(str.replace("'", ""));
+                if (!structure.contains(string)) {
+                    sender.sendError("Unknown key!");
+                    return;
                 }
 
-                String base;
-                String primaryKey;
-
-                if (arguments.containsKey("INTO")) {
-                    base = MyJFQL.getInstance().getFormatter().formatString(arguments.get("INTO"));
-                } else {
-                    base = MyJFQL.getInstance().getDBSession().get(user.getName());
-                }
-
-                if (!user.hasPermission("execute.use.*") && !user.hasPermission("execute.use." + base)) {
-                    return false;
-                }
-
-                if (arguments.containsKey("PRIMARY-KEY")) {
-                    primaryKey = MyJFQL.getInstance().getFormatter().formatString(arguments.get("PRIMARY-KEY"));
-                } else {
-                    primaryKey = structure.get(0);
-                }
-
-                if (dataBaseService.getDataBase(base) == null) {
-                    remote.sendError("Database doesn't exists!");
-                    return true;
-                }
-
-                final Database dataBase = dataBaseService.getDataBase(base);
-
-                if (dataBase.getTable(name) != null) {
-                    remote.sendError("Table already exists!");
-                    return true;
-                }
-
-
-                remote.sendSuccess();
-                dataBase.addTable(new Table(name, structure, primaryKey));
-                dataBaseService.saveDataBase(dataBase);
-                return true;
+                primaryKey = string;
             }
 
+            if (args.containsKey("INTO")) {
+                final String string = formatString(args.get("INTO"));
 
-            remote.sendSyntax();
-        } else {
-            ConsoleExecutor console = (ConsoleExecutor) executor;
-
-            if (arguments.containsKey("SCRIPT") && arguments.containsKey("SRC")) {
-                String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("SCRIPT"));
-
-                if (name.equals("")) {
-                    console.sendError("Bad script name!");
-                    return true;
+                if (string == null) {
+                    sender.sendError("Database can't be null!");
+                    return;
                 }
 
-                if (MyJFQL.getInstance().getScriptService().getScript(name) != null) {
-                    System.out.print("[" + MyJFQL.getInstance().getConsole().getTime() + "] WARNING: Script already exists. Do you want to overwrite it [y/n]: ");
-
-                    if (!MyJFQL.getInstance().getConsole().read().equals("y")) {
-                        return true;
-                    }
-                }
-
-                final Script script = new Script(name);
-                script.formatCommands(MyJFQL.getInstance().getFormatter().formatString(arguments.get("SRC")));
-
-
-                console.sendInfo("Script '" + name + "' was created.");
-                console.sendInfo("To invoke this enter: 'INVOKE SCRIPT " + name + "'");
-                MyJFQL.getInstance().getScriptService().saveScript(script);
-                return true;
+                databaseName = string;
             }
 
-            if (arguments.containsKey("DATABASE")) {
-                String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("DATABASE"));
-
-                if (dataBaseService.getDataBase(name) != null) {
-                    console.sendError("Database '" + name + "' was not found!");
-                    return true;
-                }
-
-                dataBaseService.saveDataBase(new Database(name));
-                console.sendInfo("Database '" + name + "' was created.");
-                return true;
+            if (!databaseService.isCreated(databaseName)) {
+                sender.sendError("Unknown database!");
+                return;
             }
 
-            if (arguments.containsKey("TABLE") && arguments.containsKey("STRUCTURE")) {
-                String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("TABLE"));
-                List<String> structure = new ArrayList<>();
-
-                for (String str : arguments.get("STRUCTURE")) {
-                    structure.add(str.replace("'", ""));
-                }
-
-                String base;
-                String primaryKey;
-
-                if (arguments.containsKey("INTO")) {
-                    base = MyJFQL.getInstance().getFormatter().formatString(arguments.get("INTO"));
-                } else {
-                    base = MyJFQL.getInstance().getDBSession().get(user.getName());
-                }
-
-                if (arguments.containsKey("PRIMARY-KEY")) {
-                    primaryKey = MyJFQL.getInstance().getFormatter().formatString(arguments.get("PRIMARY-KEY"));
-                } else {
-                    primaryKey = structure.get(0);
-                }
-
-                if (dataBaseService.getDataBase(base) == null) {
-                    console.sendError("Database '" + name + "' was not found!");
-                    return true;
-                }
-
-                final Database dataBase = dataBaseService.getDataBase(base);
-
-                if (dataBase.getTable(name) != null) {
-                    console.sendError("Table '" + name + "' already exists!");
-                    return true;
-                }
-
-
-                console.sendInfo("Table '" + name + "' was created.");
-                dataBase.addTable(new Table(name, structure, primaryKey));
-                dataBaseService.saveDataBase(dataBase);
-                return true;
+            if (!sender.hasPermission("use.table." + name + "." + databaseName)
+                    && !sender.hasPermission("use.table.*." + databaseName)) {
+                sender.sendForbidden();
+                return;
             }
 
-            console.sendError("Unknown syntax!");
+            final Database database = databaseService.getDataBase(databaseName);
+
+            if (database.isCreated(name)) {
+                sender.sendError("Table already exists!");
+                return;
+            }
+
+            sender.sendSuccess();
+
+            database.addTable(new Table(name, structure, primaryKey));
+            databaseService.saveDataBase(database);
+            return;
         }
 
-        return true;
+        if (args.containsKey("DATABASE")) {
+            if (sender instanceof RemoteCommandSender) {
+                sender.sendForbidden();
+                return;
+            }
+
+            final String name = formatString(args.get("DATABASE"));
+
+            if (name == null) {
+                sender.sendError("Unknown database!");
+                return;
+            }
+
+            if (databaseService.isCreated(name)) {
+                sender.sendError("Database already exists!");
+                return;
+            }
+
+            databaseService.saveDataBase(new Database(name));
+            sender.sendSuccess();
+            return;
+        }
+
+        sender.sendSyntax();
     }
+
 }

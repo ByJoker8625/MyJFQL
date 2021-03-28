@@ -1,197 +1,185 @@
 package org.jokergames.myjfql.command;
 
-import org.jokergames.myjfql.command.executor.Executor;
-import org.jokergames.myjfql.command.executor.RemoteExecutor;
 import org.jokergames.myjfql.core.MyJFQL;
 import org.jokergames.myjfql.database.Database;
 import org.jokergames.myjfql.database.DatabaseService;
-import org.jokergames.myjfql.user.ConsoleUser;
-import org.jokergames.myjfql.user.RemoteUser;
 import org.jokergames.myjfql.user.User;
 import org.jokergames.myjfql.user.UserService;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Janick
- * @language This commands is not a JFQL query. It is only for the DBMS management.
- */
-
-
 public class UserCommand extends Command {
 
     public UserCommand() {
-        super("USER", List.of("COMMAND", "CREATE", "DATABASE", "PASSWORD", "DELETE", "ADD", "REMOVE", "DISPLAY", "PERMISSION", "UPDATE"));
+        super("user", List.of("COMMAND", "CREATE", "PASSWORD", "ADD", "PERMISSION", "REMOVE", "DATABASE", "UPDATE", "DISPLAY", "DELETE"));
     }
 
     @Override
-    public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
-        if (executor instanceof RemoteExecutor) {
-            return false;
+    public void handle(final CommandSender sender, final Map<String, List<String>> args) {
+        if (sender instanceof RemoteCommandSender) {
+            sender.sendForbidden();
+            return;
         }
 
         final UserService userService = MyJFQL.getInstance().getUserService();
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
 
-        if (arguments.containsKey("CREATE") && arguments.containsKey("PASSWORD")) {
-            String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("CREATE"));
-            String password = MyJFQL.getInstance().getFormatter().formatString(arguments.get("PASSWORD"));
 
-            if (userService.getUser(name) != null) {
-                MyJFQL.getInstance().getConsole().logError("User '" + name + "' already exists!");
-                return true;
+        if (args.containsKey("CREATE") && args.containsKey("PASSWORD")) {
+            final String name = formatString(args.get("CREATE"));
+            final String password = formatString(args.get("PASSWORD"));
+
+            if (name == null) {
+                sender.sendError("Unknown name!");
+                return;
             }
 
-            if (password.isEmpty()) {
-                MyJFQL.getInstance().getConsole().logError("Enter a password!");
-                return true;
+            if (password == null) {
+                sender.sendError("Unknown password!");
+                return;
             }
 
-            final User usr = new RemoteUser(name, password);
+            if (userService.isCreated(name)) {
+                sender.sendError("User already exists!");
+                return;
+            }
 
-            if (arguments.containsKey("DATABASE")) {
-                if (databaseService.getDataBase(usr.getName()) != null) {
-                    MyJFQL.getInstance().getConsole().logError("A database with name '" + usr.getName() + "' already exists!");
-                    return true;
+            final User user = new User(name, password);
+
+            if (args.containsKey("DATABASE")) {
+                if (databaseService.isCreated(name)) {
+                    sender.sendError("Database already exists!");
+                    return;
                 }
 
-                final Database database = new Database(usr.getName());
-
-                {
-                    usr.getPermissions().add("execute.create");
-                    usr.getPermissions().add("execute.delete");
-                    usr.getPermissions().add("execute.remove");
-                    usr.getPermissions().add("execute.insert");
-                    usr.getPermissions().add("execute.select");
-                    usr.getPermissions().add("execute.list");
-                    usr.getPermissions().add("execute.use");
-
-                    usr.getPermissions().add(("execute.create.table.*").toLowerCase());
-                    usr.getPermissions().add(("execute.delete.database." + database.getName()).toLowerCase());
-                    usr.getPermissions().add(("execute.delete.table.*").toLowerCase());
-                    usr.getPermissions().add(("execute.remove.database." + database.getName() + ".*").toLowerCase());
-                    usr.getPermissions().add(("execute.insert.database." + database.getName() + ".*").toLowerCase());
-                    usr.getPermissions().add(("execute.select.database." + database.getName() + ".*").toLowerCase());
-                    usr.getPermissions().add(("execute.list.tables").toLowerCase());
-                    usr.getPermissions().add(("execute.list.databases").toLowerCase());
-                    usr.getPermissions().add(("execute.use." + database.getName()).toLowerCase());
-                }
-
-                databaseService.saveDataBase(database);
+                databaseService.saveDataBase(new Database(name));
+                user.addPermission("use.table.*." + name);
+                user.addPermission("use.database." + name);
+                user.setStaticDatabase(true);
             }
 
-            userService.saveUser(usr);
-            MyJFQL.getInstance().getConsole().logInfo("User '" + name + "' was created.");
-            return true;
+            userService.saveUser(user);
+            sender.sendSuccess();
+            return;
         }
 
-        if (arguments.containsKey("UPDATE") && arguments.containsKey("PASSWORD")) {
-            String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("UPDATE"));
-            String password = MyJFQL.getInstance().getFormatter().formatString(arguments.get("PASSWORD"));
+        if (args.containsKey("DELETE")) {
+            final String name = formatString(args.get("DELETE"));
 
-            if (userService.getUser(name) == null) {
-                MyJFQL.getInstance().getConsole().logError("User '" + name + "' doesn't exists!");
-                return true;
+            if (name == null) {
+                sender.sendError("Unknown name!");
+                return;
             }
 
-            User usr = userService.getUser(name);
-
-            if (usr instanceof ConsoleUser) {
-                MyJFQL.getInstance().getConsole().logError("Can't update user 'Console'!");
-                return true;
+            if (!userService.isCreated(name)) {
+                sender.sendError("User doesn't exists!");
+                return;
             }
 
-            if (password.isEmpty()) {
-                MyJFQL.getInstance().getConsole().logError("Enter a password!");
-                return true;
-            }
-
-            usr.setPassword(password);
-            userService.saveUser(usr);
-
-            MyJFQL.getInstance().getConsole().logInfo("User '" + name + "' was updated.");
-            return true;
+            userService.deleteUser(name);
+            sender.sendSuccess();
+            return;
         }
 
-        if (arguments.containsKey("DELETE")) {
-            String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("DELETE"));
+        if (args.containsKey("UPDATE") && args.containsKey("PASSWORD")) {
+            final String name = formatString(args.get("UPDATE"));
+            final String password = formatString(args.get("PASSWORD"));
 
-            if (userService.getUser(name) == null) {
-                MyJFQL.getInstance().getConsole().logError("User '" + name + "' doesn't exists!");
-                return true;
+            if (name == null) {
+                sender.sendError("Unknown name!");
+                return;
             }
 
-            final User usr = userService.getUser(name);
-
-            if (usr.is(User.Property.NO_DELETE)) {
-                MyJFQL.getInstance().getConsole().logError("Can't delete user '" + usr.getName() + "'!");
-                return true;
+            if (password == null) {
+                sender.sendError("Unknown password!");
+                return;
             }
 
-            MyJFQL.getInstance().getConsole().logInfo("User '" + name + "' was deleted.");
-            userService.deleteUser(usr);
-            return true;
+            if (!userService.isCreated(name)) {
+                sender.sendError("User doesn't exists!");
+                return;
+            }
+
+            final User user = userService.getUser(name);
+            user.setPassword(password);
+            userService.saveUser(user);
+
+            sender.sendSuccess();
+            return;
         }
 
-        if (arguments.containsKey("DISPLAY")) {
-            String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("DISPLAY"));
+        if (args.containsKey("ADD") && args.containsKey("PERMISSION")) {
+            final String name = formatString(args.get("ADD"));
+            final String permission = formatString(args.get("PERMISSION"));
 
-            if (userService.getUser(name) == null) {
-                MyJFQL.getInstance().getConsole().logError("User '" + name + "' doesn't exists!");
-                return true;
+            if (name == null) {
+                sender.sendError("Unknown name!");
+                return;
             }
 
-            final User usr = userService.getUser(name);
-            MyJFQL.getInstance().getConsole().log(usr.toString());
-            return true;
+            if (permission == null) {
+                sender.sendError("Unknown permission!");
+                return;
+            }
+
+            if (!userService.isCreated(name)) {
+                sender.sendError("User doesn't exists!");
+                return;
+            }
+
+            final User user = userService.getUser(name);
+            user.addPermission(permission);
+            userService.saveUser(user);
+
+            sender.sendSuccess();
+            return;
         }
 
-        if (arguments.containsKey("ADD") && arguments.containsKey("PERMISSION")) {
-            String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("ADD"));
-            String permission = MyJFQL.getInstance().getFormatter().formatString(arguments.get("PERMISSION")).toLowerCase();
+        if (args.containsKey("REMOVE") && args.containsKey("PERMISSION")) {
+            final String name = formatString(args.get("REMOVE"));
+            final String permission = formatString(args.get("PERMISSION"));
 
-            if (userService.getUser(name) == null) {
-                MyJFQL.getInstance().getConsole().logError("User '" + name + "' doesn't exists!");
-                return true;
+            if (name == null) {
+                sender.sendError("Unknown name!");
+                return;
             }
 
-            final User usr = userService.getUser(name);
-
-            if (usr.is(User.Property.NO_EDIT)) {
-                MyJFQL.getInstance().getConsole().logError("Can't edit user '" + usr.getName() + "'!");
-                return true;
+            if (permission == null) {
+                sender.sendError("Unknown permission!");
+                return;
             }
 
-            MyJFQL.getInstance().getConsole().logInfo("Add permission '" + permission + "' to user '" + usr.getName() + "'.");
-            usr.getPermissions().add(permission);
-            userService.saveUser(usr);
-            return true;
+            if (!userService.isCreated(name)) {
+                sender.sendError("User doesn't exists!");
+                return;
+            }
+
+            final User user = userService.getUser(name);
+            user.removePermission(permission);
+            userService.saveUser(user);
+
+            sender.sendSuccess();
+            return;
         }
 
-        if (arguments.containsKey("REMOVE") && arguments.containsKey("PERMISSION")) {
-            String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("REMOVE"));
-            String permission = MyJFQL.getInstance().getFormatter().formatString(arguments.get("PERMISSION")).toLowerCase();
+        if (args.containsKey("DISPLAY")) {
+            final String name = formatString(args.get("DISPLAY"));
 
-            if (userService.getUser(name) == null) {
-                MyJFQL.getInstance().getConsole().logError("User '" + name + "' doesn't exists!");
-                return true;
+            if (name == null) {
+                sender.sendError("Unknown name!");
+                return;
             }
 
-            final User usr = userService.getUser(name);
-
-            if (usr.is(User.Property.NO_EDIT)) {
-                MyJFQL.getInstance().getConsole().logError("Can't edit user '" + usr.getName() + "'!");
-                return true;
+            if (!userService.isCreated(name)) {
+                sender.sendError("User doesn't exists!");
+                return;
             }
 
-            MyJFQL.getInstance().getConsole().logInfo("Remove permission '" + permission + "' to user '" + usr.getName() + "'.");
-            usr.getPermissions().remove(permission);
-            userService.saveUser(usr);
-            return true;
+            sender.send(userService.getUser(name));
+            return;
         }
 
-        MyJFQL.getInstance().getConsole().logError("Unknown syntax!");
-        return true;
+        sender.sendSyntax();
     }
 }

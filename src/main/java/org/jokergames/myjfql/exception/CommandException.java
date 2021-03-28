@@ -1,9 +1,5 @@
 package org.jokergames.myjfql.exception;
 
-/**
- * @author Janick
- */
-
 public class CommandException extends RuntimeException {
 
     public CommandException() {

@@ -8,10 +8,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Arrays;
 
-/**
- * @author Janick
- */
-
 public class FileFactory {
 
     public JSONObject load(File file) {

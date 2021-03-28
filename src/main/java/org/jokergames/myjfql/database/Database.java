@@ -1,6 +1,5 @@
 package org.jokergames.myjfql.database;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -14,7 +13,7 @@ public class Database {
     private final String name;
     private List<Table> tables;
 
-    public Database(String name) {
+    public Database(final String name) {
         this.name = name;
         this.tables = new ArrayList<>();
     }
@@ -27,29 +26,29 @@ public class Database {
         return tables;
     }
 
-    public void setTables(List<Table> tables) {
+    public void setTables(final List<Table> tables) {
         this.tables = tables;
     }
 
-    public void addTable(Table table) {
+    public void addTable(final Table table) {
         removeTable(table.getName());
         tables.add(table);
+    }
+
+    public boolean isCreated(String name) {
+        return tables.stream().anyMatch(table -> table.getName().equals(name));
     }
 
     public void removeTable(String name) {
         tables.removeIf(table -> table.getName().equals(name));
     }
 
-    public File getFile() {
-        return new File("database/" + name + ".json");
-    }
-
-    public Table getTable(String name) {
+    public Table getTable(final String name) {
         return tables.stream().filter(table -> table.getName().equals(name)).findFirst().orElse(null);
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Database database = (Database) o;

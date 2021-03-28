@@ -1,72 +1,52 @@
 package org.jokergames.myjfql.core;
 
 import org.jokergames.myjfql.command.*;
-import org.jokergames.myjfql.core.lang.Formatter;
 import org.jokergames.myjfql.database.DBSession;
+import org.jokergames.myjfql.database.Database;
 import org.jokergames.myjfql.database.DatabaseService;
-import org.jokergames.myjfql.encryption.EncryptionService;
-import org.jokergames.myjfql.event.ClientLoginEvent;
-import org.jokergames.myjfql.event.CommandExecuteEvent;
-import org.jokergames.myjfql.event.EventService;
-import org.jokergames.myjfql.event.InvokeScriptEvent;
-import org.jokergames.myjfql.exception.*;
-import org.jokergames.myjfql.module.ModuleService;
-import org.jokergames.myjfql.script.Script;
-import org.jokergames.myjfql.script.ScriptService;
+import org.jokergames.myjfql.exception.NetworkException;
 import org.jokergames.myjfql.server.Server;
-import org.jokergames.myjfql.user.ConsoleUser;
 import org.jokergames.myjfql.user.UserService;
-import org.jokergames.myjfql.util.*;
+import org.jokergames.myjfql.util.ConfigService;
+import org.jokergames.myjfql.util.Console;
+import org.jokergames.myjfql.util.UpdateConnection;
 import org.json.JSONObject;
 
 import java.util.Timer;
 import java.util.TimerTask;
-
-/**
- * @author Janick
- */
 
 public final class MyJFQL {
 
     private static MyJFQL instance;
 
     private final Console console;
+    private final UpdateConnection updateConnection;
+    private final UpdateConnection.Downloader downloader;
+    private final ConsoleCommandSender consoleCommandSender;
     private final CommandService commandService;
+    private final DatabaseService databaseService;
     private final ConfigService configService;
-    private final Formatter formatter;
-    private final String version;
-    private final Downloader downloader;
-    private final Connection connection;
-    private final JSONObject configuration;
-    private final DatabaseService dataBaseService;
     private final UserService userService;
     private final DBSession dbSession;
-    private final ScriptService scriptService;
-    private final ModuleService moduleService;
-    private final EventService eventService;
-    private final ConditionHelper conditionHelper;
-    private final EncryptionService encryptionService;
+    private final JSONObject configuration;
+    private final String version = "1.4.1";
+
     private Server server;
 
     public MyJFQL() {
         instance = this;
-
-        this.version = "1.3.9-BETA";
         this.console = new Console();
-        this.connection = new Connection();
-        this.downloader = new Downloader(connection);
-        this.formatter = new Formatter();
-        this.configService = new ConfigService();
-        this.eventService = new EventService();
-        this.moduleService = new ModuleService();
-        this.conditionHelper = new ConditionHelper();
+        this.consoleCommandSender = new ConsoleCommandSender(console);
+        this.updateConnection = new UpdateConnection();
         this.commandService = new CommandService();
-        this.dbSession = new DBSession();
-        this.scriptService = new ScriptService(configService.getFactory());
-        this.dataBaseService = new DatabaseService(configService.getFactory());
-        this.configuration = configService.getConfig();
+        this.configService = new ConfigService();
         this.userService = new UserService(configService.getFactory());
-        this.encryptionService = new EncryptionService(configService.getEncryption());
+        this.configuration = configService.getConfiguration();
+        this.downloader = new UpdateConnection.Downloader(updateConnection);
+        this.databaseService = new DatabaseService(configService.getFactory());
+        this.dbSession = new DBSession(userService, databaseService);
+
+        this.server = null;
     }
 
     public static MyJFQL getInstance() {
@@ -74,225 +54,162 @@ public final class MyJFQL {
     }
 
     public void start() {
-        console.println("      _                  ______ _ _       ____                        _                                                    \n" +
-                "     | |                |  ____(_) |     / __ \\                      | |                                                   \n" +
-                "     | | __ ___   ____ _| |__   _| | ___| |  | |_   _  ___ _ __ _   _| |     __ _ _ __   __ _ _   _  __ _ _ __   __ _  ___ \n" +
-                " _   | |/ _` \\ \\ / / _` |  __| | | |/ _ \\ |  | | | | |/ _ \\ '__| | | | |    / _` | '_ \\ / _` | | | |/ _` | '_ \\ / _` |/ _ \\\n" +
-                "| |__| | (_| |\\ V / (_| | |    | | |  __/ |__| | |_| |  __/ |  | |_| | |___| (_| | | | | (_| | |_| | (_| | | | | (_| |  __/\n" +
-                " \\____/ \\__,_| \\_/ \\__,_|_|    |_|_|\\___|\\___\\_\\\\__,_|\\___|_|   \\__, |______\\__,_|_| |_|\\__, |\\__,_|\\__,_|_| |_|\\__, |\\___|\n" +
-                "                                                                 __/ |                   __/ |                   __/ |     \n" +
-                "                                                                |___/                   |___/                   |___/      ");
-        console.logInfo("Developers » joker-games.org");
-        console.logInfo("Version » " + version + " (" + configuration.getString("Date") + ")");
+        console.print("      _                  ______ _ _       ____                        _                                              \n" +
+                "     | |                |  ____(_) |     / __ \\                      | |                                             \n" +
+                "     | | __ ___   ____ _| |__   _| | ___| |  | |_   _  ___ _ __ _   _| |     __ _ _ __   __ _ _   _  __ _  __ _  ___ \n" +
+                " _   | |/ _` \\ \\ / / _` |  __| | | |/ _ \\ |  | | | | |/ _ \\ '__| | | | |    / _` | '_ \\ / _` | | | |/ _` |/ _` |/ _ \\\n" +
+                "| |__| | (_| |\\ V / (_| | |    | | |  __/ |__| | |_| |  __/ |  | |_| | |___| (_| | | | | (_| | |_| | (_| | (_| |  __/\n" +
+                " \\____/ \\__,_| \\_/ \\__,_|_|    |_|_|\\___|\\___\\_\\\\__,_|\\___|_|   \\__, |______\\__,_|_| |_|\\__, |\\__,_|\\__,_|\\__, |\\___|\n" +
+                "                                                                 __/ |                   __/ |             __/ |     \n" +
+                "                                                                |___/                   |___/             |___/      \n" +
+                "");
+        console.logInfo("Developer > joker-games.org");
+        console.logInfo("Version > " + version);
         console.clean();
 
-        console.logInfo("Connecting to " + configuration.getString("UpdateServer") + "...");
+        {
+            console.logInfo("Connecting to " + configuration.getString("UpdateServer") + "...");
 
-        try {
-            connection.connect(configuration.getString("UpdateServer"));
+            try {
+                updateConnection.connect(configuration.getString("UpdateServer"));
 
-            if (connection.isMaintenance()) {
-                console.logWarning("Database is currently in maintenance!");
-                System.exit(0);
-                return;
+                if (updateConnection.isMaintenance()) {
+                    console.logError("Database is currently in maintenance!");
+                    return;
+                }
+            } catch (Exception ex) {
+                throw new NetworkException("Server connection failed!");
             }
-        } catch (Exception ex) {
-            throw new NetworkException("Server connection failed!");
+
+            console.logInfo("Successfully connected.");
+            console.clean();
         }
 
         {
-            console.logInfo("Successfully connected.");
-            console.clean();
-
-            if (!connection.isLatest()) {
-                if (configuration.getBoolean("AutoUpdate") && !connection.latestIsBeta()) {
+            if (!updateConnection.isLatest()) {
+                if (configuration.getBoolean("AutoUpdate")
+                        && !updateConnection.latestIsBeta()) {
                     downloader.download();
                 } else {
-                    console.logWarning("You aren't up to date. Please download the latest version.");
+                    console.logInfo("You aren't up to date. Please download the latest version.");
                 }
             }
         }
 
-        try {
-            for (String key : encryptionService.getEncryptionKeys().keySet()) {
-                MyJFQL.getInstance().getConsole().logInfo("Loading encryption " + key + "...");
-            }
-
-            if (encryptionService.getEncryptionKeys().keySet().size() != 0) {
-                console.clean();
-            }
-        } catch (Exception ex) {
-            throw new InternalException("Can't init encryption cache!");
+        {
+            commandService.register(new ClearCommand());
+            commandService.register(new ShutdownCommand());
+            commandService.register(new ListCommand());
+            commandService.register(new CreateCommand());
+            commandService.register(new DeleteCommand());
+            commandService.register(new UseCommand());
+            commandService.register(new VersionCommand());
+            commandService.register(new UserCommand());
+            commandService.register(new InsertCommand());
+            commandService.register(new SelectCommand());
+            commandService.register(new RemoveCommand());
         }
 
         try {
+            server = new Server(configuration.getInt("Port"));
+        } catch (Exception ex) {
+            throw new NetworkException(ex);
+        }
+
+        {
+            databaseService.init();
             userService.init();
-            dataBaseService.init();
-            scriptService.init();
-        } catch (Exception ex) {
-            throw new InternalException("Can't init database cache!");
-        }
 
-        {
-            if (userService.getUser("Console") == null)
-                userService.saveUser(new ConsoleUser());
-        }
-
-        try {
-            eventService.registerEvent(ClientLoginEvent.TYPE);
-            eventService.registerEvent(CommandExecuteEvent.TYPE);
-            eventService.registerEvent(InvokeScriptEvent.TYPE);
-        } catch (Exception ex) {
-            throw new EventException("Can't load events!");
-        }
-
-        try {
-            commandService.registerCommand(new ShutdownCommand());
-            commandService.registerCommand(new ClearCommand());
-            commandService.registerCommand(new UserCommand());
-            commandService.registerCommand(new VersionCommand());
-            commandService.registerCommand(new ListCommand());
-            commandService.registerCommand(new UseCommand());
-            commandService.registerCommand(new InsertCommand());
-            commandService.registerCommand(new CreateCommand());
-            commandService.registerCommand(new DeleteCommand());
-            commandService.registerCommand(new SelectCommand());
-            commandService.registerCommand(new RemoveCommand());
-            commandService.registerCommand(new InvokeCommand());
-        } catch (Exception ex) {
-            throw new CommandException("Can't load commands!");
-        }
-
-        try {
-            moduleService.enableModules();
-        } catch (Exception ex) {
-            throw new ModuleException("Can't load modules!");
-        }
-
-        if (moduleService.getModules().size() != 0) {
-            console.clean();
-        }
-
-        try {
-            server = new Server();
-        } catch (Exception ex) {
-            throw new NetworkException("Can't start javalin server");
-        }
-
-        {
-            if (configService.isFirstStart()) {
-                scriptService.saveScript(new Script("create_default_db", "create database test", "use database test"));
-                scriptService.invokeScript("create_default_db", getConsoleUser(), false);
+            if (databaseService.getDataBases().size() == 0
+                    && userService.getUsers().size() != 0) {
+                console.clean();
+                console.logWarning("No databases exist!");
             }
-        }
 
-        console.clean();
+            if (databaseService.getDataBases().size() != 0
+                    && userService.getUsers().size() == 0) {
+                console.clean();
+                console.logWarning("No users exist!");
+            }
 
-        try {
+            if (databaseService.getDataBases().size() == 0 && userService.getUsers().size() == 0) {
+                console.clean();
+                console.logWarning("No databases exist!");
+                console.logWarning("No users exist!");
+            }
+
             new Timer().scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
+                    databaseService.update();
                     userService.update();
-                    dataBaseService.update();
-                    scriptService.update();
                 }
-            }, 1000 * 120, 1000 * 120);
-        } catch (Exception ex) {
-            throw new InternalException("Can't update database cache!");
+            }, 1000 * 60 * 5, 1000 * 60 * 5);
         }
 
-        console.setInput(true);
-        console.stc();
-
-        while (true) {
-            commandService.execute(formatter.formatCommand(console.read()));
+        if (configService.isFirst()) {
+            databaseService.saveDataBase(new Database("test"));
         }
+
+        console.clean();
+        console.complete();
+
+        while (true)
+            commandService.execute(consoleCommandSender, console.readPrompt());
     }
 
     public void shutdown() {
+        console.logInfo("Shutdown...");
+        databaseService.update();
         userService.update();
-        dataBaseService.update();
-        scriptService.update();
-
-        moduleService.disableModules();
-
-        console.logInfo("Shutdown server...");
         System.exit(0);
     }
 
-    public ConsoleUser getConsoleUser() {
-        return (ConsoleUser) userService.getUser("Console");
+    public Console getConsole() {
+        return console;
     }
 
-    public ModuleService getModuleService() {
-        return moduleService;
+    public ConsoleCommandSender getConsoleCommandSender() {
+        return consoleCommandSender;
     }
 
-    public ConfigService getConfigService() {
-        return configService;
+    public UpdateConnection getUpdateConnection() {
+        return updateConnection;
     }
 
-    public Formatter getFormatter() {
-        return formatter;
+    public UpdateConnection.Downloader getDownloader() {
+        return downloader;
     }
 
     public String getVersion() {
         return version;
     }
 
-    public Downloader getUpdater() {
-        return downloader;
+    public CommandService getCommandService() {
+        return commandService;
     }
 
-    public JSONObject getConfiguration() {
-        return configuration;
-    }
-
-    public Connection getConnection() {
-        return connection;
-    }
-
-    public DatabaseService getDatabaseService() {
-        return dataBaseService;
-    }
-
-    public UserService getUserService() {
-        return userService;
+    public ConfigService getConfigService() {
+        return configService;
     }
 
     public DBSession getDBSession() {
         return dbSession;
     }
 
-    public CommandService getCommandService() {
-        return commandService;
-    }
-
-    public ConditionHelper getConditionHelper() {
-        return conditionHelper;
-    }
-
-    public ScriptService getScriptService() {
-        return scriptService;
-    }
-
-    public EventService getEventService() {
-        return eventService;
-    }
-
-    public Downloader getDownloader() {
-        return downloader;
-    }
-
     public Server getServer() {
         return server;
     }
 
-    public EncryptionService getEncryptionService() {
-        return encryptionService;
+    public DatabaseService getDatabaseService() {
+        return databaseService;
     }
 
-    public Console getConsole() {
-        return console;
+    public UserService getUserService() {
+        return userService;
+    }
+
+    public JSONObject getConfiguration() {
+        return configuration;
     }
 }

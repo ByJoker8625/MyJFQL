@@ -1,184 +1,99 @@
 package org.jokergames.myjfql.command;
 
-import org.jokergames.myjfql.command.executor.ConsoleExecutor;
-import org.jokergames.myjfql.command.executor.Executor;
-import org.jokergames.myjfql.command.executor.RemoteExecutor;
 import org.jokergames.myjfql.core.MyJFQL;
 import org.jokergames.myjfql.database.Column;
 import org.jokergames.myjfql.database.Database;
 import org.jokergames.myjfql.database.DatabaseService;
 import org.jokergames.myjfql.database.Table;
-import org.jokergames.myjfql.user.User;
+import org.jokergames.myjfql.util.ConditionHelper;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-/**
- * @author Janick
- */
 
 public class RemoveCommand extends Command {
 
     public RemoveCommand() {
-        super("REMOVE", List.of("COMMAND", "WHERE", "FROM", "COLUMN"));
+        super("remove", List.of("COMMAND", "COLUMN", "FROM", "WHERE"));
     }
 
-
     @Override
-    public boolean handle(Executor executor, Map<String, List<String>> arguments, User user) {
-        final DatabaseService dataBaseService = MyJFQL.getInstance().getDatabaseService();
+    public void handle(final CommandSender sender, final Map<String, List<String>> args) {
+        final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
+        final Database database = databaseService.getDataBase(MyJFQL.getInstance().getDBSession().get(sender.getName()));
 
-        if (executor instanceof RemoteExecutor) {
-            RemoteExecutor remote = (RemoteExecutor) executor;
+        if (args.containsKey("FROM")
+                && args.containsKey("COLUMN")) {
+            final String name = formatString(args.get("FROM"));
+            final String column = formatString(args.get("COLUMN"));
 
-            if (!user.hasPermission("execute.remove")) {
-                return false;
+            if (name == null) {
+                sender.sendError("Unknown table!");
+                return;
             }
 
-            if (arguments.containsKey("FROM") && arguments.containsKey("COLUMN")) {
-                String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
-                String column = MyJFQL.getInstance().getFormatter().formatString(arguments.get("COLUMN"));
+            if (column == null) {
+                sender.sendError("Unknown column!");
+                return;
+            }
 
-                final Database dataBase = dataBaseService.getDataBase(MyJFQL.getInstance().getDBSession().get(user.getName()));
+            if (!database.isCreated(name)) {
+                sender.sendError("Table doesn't exists!");
+                return;
+            }
 
-                if (dataBase == null) {
-                    remote.sendError("Database doesn't exists!");
-                    return true;
+            if (!sender.hasPermission("use.table." + name + "." + database.getName())
+                    && !sender.hasPermission("use.table.*." + database.getName())) {
+                sender.sendForbidden();
+                return;
+            }
+
+            final Table table = database.getTable(name);
+
+            if (!column.equals("*")
+                    && table.getColumn(column) == null) {
+                sender.sendError("Column doesn't exist!");
+                return;
+            }
+
+            if (args.containsKey("WHERE")) {
+                List<Column> columns = null;
+
+                try {
+                    columns = ConditionHelper.getRequiredColumns(table, args.get("WHERE"));
+                } catch (Exception ex) {
+                    sender.sendError("Unknown statement error!");
+                    return;
                 }
 
-                if (dataBase.getTable(name) == null) {
-                    remote.sendError("Table doesn't exists!");
-                    return true;
+                if (columns == null) {
+                    sender.sendError("Unknown statement error!");
+                    return;
                 }
 
-                final Table table = dataBase.getTable(name);
+                final String primary = table.getPrimary();
+                columns.stream().map(col -> col.getContent(primary).toString()).forEach(table::removeColumn);
 
-                if (!user.hasPermission("execute.remove.database." + dataBase.getName() + ".*") && !user.hasPermission("execute.remove.database." + dataBase.getName() + "." + table.getName())) {
-                    return false;
-                }
+                sender.sendSuccess();
 
-                if (table.getColumn(column) == null && !column.equals("*")) {
-                    remote.sendError("Unknown column!");
-                    return true;
-                }
-
-                if (arguments.containsKey("WHERE")) {
-                    List<Column> columns = null;
-
-                    try {
-                        columns = MyJFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
-                    } catch (Exception ex) {
-                        remote.sendError("Unknown 'where' error!");
-                        return true;
-                    }
-
-                    if (columns == null) {
-                        remote.sendError("Unknown 'where' error!");
-                        return true;
-                    }
-
-                    for (Column col : columns) {
-                        table.removeColumn(col.getContent(table.getPrimary()).toString());
-                    }
-
-                    remote.sendSuccess();
-                    dataBase.addTable(table);
-                    dataBaseService.saveDataBase(dataBase);
+                database.addTable(table);
+                databaseService.saveDataBase(database);
+            } else {
+                if (!column.equals("*")) {
+                    table.removeColumn(column);
                 } else {
-                    List<Column> columns;
-
-                    if (column.equals("*")) {
-                        columns = table.getColumns();
-                    } else {
-                        columns = Collections.singletonList(table.getColumn(column));
-                    }
-
-                    for (Column col : columns) {
-                        table.removeColumn(col.getContent(table.getPrimary()).toString());
-                    }
-
-                    remote.sendSuccess();
-                    dataBase.addTable(table);
-                    dataBaseService.saveDataBase(dataBase);
+                    table.setColumns(new ArrayList<>());
                 }
 
-                return true;
+                sender.sendSuccess();
+
+                database.addTable(table);
+                databaseService.saveDataBase(database);
             }
 
-            remote.sendSyntax();
-        } else {
-            ConsoleExecutor console = (ConsoleExecutor) executor;
-
-            if (arguments.containsKey("FROM") && arguments.containsKey("COLUMN")) {
-                String name = MyJFQL.getInstance().getFormatter().formatString(arguments.get("FROM"));
-                String column = MyJFQL.getInstance().getFormatter().formatString(arguments.get("COLUMN"));
-
-                final Database dataBase = dataBaseService.getDataBase(MyJFQL.getInstance().getDBSession().get(user.getName()));
-
-                if (dataBase == null) {
-                    console.sendError("Database doesn't exists!");
-                    return true;
-                }
-
-                if (dataBase.getTable(name) == null) {
-                    console.sendError("Table '" + name + "' doesn't exists!");
-                    return true;
-                }
-
-                final Table table = dataBase.getTable(name);
-
-                if (table.getColumn(column) == null && !column.equals("*")) {
-                    console.sendError("Column '" + column + "' doesn't exists!");
-                    return true;
-                }
-
-                if (arguments.containsKey("WHERE")) {
-                    List<Column> columns = null;
-
-                    try {
-                        columns = MyJFQL.getInstance().getConditionHelper().getRequiredColumns(table, arguments.get("WHERE"));
-                    } catch (Exception ex) {
-                        console.sendError("Unknown error!");
-                        return true;
-                    }
-
-                    if (columns == null) {
-                        console.sendError("Unknown key!");
-                        return true;
-                    }
-
-                    for (Column col : columns) {
-                        table.removeColumn(col.getContent(table.getPrimary()).toString());
-                    }
-
-                    console.sendInfo("Column/s was removed.");
-                    dataBase.addTable(table);
-                    dataBaseService.saveDataBase(dataBase);
-                } else {
-                    List<Column> columns;
-
-                    if (column.equals("*")) {
-                        columns = table.getColumns();
-                    } else {
-                        columns = Collections.singletonList(table.getColumn(column));
-                    }
-
-                    for (Column col : columns) {
-                        table.removeColumn(col.getContent(table.getPrimary()).toString());
-                    }
-
-                    console.sendInfo("Column/s was removed.");
-                    dataBase.addTable(table);
-                    dataBaseService.saveDataBase(dataBase);
-                }
-
-                return true;
-            }
-
-            console.sendError("Unknown syntax!");
+            return;
         }
 
-        return true;
+        sender.sendSyntax();
     }
 }

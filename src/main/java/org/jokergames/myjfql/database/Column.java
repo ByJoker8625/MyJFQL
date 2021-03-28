@@ -18,7 +18,7 @@ public class Column {
         this.creation = System.currentTimeMillis();
     }
 
-    public Column(Map<String, Object> content) {
+    public Column(final Map<String, Object> content) {
         this.content = content;
         this.creation = System.currentTimeMillis();
     }
@@ -27,15 +27,15 @@ public class Column {
         return creation;
     }
 
-    public void setCreation(long creation) {
+    public void setCreation(final long creation) {
         this.creation = creation;
     }
 
-    public Object getContent(String key) {
+    public Object getContent(final String key) {
         return content.get(key);
     }
 
-    public void putContent(String key, Object o) {
+    public void putContent(final String key, final Object o) {
         content.put(key, o);
     }
 
@@ -43,12 +43,12 @@ public class Column {
         return content;
     }
 
-    public void setContent(Map<String, Object> content) {
+    public void setContent(final Map<String, Object> content) {
         this.content = content;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Column column = (Column) o;

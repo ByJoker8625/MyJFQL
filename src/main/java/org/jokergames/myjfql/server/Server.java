@@ -1,65 +1,127 @@
 package org.jokergames.myjfql.server;
 
 import io.javalin.Javalin;
+import org.jokergames.myjfql.command.CommandService;
+import org.jokergames.myjfql.command.RemoteCommandSender;
 import org.jokergames.myjfql.core.MyJFQL;
-import org.jokergames.myjfql.server.controller.ControllerHandler;
-import org.jokergames.myjfql.server.controller.ControllerService;
-import org.jokergames.myjfql.server.controller.ErrorController;
-import org.jokergames.myjfql.server.controller.QueryController;
-import org.jokergames.myjfql.server.util.ResponseBuilder;
+import org.jokergames.myjfql.user.UserService;
+import org.jokergames.myjfql.util.Console;
+import org.json.JSONObject;
 
-import java.util.List;
-
-/**
- * @author Janick
- */
+import java.util.*;
 
 public class Server {
 
     private final Javalin app;
-    private final ResponseBuilder responseBuilder;
-    private final ControllerService controllerService;
 
-    public Server() {
-        this.responseBuilder = new ResponseBuilder();
-        this.controllerService = new ControllerService();
+    private final List<String> clients;
+    private final Map<String, String> confirmedClients;
+
+    public Server(final int port) {
         this.app = Javalin.create();
-
-        controllerService.registerController(new QueryController());
-        controllerService.registerController(new ErrorController());
         app.config.showJavalinBanner = false;
 
-        app.start(MyJFQL.getInstance().getConfiguration().getInt("Port"));
+        final Console console = MyJFQL.getInstance().getConsole();
+        final CommandService commandService = MyJFQL.getInstance().getCommandService();
+        final UserService userService = MyJFQL.getInstance().getUserService();
 
-        controllerService.getControllers().forEach(controller -> {
-            final List<ControllerHandler> declarers = controllerService.getControllerDeclarerByController(controller);
-            for (ControllerHandler declarer : declarers) {
-                switch (declarer.method()) {
-                    case STATUS:
-                        app.error(declarer.status(), context -> controllerService.invokeMethodsByDeclarerAndController(controller, declarer, context));
-                        break;
-                    case GET:
-                        app.get(declarer.path(), context -> controllerService.invokeMethodsByDeclarerAndController(controller, declarer, context));
-                        break;
-                    case POST:
-                        app.post(declarer.path(), context -> controllerService.invokeMethodsByDeclarerAndController(controller, declarer, context));
-                        break;
+        this.clients = new ArrayList<>();
+        this.confirmedClients = new HashMap<>();
+
+        app.ws("/query", handler -> {
+
+            handler.onConnect(context -> {
+                final String sessionID = context.getSessionId();
+                clients.add(sessionID);
+
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (!confirmedClients.containsKey(sessionID)) {
+                            clients.remove(sessionID);
+                            context.session.close();
+                        }
+                    }
+                }, 1000 * 10);
+            });
+
+            handler.onMessage(context -> {
+                final String sessionID = context.getSessionId();
+
+                if (!confirmedClients.containsKey(sessionID)) {
+                    final RemoteCommandSender sender = new RemoteCommandSender(null, context.session.getRemoteAddress().getHostString(), context);
+
+                    try {
+                        final JSONObject jsonObject = new JSONObject(context.message());
+                        final String name = jsonObject.getString("user");
+
+                        if (userService.isCreated(name) && userService.getUser(name).getPassword().equals(jsonObject.getString("password"))) {
+                            confirmedClients.put(sessionID, name);
+                            clients.remove(sessionID);
+                            sender.sendSuccess();
+
+                            console.setInput(false);
+                            console.logInfo("[" + sender.getAddress() + "/" + name + "] oped a connection.");
+                            console.setInput(true);
+                            return;
+                        }
+
+                        sender.sendForbidden();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
+                    return;
                 }
 
-            }
+                final RemoteCommandSender sender = new RemoteCommandSender(confirmedClients.get(sessionID), context.session.getRemoteAddress().getHostString(), context);
+
+                try {
+                    final JSONObject request = new JSONObject(context.message());
+                    final int id = request.getInt("id");
+                    final String query = request.getString("query");
+
+                    commandService.execute(sender.toCommandSenderWithId(id), query);
+
+                    console.setInput(false);
+                    console.logInfo("[" + sender.getAddress() + "/" + sender.getName() + "] queried \"" + query + "\".");
+                    console.setInput(true);
+                } catch (Exception ex) {
+                    sender.sendError(ex);
+                }
+            });
+
+            handler.onClose(context -> {
+                final String sessionID = context.getSessionId();
+
+                if (!confirmedClients.containsKey(sessionID)) {
+                    clients.remove(sessionID);
+                    return;
+                }
+
+                {
+                    console.setInput(false);
+                    console.logInfo("[" + context.session.getRemoteAddress().getAddress().getHostAddress() + "/" + confirmedClients.get(sessionID) + "] closed the connection.");
+                    console.setInput(true);
+                }
+
+                confirmedClients.remove(sessionID);
+            });
+
         });
+
+        app.start(port);
     }
 
-    @Deprecated
+    public Map<String, String> getConfirmedClients() {
+        return confirmedClients;
+    }
+
+    public List<String> getClients() {
+        return clients;
+    }
+
     public Javalin getApp() {
         return app;
-    }
-
-    public ControllerService getControllerService() {
-        return controllerService;
-    }
-
-    public ResponseBuilder getResponseBuilder() {
-        return responseBuilder;
     }
 }

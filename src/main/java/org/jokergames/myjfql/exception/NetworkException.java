@@ -1,27 +1,23 @@
 package org.jokergames.myjfql.exception;
 
-/**
- * @author Janick
- */
-
 public class NetworkException extends RuntimeException {
 
     public NetworkException() {
     }
 
-    public NetworkException(String message) {
+    public NetworkException(final String message) {
         super(message);
     }
 
-    public NetworkException(String message, Throwable cause) {
+    public NetworkException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public NetworkException(Throwable cause) {
+    public NetworkException(final Throwable cause) {
         super(cause);
     }
 
-    public NetworkException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public NetworkException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

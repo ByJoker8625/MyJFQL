@@ -9,18 +9,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * @author Janick
- */
-
 public class UserService {
 
-    private final FileFactory fileFactory;
+    private final FileFactory factory;
     private final List<User> users;
 
-    public UserService(FileFactory fileFactory) {
-        this.fileFactory = fileFactory;
+    public UserService(final FileFactory fileFactory) {
         this.users = new ArrayList<>();
+        this.factory = fileFactory;
     }
 
     public void saveUser(User user) {
@@ -38,43 +34,33 @@ public class UserService {
         return users.stream().filter(user -> user.getName().equals(name)).findFirst().orElse(null);
     }
 
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void deleteUser(User user) {
-        deleteUser(user.getName());
+    public boolean isCreated(String name) {
+        return users.stream().anyMatch(user -> user.getName().equals(name));
     }
 
     public void deleteUser(String name) {
         users.removeIf(user -> user.getName().equals(name));
     }
 
+    public List<User> getUsers() {
+        return users;
+    }
+
     public void init() {
-        Arrays.stream(Objects.requireNonNull(new File("user").listFiles())).map(fileFactory::load).forEach(jsonObject -> {
-            List<User.Property> properties = new ArrayList<>();
-            List<String> permissions = new ArrayList<>();
-            for (Object prop : jsonObject.getJSONArray("properties").toList()) {
-                properties.add(User.Property.valueOf(prop.toString()));
-            }
-            for (Object perms : jsonObject.getJSONArray("permissions").toList()) {
-                permissions.add(perms.toString().toLowerCase());
-            }
-            if (!properties.contains(User.Property.CONSOLE)) {
-                RemoteUser remoteUser = new RemoteUser(jsonObject.getString("name"), jsonObject.getString("password"));
-                remoteUser.setProperties(properties);
-                remoteUser.setPermissions(permissions);
+        Arrays.stream(Objects.requireNonNull(new File("user").listFiles())).map(factory::load).forEach(jsonObject -> {
+            List<String> tables = new ArrayList<>();
 
-                users.add(remoteUser);
-            } else {
-                ConsoleUser consoleUser = new ConsoleUser();
-                consoleUser.setProperties(properties);
-                consoleUser.setPermissions(permissions);
+            if (!jsonObject.isNull("permissions"))
+                for (Object obj : jsonObject.getJSONArray("permissions")) {
+                    tables.add(obj.toString());
+                }
 
-                users.add(consoleUser);
-            }
+            final User user = new User(jsonObject.getString("name"), jsonObject.getString("password"));
+            user.setStaticDatabase(jsonObject.getBoolean("staticDatabase"));
+            user.setPermissions(tables);
+
+            users.add(user);
         });
-
     }
 
     public void update() {
@@ -85,9 +71,9 @@ public class UserService {
             final JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", user.getName());
             jsonObject.put("password", user.getPassword());
-            jsonObject.put("permissions", user.getPermissions());
-            jsonObject.put("properties", user.getProperties());
-            fileFactory.save(file, jsonObject);
+            jsonObject.put("tables", user.getPermissions());
+            jsonObject.put("staticDatabase", user.isStaticDatabase());
+            factory.save(file, jsonObject);
         });
     }
 
