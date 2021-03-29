@@ -61,14 +61,14 @@ public class Server {
                             sender.sendSuccess();
 
                             console.setInput(false);
-                            console.logInfo("[" + sender.getAddress() + "/" + name + "] oped a connection.");
+                            console.logInfo("[" + sender.getAddress() + "/" + sessionID + "] [" + name + "] oped a connection.");
                             console.setInput(true);
                             return;
                         }
 
                         sender.sendForbidden();
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        sender.sendForbidden();
                     }
 
                     return;
@@ -78,14 +78,16 @@ public class Server {
 
                 try {
                     final JSONObject request = new JSONObject(context.message());
-                    final int id = request.getInt("id");
+                    final String id = request.getString("id");
                     final String query = request.getString("query");
 
                     commandService.execute(sender.toCommandSenderWithId(id), query);
 
-                    console.setInput(false);
-                    console.logInfo("[" + sender.getAddress() + "/" + sender.getName() + "] queried \"" + query + "\".");
-                    console.setInput(true);
+                    {
+                        console.setInput(false);
+                        console.logInfo("[" + sender.getAddress() + "/" + sessionID + "] [" + sender.getName() + "] queried \"" + query + "\".");
+                        console.setInput(true);
+                    }
                 } catch (Exception ex) {
                     sender.sendError(ex);
                 }
@@ -101,7 +103,7 @@ public class Server {
 
                 {
                     console.setInput(false);
-                    console.logInfo("[" + context.session.getRemoteAddress().getAddress().getHostAddress() + "/" + confirmedClients.get(sessionID) + "] closed the connection.");
+                    console.logInfo("[" + context.session.getRemoteAddress().getAddress().getHostAddress() + "/" + sessionID + "] [" + confirmedClients.get(sessionID) + "] closed the connection.");
                     console.setInput(true);
                 }
 

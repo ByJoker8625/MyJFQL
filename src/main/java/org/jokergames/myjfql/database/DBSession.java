@@ -28,10 +28,6 @@ public class DBSession {
                 && directories.get(key).equals(dir))
             return;
 
-        if (userService.isCreated(key)
-                && userService.getUser(key).isStaticDatabase())
-            throw new CommandException("Can't change database!");
-
         directories.put(key, dir);
     }
 

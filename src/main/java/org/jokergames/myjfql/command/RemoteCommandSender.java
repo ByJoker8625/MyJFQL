@@ -10,12 +10,12 @@ public class RemoteCommandSender extends CommandSender {
 
     private final WsMessageContext context;
     private final User user;
-    private int id;
+    private String id;
 
     public RemoteCommandSender(final String name, final String address, final WsMessageContext context) {
         super(name, address);
         this.context = context;
-        this.id = -1;
+        this.id = "-1";
         this.user = MyJFQL.getInstance().getUserService().getUser(name);
     }
 
@@ -96,18 +96,18 @@ public class RemoteCommandSender extends CommandSender {
         context.send(((JSONObject) obj).toString());
     }
 
-    public CommandSender toCommandSenderWithId(final int id) {
+    public CommandSender toCommandSenderWithId(final String id) {
         final RemoteCommandSender sender = this;
         sender.setId(id);
 
         return sender;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(final String id) {
         this.id = id;
     }
 

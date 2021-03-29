@@ -71,7 +71,7 @@ public class UserService {
             final JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", user.getName());
             jsonObject.put("password", user.getPassword());
-            jsonObject.put("tables", user.getPermissions());
+            jsonObject.put("permissions", user.getPermissions());
             jsonObject.put("staticDatabase", user.isStaticDatabase());
             factory.save(file, jsonObject);
         });
