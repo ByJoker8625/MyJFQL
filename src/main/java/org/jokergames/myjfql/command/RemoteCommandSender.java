@@ -1,5 +1,6 @@
 package org.jokergames.myjfql.command;
 
+import io.javalin.http.Context;
 import io.javalin.websocket.WsMessageContext;
 import org.jokergames.myjfql.core.MyJFQL;
 import org.jokergames.myjfql.exception.CommandException;
@@ -8,15 +9,17 @@ import org.json.JSONObject;
 
 public class RemoteCommandSender extends CommandSender {
 
-    private final WsMessageContext context;
+    private final WsMessageContext socketContext;
+    private final Context httpContext;
     private final User user;
     private String id;
 
-    public RemoteCommandSender(final String name, final String address, final WsMessageContext context) {
+    public RemoteCommandSender(final String name, final String address, final WsMessageContext socketContext, final Context httpContext) {
         super(name, address);
-        this.context = context;
+        this.socketContext = socketContext;
         this.id = "-1";
         this.user = MyJFQL.getInstance().getUserService().getUser(name);
+        this.httpContext = httpContext;
     }
 
     @Override
@@ -93,7 +96,16 @@ public class RemoteCommandSender extends CommandSender {
     public void send(final Object obj) {
         if (!(obj instanceof JSONObject))
             throw new CommandException("Input is not a jsonobject!");
-        context.send(((JSONObject) obj).toString());
+        if (httpContext == null)
+            socketContext.send(((JSONObject) obj).toString());
+        else {
+            httpContext.header("Access-Control-Allow-Origin", "*");
+            httpContext.header("Access-Control-Allow-Methods", "GET,POST");
+            httpContext.header("Access-Control-Allow-Headers", "*");
+            httpContext.header("Access-Control-Allow-Credentials", "true");
+            httpContext.header("Access-Control-Allow-Credentials-Header", "*");
+            httpContext.result(((JSONObject) obj).toString());
+        }
     }
 
     public CommandSender toCommandSenderWithId(final String id) {
@@ -102,6 +114,9 @@ public class RemoteCommandSender extends CommandSender {
 
         return sender;
     }
+
+
+
 
     public String getId() {
         return id;

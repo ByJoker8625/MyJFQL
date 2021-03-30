@@ -29,7 +29,7 @@ public final class MyJFQL {
     private final UserService userService;
     private final DBSession dbSession;
     private final JSONObject configuration;
-    private final String version = "1.4.1";
+    private final String version = "1.4.2";
 
     private Server server;
 
