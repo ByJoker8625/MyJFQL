@@ -1,10 +1,12 @@
 package org.jokergames.myjfql.database;
 
+import org.apache.commons.io.FileUtils;
 import org.jokergames.myjfql.util.FileFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -89,6 +91,12 @@ public class DatabaseService {
     }
 
     public void update() {
+        try {
+            FileUtils.copyDirectory(new File("database"), new File("backup/database"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         Arrays.stream(Objects.requireNonNull(new File("database").listFiles())).forEach(File::delete);
 
         databases.forEach(database -> {

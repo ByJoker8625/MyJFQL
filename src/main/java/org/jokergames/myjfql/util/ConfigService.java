@@ -22,6 +22,21 @@ public class ConfigService {
         if (!file.exists())
             file.mkdirs();
 
+        file = new File("backup");
+
+        if (!file.exists())
+            file.mkdir();
+
+        file = new File("backup/database");
+
+        if (!file.exists())
+            file.mkdirs();
+
+        file = new File("backup/database");
+
+        if (!file.exists())
+            file.mkdirs();
+
         file = new File("config.json");
 
         if (!file.exists()) {
