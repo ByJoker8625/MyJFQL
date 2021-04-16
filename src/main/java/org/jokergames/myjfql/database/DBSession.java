@@ -1,6 +1,5 @@
 package org.jokergames.myjfql.database;
 
-import org.jokergames.myjfql.exception.CommandException;
 import org.jokergames.myjfql.exception.FileException;
 import org.jokergames.myjfql.user.UserService;
 

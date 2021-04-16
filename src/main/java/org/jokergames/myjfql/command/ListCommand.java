@@ -51,7 +51,7 @@ public class ListCommand extends Command {
                 Sorter.Order order = null;
 
                 try {
-                    order = Sorter.Order.valueOf(formatString(args.get("ORDER")));
+                    order = Sorter.Order.valueOf(formatString(args.get("ORDER")).toUpperCase());
                 } catch (Exception ex) {
                     sender.sendError("Unknown sort order!");
                     return;
@@ -116,7 +116,7 @@ public class ListCommand extends Command {
                 Sorter.Order order = null;
 
                 try {
-                    order = Sorter.Order.valueOf(formatString(args.get("ORDER")));
+                    order = Sorter.Order.valueOf(formatString(args.get("ORDER")).toUpperCase());
                 } catch (Exception ex) {
                     sender.sendError("Unknown sort order!");
                     return;
@@ -162,7 +162,7 @@ public class ListCommand extends Command {
                 Sorter.Order order = null;
 
                 try {
-                    order = Sorter.Order.valueOf(formatString(args.get("ORDER")));
+                    order = Sorter.Order.valueOf(formatString(args.get("ORDER")).toUpperCase());
                 } catch (Exception ex) {
                     sender.sendError("Unknown sort order!");
                     return;
