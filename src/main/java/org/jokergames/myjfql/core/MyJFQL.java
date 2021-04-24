@@ -29,7 +29,7 @@ public final class MyJFQL {
     private final UserService userService;
     private final DBSession dbSession;
     private final JSONObject configuration;
-    private final String version = "1.4.2";
+    private final String version = "1.4.3-BETA";
 
     private Server server;
 
@@ -108,6 +108,7 @@ public final class MyJFQL {
             commandService.register(new InsertCommand());
             commandService.register(new SelectCommand());
             commandService.register(new RemoveCommand());
+            commandService.register(new BackupCommand());
         }
 
         try {
@@ -116,10 +117,16 @@ public final class MyJFQL {
             throw new NetworkException(ex);
         }
 
+        console.clean();
+
         {
+            console.logInfo("Loading databases and users (This can take a white)...");
             databaseService.init();
             userService.init();
+            console.logInfo("Loading finished!");
+        }
 
+        {
             if (databaseService.getDataBases().size() == 0
                     && userService.getUsers().size() != 0) {
                 console.clean();
@@ -159,7 +166,9 @@ public final class MyJFQL {
     }
 
     public void shutdown() {
-        console.logInfo("Shutdown...");
+        if (configuration.getBoolean("SecondaryBackup"))
+            commandService.execute(consoleCommandSender, "backup");
+        console.logInfo("Shutdown (This can take a white)...");
         databaseService.update();
         userService.update();
         System.exit(0);

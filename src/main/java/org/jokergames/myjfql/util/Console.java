@@ -32,7 +32,7 @@ public class Console {
             throw new CommandException(ex);
         }
 
-        reader.setPrompt("> ");
+        reader.setPrompt("");
 
         System.setErr(new PrintStream(System.err) {
             @Override
