@@ -7,6 +7,7 @@ import org.jokergames.myjfql.database.DatabaseService;
 import org.jokergames.myjfql.database.Table;
 import org.jokergames.myjfql.util.ConditionHelper;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.Map;
 public class InsertCommand extends Command {
 
     public InsertCommand() {
-        super("insert", List.of("COMMAND", "INTO", "KEY", "VALUE", "PRIMARY-KEY", "WHERE"));
+        super("insert", Arrays.asList("COMMAND", "INTO", "KEY", "VALUE", "PRIMARY-KEY", "WHERE"));
     }
 
     @Override

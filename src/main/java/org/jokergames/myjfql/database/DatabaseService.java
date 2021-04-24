@@ -92,7 +92,7 @@ public class DatabaseService {
 
     public void update() {
         try {
-            FileUtils.copyDirectory(new File("database"), new File("backup/database"));
+            FileUtils.copyDirectory(new File("database"), new File("backup/temp"));
         } catch (IOException e) {
             e.printStackTrace();
         }

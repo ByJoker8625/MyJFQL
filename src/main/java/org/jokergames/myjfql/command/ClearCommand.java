@@ -1,12 +1,13 @@
 package org.jokergames.myjfql.command;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class ClearCommand extends Command {
 
     public ClearCommand() {
-        super("clear", List.of("COMMAND"));
+        super("clear", Arrays.asList("COMMAND"));
     }
 
     @Override

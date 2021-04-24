@@ -6,13 +6,14 @@ import org.jokergames.myjfql.database.DatabaseService;
 import org.jokergames.myjfql.user.User;
 import org.jokergames.myjfql.user.UserService;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class UserCommand extends Command {
 
     public UserCommand() {
-        super("user", List.of("COMMAND", "CREATE", "PASSWORD", "ADD", "PERMISSION", "REMOVE", "DATABASE", "UPDATE", "DISPLAY", "DELETE"));
+        super("user", Arrays.asList("COMMAND", "CREATE", "PASSWORD", "ADD", "PERMISSION", "REMOVE", "DATABASE", "UPDATE", "DISPLAY", "DELETE"));
     }
 
     @Override

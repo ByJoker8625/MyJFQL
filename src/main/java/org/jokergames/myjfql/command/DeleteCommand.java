@@ -5,13 +5,14 @@ import org.jokergames.myjfql.database.DBSession;
 import org.jokergames.myjfql.database.Database;
 import org.jokergames.myjfql.database.DatabaseService;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class DeleteCommand extends Command {
 
     public DeleteCommand() {
-        super("delete", List.of("COMMAND", "DATABASE", "TABLE", "FROM"));
+        super("delete", Arrays.asList("COMMAND", "DATABASE", "TABLE", "FROM"));
     }
 
     @Override

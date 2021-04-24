@@ -1,11 +1,9 @@
 package org.jokergames.myjfql.user;
 
-import org.apache.commons.io.FileUtils;
 import org.jokergames.myjfql.util.FileFactory;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,12 +64,6 @@ public class UserService {
     }
 
     public void update() {
-        try {
-            FileUtils.copyDirectory(new File("user"), new File("backup/user"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         Arrays.stream(Objects.requireNonNull(new File("user").listFiles())).forEach(File::delete);
 
         users.forEach(user -> {

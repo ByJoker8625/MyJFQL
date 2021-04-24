@@ -6,13 +6,14 @@ import org.jokergames.myjfql.database.Database;
 import org.jokergames.myjfql.database.DatabaseService;
 import org.jokergames.myjfql.database.Table;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class CreateCommand extends Command {
 
     public CreateCommand() {
-        super("create", List.of("COMMAND", "DATABASE", "TABLE", "STRUCTURE", "PRIMARY-KEY", "INTO"));
+        super("create", Arrays.asList("COMMAND", "DATABASE", "TABLE", "STRUCTURE", "PRIMARY-KEY", "INTO"));
     }
 
     @Override

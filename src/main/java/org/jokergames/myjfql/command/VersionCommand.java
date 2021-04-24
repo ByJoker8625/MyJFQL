@@ -2,13 +2,14 @@ package org.jokergames.myjfql.command;
 
 import org.jokergames.myjfql.core.MyJFQL;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class VersionCommand extends Command {
 
     public VersionCommand() {
-        super("version", List.of("COMMAND", "DISPLAY", "UPDATE"));
+        super("version", Arrays.asList("COMMAND", "DISPLAY", "UPDATE"));
     }
 
     @Override
@@ -19,7 +20,7 @@ public class VersionCommand extends Command {
         }
 
         if (args.containsKey("DISPLAY")) {
-            sender.sendAnswer(List.of(MyJFQL.getInstance().getVersion()), new String[]{"Version"});
+            sender.sendAnswer(Arrays.asList(MyJFQL.getInstance().getVersion()), new String[]{"Version"});
             return;
         }
 

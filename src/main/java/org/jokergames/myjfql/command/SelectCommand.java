@@ -9,6 +9,7 @@ import org.jokergames.myjfql.util.ConditionHelper;
 import org.jokergames.myjfql.util.Sorter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 public class SelectCommand extends Command {
 
     public SelectCommand() {
-        super("select", List.of("COMMAND", "VALUE", "FROM", "WHERE", "LIMIT", "SORT", "ORDER", "PRIMARY-KEY"));
+        super("select", Arrays.asList("COMMAND", "VALUE", "FROM", "WHERE", "LIMIT", "SORT", "ORDER", "PRIMARY-KEY"));
     }
 
     @Override
@@ -146,7 +147,7 @@ public class SelectCommand extends Command {
                 }
 
                 column.getContent().keySet().stream().filter(key -> !values.contains(key)).forEach(key -> column.getContent().remove(key));
-                sender.sendAnswer(List.of(column), values);
+                sender.sendAnswer(Arrays.asList(column), values);
             } else if (args.containsKey("WHERE")) {
                 List<Column> columns = null;
 

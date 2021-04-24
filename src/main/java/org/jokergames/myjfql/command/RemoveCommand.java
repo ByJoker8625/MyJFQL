@@ -8,13 +8,14 @@ import org.jokergames.myjfql.database.Table;
 import org.jokergames.myjfql.util.ConditionHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class RemoveCommand extends Command {
 
     public RemoveCommand() {
-        super("remove", List.of("COMMAND", "COLUMN", "FROM", "WHERE"));
+        super("remove", Arrays.asList("COMMAND", "COLUMN", "FROM", "WHERE"));
     }
 
     @Override

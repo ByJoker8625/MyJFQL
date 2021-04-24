@@ -4,13 +4,14 @@ import org.jokergames.myjfql.core.MyJFQL;
 import org.jokergames.myjfql.database.DBSession;
 import org.jokergames.myjfql.database.DatabaseService;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class UseCommand extends Command {
 
     public UseCommand() {
-        super("use", List.of("COMMAND", "DATABASE"));
+        super("use", Arrays.asList("COMMAND", "DATABASE"));
     }
 
     @Override

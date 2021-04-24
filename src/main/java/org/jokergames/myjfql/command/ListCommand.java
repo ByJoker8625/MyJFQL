@@ -9,6 +9,7 @@ import org.jokergames.myjfql.user.UserService;
 import org.jokergames.myjfql.util.Sorter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 public class ListCommand extends Command {
 
     public ListCommand() {
-        super("list", List.of("COMMAND", "TABLES", "DATABASES", "USERS", "ORDER", "FROM", "LIMIT"));
+        super("list", Arrays.asList("COMMAND", "TABLES", "DATABASES", "USERS", "ORDER", "FROM", "LIMIT"));
     }
 
     @Override

@@ -27,12 +27,7 @@ public class ConfigService {
         if (!file.exists())
             file.mkdir();
 
-        file = new File("backup/database");
-
-        if (!file.exists())
-            file.mkdirs();
-
-        file = new File("backup/user");
+        file = new File("backup/temp");
 
         if (!file.exists())
             file.mkdirs();
