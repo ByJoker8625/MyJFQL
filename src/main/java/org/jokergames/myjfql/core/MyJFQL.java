@@ -32,6 +32,7 @@ public final class MyJFQL {
     private final String version = "1.4.3-BETA";
 
     private Server server;
+    private long lastUpdate;
 
     public MyJFQL() {
         instance = this;
@@ -46,6 +47,7 @@ public final class MyJFQL {
         this.databaseService = new DatabaseService(configService.getFactory());
         this.dbSession = new DBSession(userService, databaseService);
 
+        this.lastUpdate = -1;
         this.server = null;
     }
 
@@ -109,6 +111,7 @@ public final class MyJFQL {
             commandService.register(new SelectCommand());
             commandService.register(new RemoveCommand());
             commandService.register(new BackupCommand());
+            commandService.register(new LastUpdateCommand());
         }
 
         try {
@@ -150,8 +153,9 @@ public final class MyJFQL {
                 public void run() {
                     databaseService.update();
                     userService.update();
+                    lastUpdate = System.currentTimeMillis();
                 }
-            }, 1000 * 60 * 5, 1000 * 60 * 5);
+            }, 1000 * 60, 1000 * 60);
         }
 
         if (configService.isFirst()) {
@@ -168,6 +172,7 @@ public final class MyJFQL {
     public void shutdown() {
         if (configuration.getBoolean("SecondaryBackup"))
             commandService.execute(consoleCommandSender, "backup");
+
         console.logInfo("Shutdown (This can take a white)...");
         databaseService.update();
         userService.update();
@@ -204,6 +209,10 @@ public final class MyJFQL {
 
     public DBSession getDBSession() {
         return dbSession;
+    }
+
+    public long getLastUpdate() {
+        return lastUpdate;
     }
 
     public Server getServer() {

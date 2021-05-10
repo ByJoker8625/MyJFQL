@@ -2,14 +2,14 @@ package org.jokergames.myjfql.command;
 
 import org.jokergames.myjfql.core.MyJFQL;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 public class ShutdownCommand extends Command {
 
     public ShutdownCommand() {
-        super("shutdown", Arrays.asList("COMMAND"));
+        super("shutdown", Collections.singletonList("COMMAND"));
     }
 
     @Override

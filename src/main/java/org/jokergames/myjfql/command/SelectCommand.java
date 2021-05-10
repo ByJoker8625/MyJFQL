@@ -8,10 +8,7 @@ import org.jokergames.myjfql.database.Table;
 import org.jokergames.myjfql.util.ConditionHelper;
 import org.jokergames.myjfql.util.Sorter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SelectCommand extends Command {
@@ -147,7 +144,7 @@ public class SelectCommand extends Command {
                 }
 
                 column.getContent().keySet().stream().filter(key -> !values.contains(key)).forEach(key -> column.getContent().remove(key));
-                sender.sendAnswer(Arrays.asList(column), values);
+                sender.sendAnswer(Collections.singletonList(column), values);
             } else if (args.containsKey("WHERE")) {
                 List<Column> columns = null;
 

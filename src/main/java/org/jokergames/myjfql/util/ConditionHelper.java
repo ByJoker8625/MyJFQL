@@ -11,6 +11,17 @@ import java.util.Objects;
 
 public class ConditionHelper {
 
+    public static List<Column> getRequiredColumnRows(final List<Column> columns, final List<String> values) {
+        final List<Column> requiredColumnRows = new ArrayList<>();
+
+        columns.forEach(column -> {
+            column.getContent().keySet().stream().filter(s -> !values.contains(s)).forEach(s -> column.getContent().remove(s));
+            requiredColumnRows.add(column);
+        });
+
+        return requiredColumnRows;
+    }
+
     public static List<Column> getRequiredColumns(final Table table, final List<String> argument) {
         return getRequiredColumns(table, argument, Sorter.Type.CREATION, null, Sorter.Order.ASC);
     }
