@@ -50,10 +50,6 @@ public class Table {
         return columns.stream().filter(col -> col.getContent().get(primary).toString().equals(key)).findFirst().orElse(null);
     }
 
-    public List<Column> getRawColumns() {
-        return columns;
-    }
-
     public List<Column> getColumns() {
         return getColumns(Sorter.Type.CREATION, Sorter.Order.ASC);
     }
