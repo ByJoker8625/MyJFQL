@@ -89,33 +89,11 @@ public class RemoteCommandSender extends CommandSender {
 
     @Override
     public void sendAnswer(final Object obj, final Object structure) {
-        if (!(obj instanceof List))
-            throw new CommandException("Input isn't a list!");
-
-        if (!(structure instanceof String[]) && !(structure instanceof List))
-            throw new CommandException("Input is not an array!");
-
-        long l = System.currentTimeMillis();
-
-        List<String> values = null;
-
-        if (!(structure instanceof String[])) {
-            values = (List<String>) structure;
-        } else {
-            values = Arrays.asList((String[]) structure);
-        }
-
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", ResponseType.REST);
         jsonObject.put("id", id);
-        jsonObject.put("structure", values);
-
-        try {
-            jsonObject.put("answer", ConditionHelper.getRequiredColumnRows((List<Column>) obj, values));
-        } catch (Exception ex) {
-            jsonObject.put("answer", obj);
-        }
-
+        jsonObject.put("structure", structure);
+        jsonObject.put("answer", obj);
         this.send(jsonObject);
     }
 
