@@ -50,7 +50,7 @@ public class RefreshCommand extends Command {
         }
 
         if (args.containsKey("NOW")) {
-            sender.sendInfo("Refreshing users and databases (This can take a white)...");
+            sender.sendInfo("Refreshing users and databases (This can take a while)...");
             MyJFQL.getInstance().refresh();
             sender.sendInfo("All files are refreshed.");
             return;

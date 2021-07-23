@@ -123,7 +123,7 @@ public final class MyJFQL {
         console.clean();
 
         {
-            console.logInfo("Loading databases and users (This can take a white)...");
+            console.logInfo("Loading databases and users (This can take a while)...");
             databaseService.init();
             userService.init();
             console.logInfo("Loading finished!");
@@ -171,7 +171,7 @@ public final class MyJFQL {
         if (configuration.getBoolean("SecondaryBackup"))
             commandService.execute(consoleCommandSender, "backup");
 
-        console.logInfo("Shutdown (This can take a white)...");
+        console.logInfo("Shutdown (This can take a while)...");
         databaseService.update();
         userService.update();
         System.exit(0);
