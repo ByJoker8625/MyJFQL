@@ -38,7 +38,7 @@ public class ConfigService {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("AutoUpdate", true);
             jsonObject.put("Port", 2291);
-            jsonObject.put("SecondaryBackup", true);
+            jsonObject.put("SecondaryBackup", false);
             jsonObject.put("UpdateServer", "https://joker-games.org/lib/myjfql/rest.json");
 
             factory.save(file, jsonObject);
@@ -47,9 +47,6 @@ public class ConfigService {
             first = false;
 
         this.configuration = factory.load(file);
-
-        if (configuration.opt("SecondaryBackup") == null)
-            configuration.put("SecondaryBackup", true);
     }
 
     public boolean isFirst() {

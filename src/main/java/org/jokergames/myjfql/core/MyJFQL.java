@@ -29,10 +29,10 @@ public final class MyJFQL {
     private final UserService userService;
     private final DBSession dbSession;
     private final JSONObject configuration;
-    private final String version = "1.4.3-BETA";
+    private final String version = "1.4.4";
 
     private Server server;
-    private long lastUpdate;
+    private long lastRefresh;
 
     public MyJFQL() {
         instance = this;
@@ -47,7 +47,7 @@ public final class MyJFQL {
         this.databaseService = new DatabaseService(configService.getFactory());
         this.dbSession = new DBSession(userService, databaseService);
 
-        this.lastUpdate = -1;
+        this.lastRefresh = -1;
         this.server = null;
     }
 
@@ -101,6 +101,8 @@ public final class MyJFQL {
         {
             commandService.register(new ClearCommand());
             commandService.register(new ShutdownCommand());
+            commandService.register(new RefreshCommand());
+            commandService.register(new StructureCommand());
             commandService.register(new ListCommand());
             commandService.register(new CreateCommand());
             commandService.register(new DeleteCommand());
@@ -110,8 +112,6 @@ public final class MyJFQL {
             commandService.register(new InsertCommand());
             commandService.register(new SelectCommand());
             commandService.register(new RemoveCommand());
-            commandService.register(new BackupCommand());
-            commandService.register(new LastUpdateCommand());
         }
 
         try {
@@ -151,9 +151,7 @@ public final class MyJFQL {
             new Timer().scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
-                    databaseService.update();
-                    userService.update();
-                    lastUpdate = System.currentTimeMillis();
+                    refresh();
                 }
             }, 1000 * 60, 1000 * 60);
         }
@@ -177,6 +175,12 @@ public final class MyJFQL {
         databaseService.update();
         userService.update();
         System.exit(0);
+    }
+
+    public void refresh() {
+        databaseService.update();
+        userService.update();
+        lastRefresh = System.currentTimeMillis();
     }
 
     public Console getConsole() {
@@ -211,8 +215,8 @@ public final class MyJFQL {
         return dbSession;
     }
 
-    public long getLastUpdate() {
-        return lastUpdate;
+    public long getLastRefresh() {
+        return lastRefresh;
     }
 
     public Server getServer() {
