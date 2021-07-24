@@ -20,6 +20,10 @@ execute the following command:
 java -Xmx2G -Xms2G -jar MyJFQL.jar
 ```
 
+### Documentation
+
+To see detailed documentation on JFQL or MyJFQL clike [here](https://joker-games.org/documentation/myjfql/create).
+
 ### License
 
 All files on this repository are subject to the MIT license. Please read
