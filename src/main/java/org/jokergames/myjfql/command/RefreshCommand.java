@@ -8,19 +8,14 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class RefreshCommand extends Command {
+public class RefreshCommand extends ConsoleCommand {
 
     public RefreshCommand() {
         super("refresh", Arrays.asList("COMMAND", "STATUS", "NOW", "AS-BACKUP"));
     }
 
     @Override
-    public void handle(final CommandSender sender, final Map<String, List<String>> args) {
-        if (!(sender instanceof ConsoleCommandSender)) {
-            sender.sendForbidden();
-            return;
-        }
-
+    public void handleConsoleCommand(final ConsoleCommandSender sender, final Map<String, List<String>> args) {
         if (args.containsKey("STATUS")) {
             sender.sendInfo("Last refresh at: " + new Date(MyJFQL.getInstance().getLastRefresh()));
             return;
@@ -50,12 +45,12 @@ public class RefreshCommand extends Command {
         }
 
         if (args.containsKey("NOW")) {
-            sender.sendInfo("Refreshing users and databases (This can take a while)...");
             MyJFQL.getInstance().refresh();
-            sender.sendInfo("All files are refreshed.");
+            sender.sendInfo("All users and databases were successfully refreshed.");
             return;
         }
 
         sender.sendSyntax();
     }
+
 }

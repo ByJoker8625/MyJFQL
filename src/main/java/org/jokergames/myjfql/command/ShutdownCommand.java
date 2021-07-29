@@ -6,19 +6,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class ShutdownCommand extends Command {
+public class ShutdownCommand extends ConsoleCommand {
 
     public ShutdownCommand() {
         super("shutdown", Collections.singletonList("COMMAND"));
     }
 
     @Override
-    public void handle(final CommandSender sender, final Map<String, List<String>> args) {
-        if (!(sender instanceof ConsoleCommandSender)) {
-            sender.sendForbidden();
-            return;
-        }
-
+    public void handleConsoleCommand(final ConsoleCommandSender sender, final Map<String, List<String>> args) {
         MyJFQL.getInstance().shutdown();
     }
 

@@ -7,11 +7,18 @@ import java.io.File;
 public class ConfigService {
 
     private final FileFactory factory;
-    private final JSONObject configuration;
-    private final boolean first;
+    private JSONObject configuration;
+    private boolean first;
 
     public ConfigService() {
         this.factory = new FileFactory();
+        this.configuration = null;
+        this.first = false;
+
+        load();
+    }
+
+    public void load() {
         File file = new File("database");
 
         if (!file.exists())
@@ -43,8 +50,7 @@ public class ConfigService {
 
             factory.save(file, jsonObject);
             first = true;
-        } else
-            first = false;
+        }
 
         this.configuration = factory.load(file);
     }

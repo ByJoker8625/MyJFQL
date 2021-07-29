@@ -3,14 +3,9 @@ package org.jokergames.myjfql.command;
 import io.javalin.http.Context;
 import io.javalin.websocket.WsMessageContext;
 import org.jokergames.myjfql.core.MyJFQL;
-import org.jokergames.myjfql.database.Column;
 import org.jokergames.myjfql.exception.CommandException;
 import org.jokergames.myjfql.user.User;
-import org.jokergames.myjfql.util.ConditionHelper;
 import org.json.JSONObject;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class RemoteCommandSender extends CommandSender {
 

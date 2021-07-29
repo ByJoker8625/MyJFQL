@@ -46,7 +46,7 @@ public class UserService {
         return users;
     }
 
-    public void init() {
+    public void load() {
         Arrays.stream(Objects.requireNonNull(new File("user").listFiles())).map(factory::load).forEach(jsonObject -> {
             List<String> tables = new ArrayList<>();
 

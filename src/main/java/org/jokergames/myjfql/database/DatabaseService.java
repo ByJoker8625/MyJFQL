@@ -54,7 +54,9 @@ public class DatabaseService {
         return databases;
     }
 
-    public void init() {
+    public void load() {
+        databases.clear();
+
         for (File file : Objects.requireNonNull(new File("database").listFiles())) {
             final JSONObject jsonObject = fileFactory.load(file);
             final JSONArray jsonArray = jsonObject.getJSONArray("tables");

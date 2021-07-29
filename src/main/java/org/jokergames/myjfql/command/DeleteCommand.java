@@ -16,7 +16,7 @@ public class DeleteCommand extends Command {
     }
 
     @Override
-    public void handle(final CommandSender sender, final Map<String, List<String>> args) {
+    public void handleCommand(final CommandSender sender, final Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
         final DBSession session = MyJFQL.getInstance().getDBSession();
 

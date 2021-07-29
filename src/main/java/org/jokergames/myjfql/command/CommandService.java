@@ -49,7 +49,7 @@ public class CommandService {
                 return;
             }
 
-            command.handle(sender, arguments);
+            command.handleCommand(sender, arguments);
         } catch (Exception ex) {
             new CommandException(ex).printStackTrace();
         }

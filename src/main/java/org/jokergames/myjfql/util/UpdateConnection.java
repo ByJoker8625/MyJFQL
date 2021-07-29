@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 public class UpdateConnection {
 
-    private JSONObject jsonObject;
+    private JSONObject jsonObject = null;
 
     public void connect(final String url) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url).openStream(), StandardCharsets.UTF_8));

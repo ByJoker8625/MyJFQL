@@ -16,7 +16,7 @@ public abstract class Command {
         this.syntax = syntax;
     }
 
-    public abstract void handle(final CommandSender sender, final Map<String, List<String>> args);
+    public abstract void handleCommand(final CommandSender sender, final Map<String, List<String>> args);
 
     public final String formatString(final List<String> strings) {
         if (strings.size() == 0)

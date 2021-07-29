@@ -28,10 +28,11 @@ public final class MyJFQL {
     private final ConfigService configService;
     private final UserService userService;
     private final DBSession dbSession;
-    private final JSONObject configuration;
+    private final Server server;
+
     private final String version = "1.4.4";
 
-    private Server server;
+    private JSONObject configuration;
     private long lastRefresh;
 
     public MyJFQL() {
@@ -46,9 +47,9 @@ public final class MyJFQL {
         this.downloader = new UpdateConnection.Downloader(updateConnection);
         this.databaseService = new DatabaseService(configService.getFactory());
         this.dbSession = new DBSession(userService, databaseService);
+        this.server = new Server();
 
         this.lastRefresh = -1;
-        this.server = null;
     }
 
     public static MyJFQL getInstance() {
@@ -102,6 +103,7 @@ public final class MyJFQL {
             commandService.register(new ClearCommand());
             commandService.register(new ShutdownCommand());
             commandService.register(new RefreshCommand());
+            commandService.register(new ReloadCommand());
             commandService.register(new StructureCommand());
             commandService.register(new ListCommand());
             commandService.register(new CreateCommand());
@@ -115,7 +117,7 @@ public final class MyJFQL {
         }
 
         try {
-            server = new Server(configuration.getInt("Port"));
+            server.start(configuration.getInt("Port"));
         } catch (Exception ex) {
             throw new NetworkException(ex);
         }
@@ -124,8 +126,8 @@ public final class MyJFQL {
 
         {
             console.logInfo("Loading databases and users (This can take a while)...");
-            databaseService.init();
-            userService.init();
+            databaseService.load();
+            userService.load();
             console.logInfo("Loading finished!");
         }
 
@@ -168,12 +170,18 @@ public final class MyJFQL {
     }
 
     public void shutdown() {
-        if (configuration.getBoolean("SecondaryBackup"))
-            commandService.execute(consoleCommandSender, "backup");
 
-        console.logInfo("Shutdown (This can take a while)...");
-        databaseService.update();
-        userService.update();
+        try {
+            if (configuration.getBoolean("SecondaryBackup"))
+                commandService.execute(consoleCommandSender, "backup");
+
+            console.logInfo("Shutdown (This can take a while)...");
+            databaseService.update();
+            userService.update();
+        } catch (Exception ex) {
+            console.logError("Ignoring this exception: " + ex.getMessage());
+        }
+
         System.exit(0);
     }
 
@@ -181,6 +189,31 @@ public final class MyJFQL {
         databaseService.update();
         userService.update();
         lastRefresh = System.currentTimeMillis();
+    }
+
+    public void reload() {
+        reloadConfig();
+        reloadUsers();
+        reloadDatabases();
+        restartServer();
+    }
+
+    public void restartServer() {
+        server.setPort(configuration.getInt("Port"));
+        server.restart();
+    }
+
+    public void reloadConfig() {
+        configService.load();
+        configuration = configService.getConfiguration();
+    }
+
+    public void reloadDatabases() {
+        databaseService.load();
+    }
+
+    public void reloadUsers() {
+        userService.load();
     }
 
     public Console getConsole() {

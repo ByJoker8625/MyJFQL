@@ -10,19 +10,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class UserCommand extends Command {
+public class UserCommand extends ConsoleCommand {
 
     public UserCommand() {
         super("user", Arrays.asList("COMMAND", "CREATE", "PASSWORD", "ADD", "PERMISSION", "REMOVE", "DATABASE", "UPDATE", "DISPLAY", "DELETE"));
     }
 
     @Override
-    public void handle(final CommandSender sender, final Map<String, List<String>> args) {
-        if (sender instanceof RemoteCommandSender) {
-            sender.sendForbidden();
-            return;
-        }
-
+    public void handleConsoleCommand(final ConsoleCommandSender sender, final Map<String, List<String>> args) {
         final UserService userService = MyJFQL.getInstance().getUserService();
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
 
