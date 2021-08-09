@@ -18,7 +18,7 @@ public class ConsoleCommandSender extends CommandSender {
 
     @Override
     public boolean hasPermission(final String permission) {
-        return true;
+        return !permission.startsWith("-");
     }
 
     @Override

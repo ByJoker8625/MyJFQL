@@ -26,7 +26,14 @@ public class ListCommand extends Command {
         final UserService userService = MyJFQL.getInstance().getUserService();
 
         if (args.containsKey("DATABASES")) {
-            List<String> databases = databaseService.getDataBases().stream().map(Database::getName).collect(Collectors.toList());
+            if (sender.hasPermission("-use.database.*")) {
+                sender.sendForbidden();
+                return;
+            }
+
+            List<String> databases = databaseService.getDataBases().stream().map(Database::getName).filter(db ->
+                    !sender.hasPermission("-use.database." + db) && (sender.hasPermission("use.database." + db) || sender.hasPermission("use.database.*"))
+            ).collect(Collectors.toList());
 
             if (args.containsKey("LIMIT")) {
                 int limit = -1;
@@ -68,14 +75,33 @@ public class ListCommand extends Command {
         }
 
         if (args.containsKey("TABLES")) {
+            if (sender.hasPermission("-use.table.*.*") || sender.hasPermission("-use.database.*")) {
+                sender.sendForbidden();
+                return;
+            }
+
             List<String> tables = new ArrayList<>();
 
             if (!args.containsKey("FROM")) {
                 for (Database database : databaseService.getDataBases()) {
-                    for (Table table : database.getTables()) {
-                        if (sender.hasPermission("use.table." + table.getName() + "." + database.getName()) && sender.hasPermission("use.table.*." + database.getName()))
-                            tables.add(table.getName());
+                    final String databaseName = database.getName();
+
+                    if ((sender.hasPermission("use.database." + databaseName)
+                            || sender.hasPermission("use.database.*"))
+                            && !sender.hasPermission("-use.database." + databaseName)
+                            && !sender.hasPermission("-use.database.*")) {
+
+                        for (Table table : database.getTables()) {
+                            final String tableName = table.getName();
+
+                            if ((sender.hasPermission("use.table.*." + databaseName)
+                                    || sender.hasPermission("use.table." + tableName + "." + databaseName))
+                                    && !sender.hasPermission("-use.table.*." + databaseName)
+                                    && !sender.hasPermission("-use.table." + tableName + "." + databaseName))
+                                tables.add(table.getName());
+                        }
                     }
+
                 }
             } else {
                 final String name = formatString(args.get("FROM"));
@@ -85,10 +111,23 @@ public class ListCommand extends Command {
                     return;
                 }
 
+                if ((!sender.hasPermission("use.database." + name)
+                        && !sender.hasPermission("use.database.*"))
+                        || sender.hasPermission("-use.database." + name)
+                        || sender.hasPermission("-use.database.*")) {
+                    sender.sendForbidden();
+                    return;
+                }
+
                 final Database database = databaseService.getDataBase(name);
 
                 for (Table table : database.getTables()) {
-                    if (sender.hasPermission("use.table." + table.getName() + "." + database.getName()) && sender.hasPermission("use.table.*." + database.getName()))
+                    final String tableName = table.getName();
+
+                    if ((sender.hasPermission("use.table.*." + name)
+                            || sender.hasPermission("use.table." + tableName + "." + name))
+                            && !sender.hasPermission("-use.table.*." + name)
+                            && !sender.hasPermission("-use.table." + tableName + "." + name))
                         tables.add(table.getName());
                 }
             }

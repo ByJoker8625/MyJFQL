@@ -95,16 +95,16 @@ public class RemoteCommandSender extends CommandSender {
     @Override
     public void send(final Object obj) {
         if (!(obj instanceof JSONObject))
-            throw new CommandException("Input is not a jsonobject!");
+            throw new CommandException("Input is not a JSONObject!");
         if (httpContext == null)
-            socketContext.send(((JSONObject) obj).toString());
+            socketContext.send(obj.toString());
         else {
             httpContext.header("Access-Control-Allow-Origin", "*");
-            httpContext.header("Access-Control-Allow-Methods", "GET,POST");
+            httpContext.header("Access-Control-Allow-Methods", "GET, POST");
             httpContext.header("Access-Control-Allow-Headers", "*");
             httpContext.header("Access-Control-Allow-Credentials", "true");
             httpContext.header("Access-Control-Allow-Credentials-Header", "*");
-            httpContext.result(((JSONObject) obj).toString());
+            httpContext.result(obj.toString());
         }
     }
 

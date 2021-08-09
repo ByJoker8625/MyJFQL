@@ -6,7 +6,8 @@ is similar to SQL but is very simplified.
 
 ### Documentation
 
-To see detailed documentation on JFQL or MyJFQL clike [here](https://joker-games.org/documentation/jfql/create) for JFQL and [here](https://joker-games.org/documentation/myjfql/download/) for MyJFQL.
+To see detailed documentation on JFQL or MyJFQL clike [here](https://joker-games.org/documentation/jfql/create) for JFQL
+and [here](https://joker-games.org/documentation/myjfql/download/) for MyJFQL.
 
 ### License
 

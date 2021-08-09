@@ -3,7 +3,6 @@ package org.jokergames.myjfql.command;
 import org.jokergames.myjfql.core.MyJFQL;
 import org.jokergames.myjfql.database.Column;
 import org.jokergames.myjfql.database.Database;
-import org.jokergames.myjfql.database.DatabaseService;
 import org.jokergames.myjfql.database.Table;
 import org.jokergames.myjfql.util.ConditionHelper;
 import org.jokergames.myjfql.util.Sorter;
@@ -19,22 +18,20 @@ public class SelectCommand extends Command {
 
     @Override
     public void handleCommand(final CommandSender sender, final Map<String, List<String>> args) {
-        final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
-        final Database database = databaseService.getDataBase(MyJFQL.getInstance().getDBSession().get(sender.getName()));
+        final Database database = MyJFQL.getInstance().getDBSession().getDirectlyDatabase(sender.getName());
 
+        if (database == null) {
+            sender.sendError("No database is in use for this user!");
+            return;
+        }
 
         if (args.containsKey("VALUE")
                 && args.containsKey("FROM")) {
 
-            if (database == null) {
-                sender.sendError("Unknown database!");
-                return;
-            }
-
             final String name = formatString(args.get("FROM"));
 
             if (name == null) {
-                sender.sendError("Unknown name!");
+                sender.sendError("Undefined name!");
                 return;
             }
 
@@ -44,9 +41,10 @@ public class SelectCommand extends Command {
             }
 
             final Table table = database.getTable(name);
+            final String databaseName = database.getName();
 
-            if (!sender.hasPermission("use.table." + name + "." + database.getName())
-                    && !sender.hasPermission("use.table.*." + database.getName())) {
+            if ((sender.hasPermission("-use.table." + name + "." + databaseName) || sender.hasPermission("-use.table.*." + databaseName))
+                    || (!sender.hasPermission("use.table." + name + "." + databaseName) && !sender.hasPermission("use.table.*." + databaseName))) {
                 sender.sendForbidden();
                 return;
             }
@@ -101,7 +99,7 @@ public class SelectCommand extends Command {
                 final String sort = formatString(args.get("SORT"));
 
                 if (sort == null) {
-                    sender.sendError("Unknown sort item!");
+                    sender.sendError("Undefined sort item!");
                     return;
                 }
 
@@ -132,7 +130,7 @@ public class SelectCommand extends Command {
                 final String primaryKey = formatString(args.get("PRIMARY-KEY"));
 
                 if (primaryKey == null) {
-                    sender.sendError("Unknown primary-key!");
+                    sender.sendError("Undefined primary-key!");
                     return;
                 }
 

@@ -23,6 +23,10 @@ public class Server {
         final CommandService commandService = MyJFQL.getInstance().getCommandService();
         final UserService userService = MyJFQL.getInstance().getUserService();
 
+        app.error(404, context -> {
+
+        });
+
         app.post("/query", context -> {
             RemoteCommandSender sender = new RemoteCommandSender(null, context.req.getRemoteAddr(), null, context);
 
