@@ -8,10 +8,7 @@ import org.jokergames.myjfql.user.User;
 import org.jokergames.myjfql.user.UserService;
 import org.jokergames.myjfql.util.Sorter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ListCommand extends Command {
@@ -36,7 +33,7 @@ public class ListCommand extends Command {
             ).collect(Collectors.toList());
 
             if (args.containsKey("LIMIT")) {
-                int limit = -1;
+                int limit;
 
                 try {
                     limit = formatInteger(args.get("LIMIT"));
@@ -56,10 +53,10 @@ public class ListCommand extends Command {
             }
 
             if (args.containsKey("ORDER")) {
-                Sorter.Order order = null;
+                Sorter.Order order;
 
                 try {
-                    order = Sorter.Order.valueOf(formatString(args.get("ORDER")).toUpperCase());
+                    order = Sorter.Order.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
                 } catch (Exception ex) {
                     sender.sendError("Unknown sort order!");
                     return;
@@ -83,7 +80,7 @@ public class ListCommand extends Command {
             List<String> tables = new ArrayList<>();
 
             if (!args.containsKey("FROM")) {
-                for (Database database : databaseService.getDataBases()) {
+                for (final Database database : databaseService.getDataBases()) {
                     final String databaseName = database.getName();
 
                     if ((sender.hasPermission("use.database." + databaseName)
@@ -91,7 +88,7 @@ public class ListCommand extends Command {
                             && !sender.hasPermission("-use.database." + databaseName)
                             && !sender.hasPermission("-use.database.*")) {
 
-                        for (Table table : database.getTables()) {
+                        for (final Table table : database.getTables()) {
                             final String tableName = table.getName();
 
                             if ((sender.hasPermission("use.table.*." + databaseName)
@@ -121,7 +118,7 @@ public class ListCommand extends Command {
 
                 final Database database = databaseService.getDataBase(name);
 
-                for (Table table : database.getTables()) {
+                for (final Table table : database.getTables()) {
                     final String tableName = table.getName();
 
                     if ((sender.hasPermission("use.table.*." + name)
@@ -133,7 +130,7 @@ public class ListCommand extends Command {
             }
 
             if (args.containsKey("LIMIT")) {
-                int limit = -1;
+                int limit;
 
                 try {
                     limit = formatInteger(args.get("LIMIT"));
@@ -153,10 +150,10 @@ public class ListCommand extends Command {
             }
 
             if (args.containsKey("ORDER")) {
-                Sorter.Order order = null;
+                Sorter.Order order;
 
                 try {
-                    order = Sorter.Order.valueOf(formatString(args.get("ORDER")).toUpperCase());
+                    order = Sorter.Order.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
                 } catch (Exception ex) {
                     sender.sendError("Unknown sort order!");
                     return;
@@ -179,7 +176,7 @@ public class ListCommand extends Command {
             List<String> users = userService.getUsers().stream().map(User::getName).collect(Collectors.toList());
 
             if (args.containsKey("LIMIT")) {
-                int limit = -1;
+                int limit;
 
                 try {
                     limit = formatInteger(args.get("LIMIT"));
@@ -199,10 +196,10 @@ public class ListCommand extends Command {
             }
 
             if (args.containsKey("ORDER")) {
-                Sorter.Order order = null;
+                Sorter.Order order;
 
                 try {
-                    order = Sorter.Order.valueOf(formatString(args.get("ORDER")).toUpperCase());
+                    order = Sorter.Order.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
                 } catch (Exception ex) {
                     sender.sendError("Unknown sort order!");
                     return;

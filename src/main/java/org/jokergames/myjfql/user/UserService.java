@@ -51,7 +51,7 @@ public class UserService {
             List<String> tables = new ArrayList<>();
 
             if (!jsonObject.isNull("permissions"))
-                for (Object obj : jsonObject.getJSONArray("permissions")) {
+                for (final Object obj : jsonObject.getJSONArray("permissions")) {
                     tables.add(obj.toString());
                 }
 
@@ -64,6 +64,7 @@ public class UserService {
     }
 
     public void update() {
+        //noinspection ResultOfMethodCallIgnored
         Arrays.stream(Objects.requireNonNull(new File("user").listFiles())).forEach(File::delete);
 
         users.forEach(user -> {

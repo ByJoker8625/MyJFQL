@@ -63,7 +63,7 @@ public class SelectCommand extends Command {
                 strings = formatList(strings);
 
                 if (!strings.contains("*")) {
-                    for (String key : strings) {
+                    for (final String key : strings) {
                         if (!tableStructure.contains(key)) {
                             sender.sendError("Key doesn't exists!");
                             return;
@@ -144,7 +144,7 @@ public class SelectCommand extends Command {
                 column.getContent().keySet().stream().filter(key -> !values.contains(key)).forEach(key -> column.getContent().remove(key));
                 sender.sendAnswer(Collections.singletonList(column), values);
             } else if (args.containsKey("WHERE")) {
-                List<Column> columns = null;
+                List<Column> columns;
 
                 try {
                     columns = ConditionHelper.getRequiredColumns(table, args.get("WHERE"), type, sorter, order);

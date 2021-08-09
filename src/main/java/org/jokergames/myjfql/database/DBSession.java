@@ -23,11 +23,6 @@ public class DBSession {
         this.databaseService = databaseService;
     }
 
-    public void load() {
-        for (User user : userService.getUsers())
-            get(user.getName());
-    }
-
     public void put(final String name, final String database) {
         final User user = userService.getUser(name);
 

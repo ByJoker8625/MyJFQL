@@ -24,11 +24,19 @@ public class Server {
         final UserService userService = MyJFQL.getInstance().getUserService();
 
         app.error(404, context -> {
+            final JSONObject jsonObject = new JSONObject();
+            jsonObject.put("type", RemoteCommandSender.ResponseType.SYNTAX_ERROR);
 
+            context.header("Access-Control-Allow-Origin", "*");
+            context.header("Access-Control-Allow-Methods", "GET, POST");
+            context.header("Access-Control-Allow-Headers", "*");
+            context.header("Access-Control-Allow-Credentials", "true");
+            context.header("Access-Control-Allow-Credentials-Header", "*");
+            context.result(jsonObject.toString());
         });
 
         app.post("/query", context -> {
-            RemoteCommandSender sender = new RemoteCommandSender(null, context.req.getRemoteAddr(), null, context);
+            RemoteCommandSender sender = new RemoteCommandSender(null, context.req.getRemoteAddr(), context);
 
             try {
                 final JSONObject request = new JSONObject(context.body());
@@ -43,16 +51,11 @@ public class Server {
                 final String name = request.getString("name");
 
                 if (userService.isCreated(name) && userService.getUser(name).getPassword().equals(request.getString("password"))) {
-                    sender = new RemoteCommandSender(name, context.req.getRemoteAddr(), null, context);
                     final String query = request.getString("query");
+                    sender = sender.rename(name);
 
+                    console.logInfo("[" + sender.getAddress() + "] [" + name + "] queried \"" + query + "\".");
                     commandService.execute(sender, query);
-
-                    {
-                        console.setInput(false);
-                        console.logInfo("[" + sender.getAddress() + "] [" + name + "] queried \"" + query + "\".");
-                        console.setInput(true);
-                    }
                     return;
                 }
 
@@ -61,8 +64,7 @@ public class Server {
                 sender.sendError(ex);
             }
         });
-
-
+        
         app.start(port);
     }
 
