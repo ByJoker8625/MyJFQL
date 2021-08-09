@@ -1,3 +1,5 @@
 Manifest-Version: 1.0
 Main-Class: org.jokergames.myjfql.core.boot.Boot
+Created-By: ByJoker
+Name: MyJFQL
 

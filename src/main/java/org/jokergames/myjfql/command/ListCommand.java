@@ -38,7 +38,7 @@ public class ListCommand extends Command {
                 try {
                     limit = formatInteger(args.get("LIMIT"));
                 } catch (Exception ex) {
-                    sender.sendError("Unknown limit!");
+                    sender.sendError("Unknown or undefined limit!");
                     return;
                 }
 
@@ -58,7 +58,7 @@ public class ListCommand extends Command {
                 try {
                     order = Sorter.Order.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
                 } catch (Exception ex) {
-                    sender.sendError("Unknown sort order!");
+                    sender.sendError("Unknown or undefined sort order!");
                     return;
                 }
 
@@ -135,7 +135,7 @@ public class ListCommand extends Command {
                 try {
                     limit = formatInteger(args.get("LIMIT"));
                 } catch (Exception ex) {
-                    sender.sendError("Unknown limit!");
+                    sender.sendError("Unknown or undefined limit!");
                     return;
                 }
 
@@ -155,7 +155,7 @@ public class ListCommand extends Command {
                 try {
                     order = Sorter.Order.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
                 } catch (Exception ex) {
-                    sender.sendError("Unknown sort order!");
+                    sender.sendError("Unknown or undefined sort order!");
                     return;
                 }
 
@@ -181,7 +181,7 @@ public class ListCommand extends Command {
                 try {
                     limit = formatInteger(args.get("LIMIT"));
                 } catch (Exception ex) {
-                    sender.sendError("Unknown limit!");
+                    sender.sendError("Unknown or undefined limit!");
                     return;
                 }
 
@@ -201,7 +201,7 @@ public class ListCommand extends Command {
                 try {
                     order = Sorter.Order.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
                 } catch (Exception ex) {
-                    sender.sendError("Unknown sort order!");
+                    sender.sendError("Unknown or undefined sort order!");
                     return;
                 }
 

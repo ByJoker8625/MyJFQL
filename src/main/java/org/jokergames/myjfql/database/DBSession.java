@@ -1,5 +1,7 @@
 package org.jokergames.myjfql.database;
 
+import org.jokergames.myjfql.command.ConsoleCommandSender;
+import org.jokergames.myjfql.core.MyJFQL;
 import org.jokergames.myjfql.exception.FileException;
 import org.jokergames.myjfql.user.User;
 import org.jokergames.myjfql.user.UserService;
@@ -16,14 +18,21 @@ public class DBSession {
     private final Map<String, String> databases;
     private final UserService userService;
     private final DatabaseService databaseService;
+    private final ConsoleCommandSender consoleCommandSender;
 
     public DBSession(final UserService userService, final DatabaseService databaseService) {
         this.databases = new HashMap<>();
         this.userService = userService;
         this.databaseService = databaseService;
+        this.consoleCommandSender = MyJFQL.getInstance().getConsoleCommandSender();
     }
 
     public void put(final String name, final String database) {
+        if (name.equalsIgnoreCase(consoleCommandSender.getName())) {
+            databases.put(name, database);
+            return;
+        }
+
         final User user = userService.getUser(name);
 
         if (databases.containsKey(name)
@@ -49,6 +58,10 @@ public class DBSession {
     }
 
     public String get(final String name) {
+        if (name.equalsIgnoreCase(consoleCommandSender.getName())) {
+            return databases.get(name);
+        }
+
         final User user = userService.getUser(name);
 
         if (user == null) {

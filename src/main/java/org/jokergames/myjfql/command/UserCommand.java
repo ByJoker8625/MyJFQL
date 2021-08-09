@@ -31,6 +31,11 @@ public class UserCommand extends ConsoleCommand {
                 return;
             }
 
+            if (name.equalsIgnoreCase(sender.getName())) {
+                sender.sendError("The named user is system-relevant and you can't create a user with the same name!");
+                return;
+            }
+
             if (password == null) {
                 sender.sendError("Undefined password!");
                 return;
@@ -68,6 +73,11 @@ public class UserCommand extends ConsoleCommand {
                 return;
             }
 
+            if (name.equalsIgnoreCase(sender.getName())) {
+                sender.sendError("The named user is system-relevant and you can't delete him!");
+                return;
+            }
+
             if (!userService.isCreated(name)) {
                 sender.sendError("User doesn't exists!");
                 return;
@@ -84,6 +94,11 @@ public class UserCommand extends ConsoleCommand {
 
             if (name == null) {
                 sender.sendError("Undefined name!");
+                return;
+            }
+
+            if (name.equalsIgnoreCase(sender.getName())) {
+                sender.sendError("The named user is system-relevant and nothing of him can be changed!");
                 return;
             }
 
@@ -114,6 +129,11 @@ public class UserCommand extends ConsoleCommand {
                 return;
             }
 
+            if (name.equalsIgnoreCase(sender.getName())) {
+                sender.sendError("The named user is system-relevant and nothing of him can be changed!");
+                return;
+            }
+
             if (permission == null) {
                 sender.sendError("Undefined permission!");
                 return;
@@ -141,6 +161,11 @@ public class UserCommand extends ConsoleCommand {
                 return;
             }
 
+            if (name.equalsIgnoreCase(sender.getName())) {
+                sender.sendError("The named user is system-relevant and nothing of him can be changed!");
+                return;
+            }
+
             if (permission == null) {
                 sender.sendError("Undefined permission!");
                 return;
@@ -164,6 +189,11 @@ public class UserCommand extends ConsoleCommand {
 
             if (name == null) {
                 sender.sendError("Undefined name!");
+                return;
+            }
+
+            if (name.equalsIgnoreCase(sender.getName())) {
+                sender.sendError("The named user is system-relevant and nothing of him can be displayed!");
                 return;
             }
 
