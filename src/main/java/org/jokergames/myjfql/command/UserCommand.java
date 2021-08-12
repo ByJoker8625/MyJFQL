@@ -27,12 +27,17 @@ public class UserCommand extends ConsoleCommand {
             final String password = formatString(args.get("PASSWORD"));
 
             if (name == null) {
-                sender.sendError("Unknown name!");
+                sender.sendError("Undefined name!");
+                return;
+            }
+
+            if (name.equalsIgnoreCase(sender.getName())) {
+                sender.sendError("The named user is system-relevant and you can't create a user with the same name!");
                 return;
             }
 
             if (password == null) {
-                sender.sendError("Unknown password!");
+                sender.sendError("Undefined password!");
                 return;
             }
 
@@ -64,7 +69,12 @@ public class UserCommand extends ConsoleCommand {
             final String name = formatString(args.get("DELETE"));
 
             if (name == null) {
-                sender.sendError("Unknown name!");
+                sender.sendError("Undefined name!");
+                return;
+            }
+
+            if (name.equalsIgnoreCase(sender.getName())) {
+                sender.sendError("The named user is system-relevant and you can't delete him!");
                 return;
             }
 
@@ -83,12 +93,17 @@ public class UserCommand extends ConsoleCommand {
             final String password = formatString(args.get("PASSWORD"));
 
             if (name == null) {
-                sender.sendError("Unknown name!");
+                sender.sendError("Undefined name!");
+                return;
+            }
+
+            if (name.equalsIgnoreCase(sender.getName())) {
+                sender.sendError("The named user is system-relevant and nothing of him can be changed!");
                 return;
             }
 
             if (password == null) {
-                sender.sendError("Unknown password!");
+                sender.sendError("Undefined password!");
                 return;
             }
 
@@ -110,12 +125,17 @@ public class UserCommand extends ConsoleCommand {
             final String permission = formatString(args.get("PERMISSION"));
 
             if (name == null) {
-                sender.sendError("Unknown name!");
+                sender.sendError("Undefined name!");
+                return;
+            }
+
+            if (name.equalsIgnoreCase(sender.getName())) {
+                sender.sendError("The named user is system-relevant and nothing of him can be changed!");
                 return;
             }
 
             if (permission == null) {
-                sender.sendError("Unknown permission!");
+                sender.sendError("Undefined permission!");
                 return;
             }
 
@@ -137,12 +157,17 @@ public class UserCommand extends ConsoleCommand {
             final String permission = formatString(args.get("PERMISSION"));
 
             if (name == null) {
-                sender.sendError("Unknown name!");
+                sender.sendError("Undefined name!");
+                return;
+            }
+
+            if (name.equalsIgnoreCase(sender.getName())) {
+                sender.sendError("The named user is system-relevant and nothing of him can be changed!");
                 return;
             }
 
             if (permission == null) {
-                sender.sendError("Unknown permission!");
+                sender.sendError("Undefined permission!");
                 return;
             }
 
@@ -163,7 +188,12 @@ public class UserCommand extends ConsoleCommand {
             final String name = formatString(args.get("DISPLAY"));
 
             if (name == null) {
-                sender.sendError("Unknown name!");
+                sender.sendError("Undefined name!");
+                return;
+            }
+
+            if (name.equalsIgnoreCase(sender.getName())) {
+                sender.sendError("The named user is system-relevant and nothing of him can be displayed!");
                 return;
             }
 

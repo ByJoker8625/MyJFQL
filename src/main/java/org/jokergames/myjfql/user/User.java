@@ -19,14 +19,16 @@ public class User {
     }
 
     public boolean hasPermission(final String permission) {
-        if (permissions.contains("*"))
+        if (!permission.startsWith("-") && permissions.contains("*"))
             return true;
 
         return permissions.contains(permission.toLowerCase());
     }
 
     public void addPermission(final String permission) {
-        permissions.add(permission.toLowerCase());
+        if (!hasPermission(permission)) {
+            permissions.add(permission.toLowerCase());
+        }
     }
 
     public void removePermission(final String permission) {

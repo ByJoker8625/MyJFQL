@@ -1,7 +1,6 @@
 package org.jokergames.myjfql.command;
 
 import io.javalin.http.Context;
-import io.javalin.websocket.WsMessageContext;
 import org.jokergames.myjfql.core.MyJFQL;
 import org.jokergames.myjfql.exception.CommandException;
 import org.jokergames.myjfql.user.User;
@@ -9,25 +8,21 @@ import org.json.JSONObject;
 
 public class RemoteCommandSender extends CommandSender {
 
-    private final WsMessageContext socketContext;
-    private final Context httpContext;
+    private final Context context;
     private final User user;
-    private String id;
 
-    public RemoteCommandSender(final String name, final String address, final WsMessageContext socketContext, final Context httpContext) {
+    public RemoteCommandSender(final String name, final String address, final Context context) {
         super(name, address);
-        this.socketContext = socketContext;
-        this.id = "-1";
         this.user = MyJFQL.getInstance().getUserService().getUser(name);
-        this.httpContext = httpContext;
+        this.context = context;
     }
 
     @Override
     public boolean hasPermission(final String permission) {
         if (user == null)
             return false;
-        else
-            return user.hasPermission(permission);
+
+        return user.hasPermission(permission);
     }
 
     @Override
@@ -38,10 +33,9 @@ public class RemoteCommandSender extends CommandSender {
     @Override
     public void sendError(final Object obj) {
         if (!(obj instanceof Exception) && !(obj instanceof String))
-            throw new CommandException("Input is not a string or exception!");
+            throw new CommandException("Input must be an exception or a string!");
 
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", id);
 
         if (obj instanceof String) {
             jsonObject.put("exception", new CommandException(obj.toString()));
@@ -62,7 +56,6 @@ public class RemoteCommandSender extends CommandSender {
     public void sendForbidden() {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", ResponseType.FORBIDDEN);
-        jsonObject.put("id", id);
         this.send(jsonObject);
     }
 
@@ -70,7 +63,6 @@ public class RemoteCommandSender extends CommandSender {
     public void sendSyntax() {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", ResponseType.SYNTAX_ERROR);
-        jsonObject.put("id", id);
         this.send(jsonObject);
     }
 
@@ -78,7 +70,6 @@ public class RemoteCommandSender extends CommandSender {
     public void sendSuccess() {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", ResponseType.SUCCESS);
-        jsonObject.put("id", id);
         this.send(jsonObject);
     }
 
@@ -86,7 +77,6 @@ public class RemoteCommandSender extends CommandSender {
     public void sendAnswer(final Object obj, final Object structure) {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", ResponseType.REST);
-        jsonObject.put("id", id);
         jsonObject.put("structure", structure);
         jsonObject.put("answer", obj);
         this.send(jsonObject);
@@ -95,33 +85,18 @@ public class RemoteCommandSender extends CommandSender {
     @Override
     public void send(final Object obj) {
         if (!(obj instanceof JSONObject))
-            throw new CommandException("Input is not a jsonobject!");
-        if (httpContext == null)
-            socketContext.send(((JSONObject) obj).toString());
-        else {
-            httpContext.header("Access-Control-Allow-Origin", "*");
-            httpContext.header("Access-Control-Allow-Methods", "GET,POST");
-            httpContext.header("Access-Control-Allow-Headers", "*");
-            httpContext.header("Access-Control-Allow-Credentials", "true");
-            httpContext.header("Access-Control-Allow-Credentials-Header", "*");
-            httpContext.result(((JSONObject) obj).toString());
-        }
+            throw new CommandException("Input must be a JSONObject!");
+
+        context.header("Access-Control-Allow-Origin", "*");
+        context.header("Access-Control-Allow-Methods", "GET, POST");
+        context.header("Access-Control-Allow-Headers", "*");
+        context.header("Access-Control-Allow-Credentials", "true");
+        context.header("Access-Control-Allow-Credentials-Header", "*");
+        context.result(obj.toString());
     }
 
-    public CommandSender toCommandSenderWithId(final String id) {
-        final RemoteCommandSender sender = this;
-        sender.setId(id);
-
-        return sender;
-    }
-
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(final String id) {
-        this.id = id;
+    public RemoteCommandSender rename(final String name) {
+        return new RemoteCommandSender(name, getAddress(), context);
     }
 
     public enum ResponseType {

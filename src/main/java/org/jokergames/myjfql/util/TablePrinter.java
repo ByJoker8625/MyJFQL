@@ -1,6 +1,7 @@
 package org.jokergames.myjfql.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.regex.Pattern;
 
@@ -53,9 +54,7 @@ public class TablePrinter {
         this.spacing = 1;
         this.aligns = new Alignment[columns];
         this.comparator = null;
-        for (int i = 0; i < aligns.length; i++) {
-            aligns[i] = Alignment.LEFT;
-        }
+        Arrays.fill(aligns, Alignment.LEFT);
     }
 
     private void updateSizes(String[] elements) {
@@ -214,34 +213,34 @@ public class TablePrinter {
                         line.append(gc(VERTICAL_BSEP));
                     }
                 }
-                String part = "";
+                StringBuilder part = new StringBuilder();
                 for (int j = 0; j < spacing; j++) {
-                    part += " ";
+                    part.append(" ");
                 }
                 if (strings[i] != null) {
                     switch (aligns[i]) {
                         case LEFT:
-                            part += strings[i];
+                            part.append(strings[i]);
                             break;
                         case RIGHT:
                             for (int j = 0; j < tableSizes[i] - strings[i].length(); j++) {
-                                part += " ";
+                                part.append(" ");
                             }
-                            part += strings[i];
+                            part.append(strings[i]);
                             break;
                         case CENTER:
                             for (int j = 0; j < (tableSizes[i] - strings[i].length()) / 2; j++) {
-                                part += " ";
+                                part.append(" ");
                             }
-                            part += strings[i];
+                            part.append(strings[i]);
                             break;
                     }
                 }
                 while (part.length() < tableSizes[i] + spacing) {
-                    part += " ";
+                    part.append(" ");
                 }
                 for (int j = 0; j < spacing; j++) {
-                    part += " ";
+                    part.append(" ");
                 }
                 line.append(part);
             }

@@ -57,7 +57,7 @@ public class DatabaseService {
     public void load() {
         databases.clear();
 
-        for (File file : Objects.requireNonNull(new File("database").listFiles())) {
+        for (final File file : Objects.requireNonNull(new File("database").listFiles())) {
             final JSONObject jsonObject = fileFactory.load(file);
             final JSONArray jsonArray = jsonObject.getJSONArray("tables");
 
@@ -69,7 +69,7 @@ public class DatabaseService {
                 final Table table = new Table(currentObject.getString("name"), null, currentObject.getString("primary"));
                 final List<String> list = new ArrayList<>();
 
-                for (Object obj : currentObject.getJSONArray("structure")) {
+                for (final Object obj : currentObject.getJSONArray("structure")) {
                     list.add(obj.toString());
                 }
 
@@ -92,6 +92,7 @@ public class DatabaseService {
 
     }
 
+
     public void update() {
         try {
             FileUtils.copyDirectory(new File("database"), new File("backup/temp"));
@@ -99,6 +100,7 @@ public class DatabaseService {
             e.printStackTrace();
         }
 
+        //noinspection ResultOfMethodCallIgnored
         Arrays.stream(Objects.requireNonNull(new File("database").listFiles())).forEach(File::delete);
 
         databases.forEach(database -> {

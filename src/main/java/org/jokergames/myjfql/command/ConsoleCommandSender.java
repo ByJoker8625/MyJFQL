@@ -18,7 +18,7 @@ public class ConsoleCommandSender extends CommandSender {
 
     @Override
     public boolean hasPermission(final String permission) {
-        return true;
+        return !permission.startsWith("-");
     }
 
     @Override
@@ -60,7 +60,7 @@ public class ConsoleCommandSender extends CommandSender {
         if (!(obj instanceof List))
             throw new CommandException("Input is not an list!");
 
-        String[] array = null;
+        String[] array;
 
         if (!(structure instanceof String[])) {
             List<String> strings = (List<String>) structure;
@@ -76,7 +76,7 @@ public class ConsoleCommandSender extends CommandSender {
         try {
             final List<Column> columns = (List<Column>) obj;
 
-            for (Column column : columns) {
+            for (final Column column : columns) {
                 final String[] row = new String[array.length];
 
                 for (int i = 0; i < array.length; i++) {

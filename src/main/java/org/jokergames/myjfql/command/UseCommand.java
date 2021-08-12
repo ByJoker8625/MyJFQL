@@ -28,7 +28,7 @@ public class UseCommand extends Command {
             final String name = formatString(args.get("DATABASE"));
 
             if (name == null) {
-                sender.sendError("Unknown database!");
+                sender.sendError("Undefined database!");
                 return;
             }
 
@@ -37,8 +37,10 @@ public class UseCommand extends Command {
                 return;
             }
 
-            if (!sender.hasPermission("use.database." + name)
-                    && !sender.hasPermission("use.database.*")) {
+            if ((!sender.hasPermission("use.database." + name)
+                    && !sender.hasPermission("use.database.*"))
+                    || sender.hasPermission("-use.database." + name)
+                    || sender.hasPermission("-use.database.*")) {
                 sender.sendForbidden();
                 return;
             }
