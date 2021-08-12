@@ -26,23 +26,28 @@ public class CreateCommand extends Command {
             final List<String> structure = args.get("STRUCTURE");
 
             if (name == null) {
-                sender.sendError("Undefined table!");
+                sender.sendError("Unknown table!");
                 return;
             }
 
             if (structure.size() == 0) {
-                sender.sendError("Undefined structure!");
+                sender.sendError("Unknown structure!");
                 return;
             }
 
             String databaseName = session.get(sender.getName());
             String primaryKey = structure.get(0);
 
+            if (name == null) {
+                sender.sendError("Name can't be null!");
+                return;
+            }
+
             if (args.containsKey("PRIMARY-KEY")) {
                 final String string = formatString(args.get("PRIMARY-KEY"));
 
                 if (string == null) {
-                    sender.sendError("Undefined key!");
+                    sender.sendError("Key can't be null!");
                     return;
                 }
 
@@ -58,15 +63,7 @@ public class CreateCommand extends Command {
                 final String string = formatString(args.get("INTO"));
 
                 if (string == null) {
-                    sender.sendError("Undefined database!");
-                    return;
-                }
-
-                if ((!sender.hasPermission("use.database." + string)
-                        && !sender.hasPermission("use.database.*"))
-                        || sender.hasPermission("-use.database." + string)
-                        || sender.hasPermission("-use.database.*")) {
-                    sender.sendForbidden();
+                    sender.sendError("Database can't be null!");
                     return;
                 }
 
@@ -74,12 +71,12 @@ public class CreateCommand extends Command {
             }
 
             if (!databaseService.isCreated(databaseName)) {
-                sender.sendError("Database doesn't exist!");
+                sender.sendError("Unknown database!");
                 return;
             }
 
-            if ((sender.hasPermission("-use.table." + name + "." + databaseName) || sender.hasPermission("-use.table.*." + databaseName))
-                    || (!sender.hasPermission("use.table." + name + "." + databaseName) && !sender.hasPermission("use.table.*." + databaseName))) {
+            if (!sender.hasPermission("use.table." + name + "." + databaseName)
+                    && !sender.hasPermission("use.table.*." + databaseName)) {
                 sender.sendForbidden();
                 return;
             }
@@ -107,7 +104,7 @@ public class CreateCommand extends Command {
             final String name = formatString(args.get("DATABASE"));
 
             if (name == null) {
-                sender.sendError("Undefined database!");
+                sender.sendError("Unknown database!");
                 return;
             }
 

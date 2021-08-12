@@ -21,24 +21,20 @@ public class RemoveCommand extends Command {
     @Override
     public void handleCommand(final CommandSender sender, final Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
-        final Database database = MyJFQL.getInstance().getDBSession().getDirectlyDatabase(sender.getName());
+        final Database database = databaseService.getDataBase(MyJFQL.getInstance().getDBSession().get(sender.getName()));
 
-        if (database == null) {
-            sender.sendError("No database is in use for this user!");
-            return;
-        }
         if (args.containsKey("FROM")
                 && args.containsKey("COLUMN")) {
             final String name = formatString(args.get("FROM"));
             final String column = formatString(args.get("COLUMN"));
 
             if (name == null) {
-                sender.sendError("Undefined table!");
+                sender.sendError("Unknown table!");
                 return;
             }
 
             if (column == null) {
-                sender.sendError("Undefined column!");
+                sender.sendError("Unknown column!");
                 return;
             }
 
@@ -47,10 +43,8 @@ public class RemoveCommand extends Command {
                 return;
             }
 
-            final String databaseName = database.getName();
-
-            if ((sender.hasPermission("-use.table." + name + "." + databaseName) || sender.hasPermission("-use.table.*." + databaseName))
-                    || (!sender.hasPermission("use.table." + name + "." + databaseName) && !sender.hasPermission("use.table.*." + databaseName))) {
+            if (!sender.hasPermission("use.table." + name + "." + database.getName())
+                    && !sender.hasPermission("use.table.*." + database.getName())) {
                 sender.sendForbidden();
                 return;
             }

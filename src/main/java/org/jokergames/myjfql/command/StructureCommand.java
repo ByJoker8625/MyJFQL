@@ -19,18 +19,13 @@ public class StructureCommand extends Command {
     @Override
     public void handleCommand(final CommandSender sender, final Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
-        final Database database = MyJFQL.getInstance().getDBSession().getDirectlyDatabase(sender.getName());
-
-        if (database == null) {
-            sender.sendError("No database is in use for this user!");
-            return;
-        }
+        final Database database = databaseService.getDataBase(MyJFQL.getInstance().getDBSession().get(sender.getName()));
 
         if (args.containsKey("OF")) {
             final String name = formatString(args.get("OF"));
 
             if (name == null) {
-                sender.sendError("Undefined table!");
+                sender.sendError("Unknown table!");
                 return;
             }
 
@@ -39,10 +34,8 @@ public class StructureCommand extends Command {
                 return;
             }
 
-            final String databaseName = database.getName();
-
-            if ((sender.hasPermission("-use.table." + name + "." + databaseName) || sender.hasPermission("-use.table.*." + databaseName))
-                    || (!sender.hasPermission("use.table." + name + "." + databaseName) && !sender.hasPermission("use.table.*." + databaseName))) {
+            if (!sender.hasPermission("use.table." + name + "." + database.getName())
+                    && !sender.hasPermission("use.table.*." + database.getName())) {
                 sender.sendForbidden();
                 return;
             }

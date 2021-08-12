@@ -68,7 +68,7 @@ public class ConditionHelper {
                 conditions.add(requirements);
             }
 
-            List<Column> columns;
+            List<Column> columns = null;
 
             if (type == Sorter.Type.CREATION) {
                 columns = table.getColumns();
@@ -110,7 +110,7 @@ public class ConditionHelper {
                 if (value.equals("null")) {
                     accept = tableStructure.stream().noneMatch(str -> content.containsKey(str) && !content.get(str).toString().equals("null"));
                 } else {
-                    for (final String cck : tableStructure) {
+                    for (String cck : tableStructure) {
                         if (!content.containsKey(cck)) {
                             accept = false;
                             break;

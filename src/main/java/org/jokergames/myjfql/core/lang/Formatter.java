@@ -46,7 +46,7 @@ public class Formatter {
 
         }
 
-        List<String> syntax;
+        List<String> syntax = null;
 
         try {
             syntax = MyJFQL.getInstance().getCommandService().getCommand(strings.get(1)).getSyntax();
@@ -57,7 +57,7 @@ public class Formatter {
         final Map<String, List<String>> arguments = new HashMap<>();
         String section = null;
 
-        for (final String current : strings) {
+        for (String current : strings) {
             if (syntax.contains(current.toUpperCase())) {
                 section = current.toUpperCase();
                 arguments.put(section, new ArrayList<>());

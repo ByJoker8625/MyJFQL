@@ -25,7 +25,7 @@ public class DeleteCommand extends Command {
             String databaseName = session.get(sender.getName());
 
             if (name == null) {
-                sender.sendError("No database is in use for this user!");
+                sender.sendError("Unknown database!");
                 return;
             }
 
@@ -33,15 +33,7 @@ public class DeleteCommand extends Command {
                 final String string = formatString(args.get("FROM"));
 
                 if (string == null) {
-                    sender.sendError("Undefined database!");
-                    return;
-                }
-
-                if ((!sender.hasPermission("use.database." + string)
-                        && !sender.hasPermission("use.database.*"))
-                        || sender.hasPermission("-use.database." + string)
-                        || sender.hasPermission("-use.database.*")) {
-                    sender.sendForbidden();
+                    sender.sendError("Unknown database!");
                     return;
                 }
 
@@ -53,8 +45,8 @@ public class DeleteCommand extends Command {
                 return;
             }
 
-            if ((sender.hasPermission("-use.table." + name + "." + databaseName) || sender.hasPermission("-use.table.*." + databaseName))
-                    || (!sender.hasPermission("use.table." + name + "." + databaseName) && !sender.hasPermission("use.table.*." + databaseName))) {
+            if (!sender.hasPermission("use.table." + name + "." + databaseName)
+                    && !sender.hasPermission("use.table.*." + databaseName)) {
                 sender.sendForbidden();
                 return;
             }
@@ -82,7 +74,7 @@ public class DeleteCommand extends Command {
             final String name = formatString(args.get("DATABASE"));
 
             if (name == null) {
-                sender.sendError("Undefined database!");
+                sender.sendError("Unknown database!");
                 return;
             }
 

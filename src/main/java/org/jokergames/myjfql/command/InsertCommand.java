@@ -21,10 +21,10 @@ public class InsertCommand extends Command {
     @Override
     public void handleCommand(final CommandSender sender, final Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
-        final Database database = MyJFQL.getInstance().getDBSession().getDirectlyDatabase(sender.getName());
+        final Database database = databaseService.getDataBase(MyJFQL.getInstance().getDBSession().get(sender.getName()));
 
         if (database == null) {
-            sender.sendError("No database is in use for this user!");
+            sender.sendError("Unknown database!");
             return;
         }
 
@@ -34,7 +34,7 @@ public class InsertCommand extends Command {
             final String name = formatString(args.get("INTO"));
 
             if (name == null) {
-                sender.sendError("Undefined table!");
+                sender.sendError("Unknown table!");
                 return;
             }
 
@@ -43,10 +43,8 @@ public class InsertCommand extends Command {
                 return;
             }
 
-            final String databaseName = database.getName();
-
-            if ((sender.hasPermission("-use.table." + name + "." + databaseName) || sender.hasPermission("-use.table.*." + databaseName))
-                    || (!sender.hasPermission("use.table." + name + "." + databaseName) && !sender.hasPermission("use.table.*." + databaseName))) {
+            if (!sender.hasPermission("use.table." + name + "." + database.getName())
+                    && !sender.hasPermission("use.table.*." + database.getName())) {
                 sender.sendForbidden();
                 return;
             }
@@ -81,7 +79,7 @@ public class InsertCommand extends Command {
                 final String primaryKey = formatString(args.get("PRIMARY-KEY"));
 
                 if (primaryKey == null) {
-                    sender.sendError("Undefined primary-key!");
+                    sender.sendError("Unknown primary-key!");
                     return;
                 }
 
