@@ -5,15 +5,17 @@ import org.jokergames.myjfql.database.Database;
 import org.jokergames.myjfql.database.DatabaseService;
 import org.jokergames.myjfql.user.User;
 import org.jokergames.myjfql.user.UserService;
+import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class UserCommand extends ConsoleCommand {
 
     public UserCommand() {
-        super("user", Arrays.asList("COMMAND", "CREATE", "PASSWORD", "ADD", "PERMISSION", "REMOVE", "DATABASE", "UPDATE", "DISPLAY", "DELETE"));
+        super("user", Arrays.asList("COMMAND", "CREATE", "PASSWORD", "ADD", "PERMISSION", "REMOVE", "DATABASE", "UPDATE", "DISPLAY", "LIST", "DELETE"));
     }
 
     @Override
@@ -202,7 +204,18 @@ public class UserCommand extends ConsoleCommand {
                 return;
             }
 
-            sender.send(userService.getUser(name));
+            final User selectedUser = userService.getUser(name);
+            final JSONObject jsonObject = new JSONObject();
+            jsonObject.put("Name", selectedUser.getName());
+            jsonObject.put("Password", selectedUser.getPassword());
+            jsonObject.put("Permissions", selectedUser.getPermissions().toString());
+
+            sender.sendAnswer(jsonObject, new String[]{"Name", "Password", "Permissions"});
+            return;
+        }
+
+        if (args.containsKey("LIST")) {
+            sender.sendAnswer(userService.getUsers().stream().map(User::getName).collect(Collectors.toList()), new String[]{"User"});
             return;
         }
 

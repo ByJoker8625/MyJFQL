@@ -4,7 +4,6 @@ import org.jokergames.myjfql.core.MyJFQL;
 import org.jokergames.myjfql.database.Database;
 import org.jokergames.myjfql.database.DatabaseService;
 import org.jokergames.myjfql.database.Table;
-import org.jokergames.myjfql.user.User;
 import org.jokergames.myjfql.user.UserService;
 import org.jokergames.myjfql.util.Sorter;
 
@@ -14,7 +13,7 @@ import java.util.stream.Collectors;
 public class ListCommand extends Command {
 
     public ListCommand() {
-        super("list", Arrays.asList("COMMAND", "TABLES", "DATABASES", "USERS", "ORDER", "FROM", "LIMIT"));
+        super("list", Arrays.asList("COMMAND", "TABLES", "DATABASES", "ORDER", "FROM", "LIMIT"));
     }
 
     @Override
@@ -164,52 +163,6 @@ public class ListCommand extends Command {
             }
 
             sender.sendAnswer(tables, new String[]{"Table"});
-            return;
-        }
-
-        if (args.containsKey("USERS")) {
-            if (sender instanceof RemoteCommandSender) {
-                sender.sendForbidden();
-                return;
-            }
-
-            List<String> users = userService.getUsers().stream().map(User::getName).collect(Collectors.toList());
-
-            if (args.containsKey("LIMIT")) {
-                int limit;
-
-                try {
-                    limit = formatInteger(args.get("LIMIT"));
-                } catch (Exception ex) {
-                    sender.sendError("Unknown or undefined limit!");
-                    return;
-                }
-
-                if (limit <= 0) {
-                    sender.sendError("Limit is too small!");
-                    return;
-                }
-
-                if (users.size() > limit) {
-                    users = users.stream().limit(limit).collect(Collectors.toList());
-                }
-            }
-
-            if (args.containsKey("ORDER")) {
-                Sorter.Order order;
-
-                try {
-                    order = Sorter.Order.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
-                } catch (Exception ex) {
-                    sender.sendError("Unknown or undefined sort order!");
-                    return;
-                }
-
-                sender.sendAnswer(Sorter.sortList(users, order), new String[]{"User"});
-                return;
-            }
-
-            sender.sendAnswer(users, new String[]{"User"});
             return;
         }
 

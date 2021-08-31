@@ -17,19 +17,19 @@ public class ReloadCommand extends ConsoleCommand {
 
         if (args.containsKey("CONFIG")) {
             MyJFQL.getInstance().reloadConfig();
-            sender.sendInfo("Successfully loaded the 'config.json'.");
+            sender.sendInfo("Loaded the 'config.json'.");
             return;
         }
 
         if (args.containsKey("DATABASES")) {
             MyJFQL.getInstance().reloadDatabases();
-            sender.sendInfo("Successfully reloaded all databases.");
+            sender.sendInfo("Reloaded all databases.");
             return;
         }
 
         if (args.containsKey("USERS")) {
             MyJFQL.getInstance().reloadUsers();
-            sender.sendInfo("Successfully reloaded all users.");
+            sender.sendInfo("Reloaded all users.");
             return;
         }
 

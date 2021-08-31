@@ -1,12 +1,10 @@
 package org.jokergames.myjfql.database;
 
-import org.apache.commons.io.FileUtils;
 import org.jokergames.myjfql.util.FileFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,9 +53,13 @@ public class DatabaseService {
     }
 
     public void load() {
+        load(new File("database"));
+    }
+
+    public void load(final File databaseSpace) {
         databases.clear();
 
-        for (final File file : Objects.requireNonNull(new File("database").listFiles())) {
+        for (final File file : Objects.requireNonNull(databaseSpace.listFiles())) {
             final JSONObject jsonObject = fileFactory.load(file);
             final JSONArray jsonArray = jsonObject.getJSONArray("tables");
 
@@ -92,19 +94,16 @@ public class DatabaseService {
 
     }
 
-
     public void update() {
-        try {
-            FileUtils.copyDirectory(new File("database"), new File("backup/temp"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        update(new File("database"));
+    }
 
+    public void update(final File databaseSpace) {
         //noinspection ResultOfMethodCallIgnored
-        Arrays.stream(Objects.requireNonNull(new File("database").listFiles())).forEach(File::delete);
+        Arrays.stream(Objects.requireNonNull(databaseSpace.listFiles())).forEach(File::delete);
 
         databases.forEach(database -> {
-            final File file = new File("database/" + database.getName() + ".json");
+            final File file = new File(databaseSpace.getPath() + "/" + database.getName() + ".json");
             final JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", database.getName());
             jsonObject.put("tables", database.getTables());

@@ -3,6 +3,7 @@ package org.jokergames.myjfql.core;
 import org.jokergames.myjfql.command.*;
 import org.jokergames.myjfql.database.DBSession;
 import org.jokergames.myjfql.database.Database;
+import org.jokergames.myjfql.database.DatabaseBackupService;
 import org.jokergames.myjfql.database.DatabaseService;
 import org.jokergames.myjfql.exception.NetworkException;
 import org.jokergames.myjfql.server.Server;
@@ -26,11 +27,12 @@ public final class MyJFQL {
     private final CommandService commandService;
     private final DatabaseService databaseService;
     private final ConfigService configService;
+    private final DatabaseBackupService databaseBackupService;
     private final UserService userService;
     private final DBSession dbSession;
     private final Server server;
 
-    private final String version = "1.4.5";
+    private final String version = "1.4.6";
 
     private JSONObject configuration;
     private long lastRefresh;
@@ -47,6 +49,7 @@ public final class MyJFQL {
         this.downloader = new UpdateConnection.Downloader(updateConnection);
         this.databaseService = new DatabaseService(configService.getFactory());
         this.dbSession = new DBSession(userService, databaseService);
+        this.databaseBackupService = new DatabaseBackupService(configService.getFactory(), databaseService);
         this.server = new Server();
 
         this.lastRefresh = -1;
@@ -111,6 +114,7 @@ public final class MyJFQL {
             commandService.register(new UseCommand());
             commandService.register(new VersionCommand());
             commandService.register(new UserCommand());
+            commandService.register(new BackupCommand());
             commandService.register(new InsertCommand());
             commandService.register(new SelectCommand());
             commandService.register(new RemoveCommand());
@@ -262,6 +266,10 @@ public final class MyJFQL {
 
     public UserService getUserService() {
         return userService;
+    }
+
+    public DatabaseBackupService getDatabaseBackupService() {
+        return databaseBackupService;
     }
 
     public JSONObject getConfiguration() {
