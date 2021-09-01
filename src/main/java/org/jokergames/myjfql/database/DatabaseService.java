@@ -11,10 +11,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-/**
- * @author Janick
- */
-
 public class DatabaseService {
 
     private final FileFactory fileFactory;

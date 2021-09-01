@@ -6,10 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * @author Janick
- */
-
 public class Table {
 
     private final String name;
@@ -43,11 +39,11 @@ public class Table {
     }
 
     public void removeColumn(final String key) {
-        columns.removeIf(col -> col.getContent().get(primary).toString().equals(key));
+        columns.removeIf(col -> col.getContent(primary).toString().equals(key));
     }
 
     public Column getColumn(final String key) {
-        return columns.stream().filter(col -> col.getContent().get(primary).toString().equals(key)).findFirst().orElse(null);
+        return columns.stream().filter(col -> col.getContent(primary).toString().equals(key)).findFirst().orElse(null);
     }
 
     public List<Column> getColumns() {

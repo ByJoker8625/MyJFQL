@@ -49,7 +49,7 @@ public final class MyJFQL {
         this.downloader = new UpdateConnection.Downloader(updateConnection);
         this.databaseService = new DatabaseService(configService.getFactory());
         this.dbSession = new DBSession(userService, databaseService);
-        this.databaseBackupService = new DatabaseBackupService(configService.getFactory(), databaseService);
+        this.databaseBackupService = new DatabaseBackupService(databaseService);
         this.server = new Server();
 
         this.lastRefresh = -1;
@@ -176,9 +176,6 @@ public final class MyJFQL {
     public void shutdown() {
 
         try {
-            if (configuration.getBoolean("SecondaryBackup"))
-                commandService.execute(consoleCommandSender, "backup");
-
             console.logInfo("Shutdown (This can take a while)...");
             databaseService.update();
             userService.update();

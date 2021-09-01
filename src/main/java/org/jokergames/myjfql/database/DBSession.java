@@ -9,10 +9,6 @@ import org.jokergames.myjfql.user.UserService;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Janick
- */
-
 public class DBSession {
 
     private final Map<String, String> databases;

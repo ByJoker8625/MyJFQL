@@ -7,10 +7,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * @author Janick
- */
-
 public class Sorter {
 
 
@@ -18,7 +14,7 @@ public class Sorter {
         final List<String> strings = new ArrayList<>();
 
         columns.forEach(col -> {
-            if (!col.getContent().containsKey(key)) {
+            if (!col.containsContentKey(key)) {
                 strings.add("null");
             } else {
                 strings.add(String.valueOf(col.getContent(key)));
@@ -32,9 +28,9 @@ public class Sorter {
 
         sorted.forEach(string -> {
             if (string.equals("null")) {
-                columns.stream().filter(col -> !col.getContent().containsKey(key) || (col.getContent().containsKey(key) && col.getContent(key).equals("null"))).findFirst().ifPresent(nullable::add);
+                columns.stream().filter(col -> !col.containsContentKey(key) || (col.containsContentKey(key) && col.getContent(key).equals("null"))).findFirst().ifPresent(nullable::add);
             } else {
-                columns.stream().filter(col -> col.getContent().containsKey(key) && col.getContent(key).equals(string)).findFirst().ifPresent(list::add);
+                columns.stream().filter(col -> col.containsContentKey(key) && col.getContent(key).equals(string)).findFirst().ifPresent(list::add);
             }
         });
 

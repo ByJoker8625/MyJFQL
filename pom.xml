@@ -13,7 +13,19 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>joker-games</id>
+            <url>https://joker-games.org/repository</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <dependency>
+            <groupId>org.joker-games</groupId>
+            <artifactId>JFQLConnector</artifactId>
+            <version>1.1</version>
+        </dependency>
         <dependency>
             <groupId>io.javalin</groupId>
             <artifactId>javalin</artifactId>

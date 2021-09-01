@@ -1,11 +1,11 @@
 package org.jokergames.myjfql.command;
 
 import org.jokergames.myjfql.core.MyJFQL;
+import org.jokergames.myjfql.database.Column;
 import org.jokergames.myjfql.database.Database;
 import org.jokergames.myjfql.database.DatabaseService;
 import org.jokergames.myjfql.user.User;
 import org.jokergames.myjfql.user.UserService;
-import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.List;
@@ -205,12 +205,12 @@ public class UserCommand extends ConsoleCommand {
             }
 
             final User selectedUser = userService.getUser(name);
-            final JSONObject jsonObject = new JSONObject();
-            jsonObject.put("Name", selectedUser.getName());
-            jsonObject.put("Password", selectedUser.getPassword());
-            jsonObject.put("Permissions", selectedUser.getPermissions().toString());
+            final Column column = new Column();
+            column.putContent("Name", selectedUser.getName());
+            column.putContent("Password", selectedUser.getPassword());
+            column.putContent("Permissions", selectedUser.getPermissions().toString());
 
-            sender.sendAnswer(jsonObject, new String[]{"Name", "Password", "Permissions"});
+            sender.sendAnswer(Arrays.asList(column), new String[]{"Name", "Password", "Permissions"});
             return;
         }
 

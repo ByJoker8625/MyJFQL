@@ -1,12 +1,6 @@
 package org.jokergames.myjfql.database;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-/**
- * @author Janick
- */
+import java.util.*;
 
 public class Column {
 
@@ -37,6 +31,26 @@ public class Column {
 
     public void putContent(final String key, final Object o) {
         content.put(key, o);
+    }
+
+    public void removeContent(final String key) {
+        content.remove(key);
+    }
+
+    public boolean containsContentKey(final String key) {
+        return content.containsKey(key);
+    }
+
+    public boolean containsContentValue(final String value) {
+        return content.containsValue(value);
+    }
+
+    public Set<String> getContentKeySet() {
+        return content.keySet();
+    }
+
+    public Collection<Object> getContentValues() {
+        return content.values();
     }
 
     public Map<String, Object> getContent() {
