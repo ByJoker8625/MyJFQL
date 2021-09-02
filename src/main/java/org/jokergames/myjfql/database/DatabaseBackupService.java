@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class DatabaseBackupService {
@@ -29,7 +30,6 @@ public class DatabaseBackupService {
 
         if (!folder.exists())
             folder.mkdir();
-
 
         if (!file.exists())
             file.mkdir();
@@ -113,7 +113,7 @@ public class DatabaseBackupService {
     }
 
     public List<String> getBackups() throws NullPointerException {
-        return Arrays.asList(new File("backup").listFiles()).stream().map(File::getName).collect(Collectors.toList());
+        return Arrays.stream(Objects.requireNonNull(new File("backup").listFiles())).map(File::getName).collect(Collectors.toList());
     }
 
 

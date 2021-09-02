@@ -24,16 +24,18 @@ public class Formatter {
                 strings.add("COMMAND");
                 strings.add(current);
             } else {
-                if (current.startsWith("'") && current.endsWith("'")) {
+                if (current.startsWith("'") && current.endsWith("'") && !current.equals("'")) {
                     strings.add(current);
-                } else if (current.startsWith("'") && !current.endsWith("'")) {
+                } else if ((current.equals("'") && builder == null) || (current.startsWith("'") && !current.endsWith("'"))) {
                     builder = new StringBuilder(current);
-                } else if (!current.startsWith("'") && current.endsWith("'")) {
-                    assert builder != null;
-
-                    builder.append(" ").append(current);
-                    strings.add(builder.toString());
-                    builder = null;
+                } else if (current.equals("'") || (!current.startsWith("'") && current.endsWith("'"))) {
+                    if (builder == null) {
+                        strings.add(current);
+                    } else {
+                        builder.append(" ").append(current);
+                        strings.add(builder.toString());
+                        builder = null;
+                    }
                 } else {
                     if (builder == null) {
                         strings.add(current);
@@ -41,7 +43,6 @@ public class Formatter {
                         builder.append(" ").append(current);
                     }
                 }
-
             }
 
         }
