@@ -19,7 +19,7 @@ public class UserService {
         this.factory = fileFactory;
     }
 
-    public void saveUser(User user) {
+    public void saveUser(final User user) {
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getName().equals(user.getName())) {
                 users.set(i, user);
@@ -30,15 +30,15 @@ public class UserService {
         users.add(user);
     }
 
-    public User getUser(String name) {
+    public User getUser(final String name) {
         return users.stream().filter(user -> user.getName().equals(name)).findFirst().orElse(null);
     }
 
-    public boolean isCreated(String name) {
+    public boolean isCreated(final String name) {
         return users.stream().anyMatch(user -> user.getName().equals(name));
     }
 
-    public void deleteUser(String name) {
+    public void deleteUser(final String name) {
         users.removeIf(user -> user.getName().equals(name));
     }
 

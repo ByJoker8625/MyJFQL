@@ -32,15 +32,15 @@ public class ConfigService {
         file = new File("backup");
 
         if (!file.exists())
-            file.mkdir();
+            file.mkdirs();
 
         file = new File("config.json");
 
         if (!file.exists()) {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("AutoUpdate", true);
+            jsonObject.put("AutoUpdate", false);
             jsonObject.put("Port", 2291);
-            jsonObject.put("UpdateServer", "https://joker-games.org/lib/myjfql/rest.json");
+            jsonObject.put("UpdateServer", "https://joker-games.org/api/myjfql.json");
 
             factory.save(file, jsonObject);
             first = true;

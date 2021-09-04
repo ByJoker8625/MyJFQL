@@ -2,7 +2,6 @@ package org.jokergames.myjfql.core;
 
 import org.jokergames.myjfql.command.*;
 import org.jokergames.myjfql.database.DBSession;
-import org.jokergames.myjfql.database.Database;
 import org.jokergames.myjfql.database.DatabaseBackupService;
 import org.jokergames.myjfql.database.DatabaseService;
 import org.jokergames.myjfql.exception.NetworkException;
@@ -10,7 +9,7 @@ import org.jokergames.myjfql.server.Server;
 import org.jokergames.myjfql.user.UserService;
 import org.jokergames.myjfql.util.ConfigService;
 import org.jokergames.myjfql.util.Console;
-import org.jokergames.myjfql.util.UpdateConnection;
+import org.jokergames.myjfql.util.Updater;
 import org.json.JSONObject;
 
 import java.util.Timer;
@@ -21,8 +20,8 @@ public final class MyJFQL {
     private static MyJFQL instance;
 
     private final Console console;
-    private final UpdateConnection updateConnection;
-    private final UpdateConnection.Downloader downloader;
+    private final Updater updater;
+    private final Updater.Downloader downloader;
     private final ConsoleCommandSender consoleCommandSender;
     private final CommandService commandService;
     private final DatabaseService databaseService;
@@ -32,7 +31,7 @@ public final class MyJFQL {
     private final DBSession dbSession;
     private final Server server;
 
-    private final String version = "1.4.6";
+    private final String version = "1.4.1";
 
     private JSONObject configuration;
     private long lastRefresh;
@@ -41,12 +40,12 @@ public final class MyJFQL {
         instance = this;
         this.console = new Console();
         this.consoleCommandSender = new ConsoleCommandSender(console);
-        this.updateConnection = new UpdateConnection();
+        this.updater = new Updater(version);
         this.commandService = new CommandService();
         this.configService = new ConfigService();
         this.userService = new UserService(configService.getFactory());
         this.configuration = configService.getConfiguration();
-        this.downloader = new UpdateConnection.Downloader(updateConnection);
+        this.downloader = new Updater.Downloader(updater);
         this.databaseService = new DatabaseService(configService.getFactory());
         this.dbSession = new DBSession(userService, databaseService);
         this.databaseBackupService = new DatabaseBackupService(databaseService);
@@ -70,19 +69,14 @@ public final class MyJFQL {
                 "                                                                |___/                   |___/             |___/      \n" +
                 "");
         console.logInfo("Developer > joker-games.org");
-        console.logInfo("Version > " + version);
+        console.logInfo("Version > v" + version);
         console.clean();
 
         {
             console.logInfo("Connecting to " + configuration.getString("UpdateServer") + "...");
 
             try {
-                updateConnection.connect(configuration.getString("UpdateServer"));
-
-                if (updateConnection.isMaintenance()) {
-                    console.logError("Database is currently in maintenance!");
-                    return;
-                }
+                updater.fetch(configuration.getString("UpdateServer"));
             } catch (Exception ex) {
                 throw new NetworkException("Server connection failed!");
             }
@@ -92,14 +86,25 @@ public final class MyJFQL {
         }
 
         {
-            if (!updateConnection.isLatest()) {
-                if (configuration.getBoolean("AutoUpdate")
-                        && !updateConnection.latestIsBeta()) {
-                    downloader.download();
-                } else {
-                    console.logInfo("You aren't up to date. Please download the latest version.");
-                }
+            switch (updater.getCompatibilityStatus()) {
+                case SAME:
+                    console.logInfo("Your are up to date with you MyJFQL version. You can enjoy all features of this system :D");
+                    break;
+                case JUST_FINE:
+                    if (!configuration.getBoolean("AutoUpdate"))
+                        downloader.downloadLatestVersion();
+                    else
+                        console.logInfo("You aren't up to date. Please download the latest version.");
+                    break;
+                case SOME_CHANGES:
+                    console.logInfo("You aren't up to date. Please download the latest version. But please make sure that the new version working you have to make some changes!");
+                    break;
+                case PENSIONER:
+                    console.logWarning("You are using a really old version of MyJFQL! With this version you wouldn't be able to update to the latest version of MyJFQL.");
+                    break;
             }
+
+            console.clean();
         }
 
         {
@@ -169,17 +174,22 @@ public final class MyJFQL {
             commandService.execute(consoleCommandSender, console.readPrompt());
     }
 
-    public void shutdown() {
-
-        try {
-            console.logInfo("Shutdown (This can take a while)...");
-            databaseService.update();
-            userService.update();
-        } catch (Exception ex) {
-            console.logError("Ignoring this exception: " + ex.getMessage());
-        }
+    public void shutdown(boolean refresh) {
+        if (refresh)
+            try {
+                console.logInfo("Shutdown (This can take a while)...");
+                databaseService.update();
+                userService.update();
+            } catch (Exception ex) {
+                console.logError("Ignoring this exception: " + ex.getMessage());
+            }
+        else console.logInfo("Shutdown...");
 
         System.exit(0);
+    }
+
+    public void shutdown() {
+        shutdown(true);
     }
 
     public void refresh() {
@@ -221,11 +231,11 @@ public final class MyJFQL {
         return consoleCommandSender;
     }
 
-    public UpdateConnection getUpdateConnection() {
-        return updateConnection;
+    public Updater getUpdater() {
+        return updater;
     }
 
-    public UpdateConnection.Downloader getDownloader() {
+    public Updater.Downloader getDownloader() {
         return downloader;
     }
 
