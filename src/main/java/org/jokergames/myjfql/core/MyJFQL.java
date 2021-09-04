@@ -162,10 +162,6 @@ public final class MyJFQL {
             }, 1000 * 60, 1000 * 60);
         }
 
-        if (configService.isFirst()) {
-            databaseService.saveDataBase(new Database("test"));
-        }
-
         console.clean();
         console.complete();
 
