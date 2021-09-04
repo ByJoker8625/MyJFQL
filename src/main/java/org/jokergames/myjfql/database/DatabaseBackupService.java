@@ -7,7 +7,6 @@ import org.jokergames.jfql.util.Column;
 import org.jokergames.jfql.util.Result;
 import org.jokergames.jfql.util.User;
 import org.jokergames.myjfql.core.MyJFQL;
-import org.jokergames.myjfql.util.FileFactory;
 
 import java.io.File;
 import java.io.IOException;

@@ -31,7 +31,7 @@ public final class MyJFQL {
     private final DBSession dbSession;
     private final Server server;
 
-    private final String version = "1.4.1";
+    private final String version = "1.5.0";
 
     private JSONObject configuration;
     private long lastRefresh;

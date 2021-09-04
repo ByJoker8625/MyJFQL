@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 
 public class Updater {
 
-    private JSONObject serverConfiguration = null;
     private final String version;
+    private JSONObject serverConfiguration = null;
 
     public Updater(String version) {
         this.version = version;
@@ -89,15 +89,15 @@ public class Updater {
         return raw.keySet().stream().collect(Collectors.toMap(key -> key, key -> raw.get(key).toString(), (a, b) -> b));
     }
 
+    public JSONObject getServerConfiguration() {
+        return serverConfiguration;
+    }
+
     public enum VersionCompatibilityStatus {
         PENSIONER,
         SOME_CHANGES,
         JUST_FINE,
         SAME
-    }
-
-    public JSONObject getServerConfiguration() {
-        return serverConfiguration;
     }
 
     public static class Downloader {
