@@ -109,7 +109,7 @@ public class Updater {
         }
 
         public void downloadLatestVersion() {
-            downloadByVersion(updater.getLatestVersion());
+            downloadByVersion("v" + updater.getLatestVersion());
         }
 
         public void downloadByVersion(final String version) {
