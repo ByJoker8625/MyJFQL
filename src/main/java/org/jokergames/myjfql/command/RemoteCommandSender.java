@@ -6,6 +6,8 @@ import org.jokergames.myjfql.exception.CommandException;
 import org.jokergames.myjfql.user.User;
 import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
+
 public class RemoteCommandSender extends CommandSender {
 
     private final Context context;
@@ -92,7 +94,9 @@ public class RemoteCommandSender extends CommandSender {
         context.header("Access-Control-Allow-Headers", "*");
         context.header("Access-Control-Allow-Credentials", "true");
         context.header("Access-Control-Allow-Credentials-Header", "*");
-        context.result(obj.toString());
+        context.header("ContentType: application/json");
+
+        context.result(obj.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     public RemoteCommandSender rename(final String name) {
