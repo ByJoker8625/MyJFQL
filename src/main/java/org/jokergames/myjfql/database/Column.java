@@ -45,14 +45,6 @@ public class Column {
         return content.containsValue(value);
     }
 
-    public Set<String> getContentKeySet() {
-        return content.keySet();
-    }
-
-    public Collection<Object> getContentValues() {
-        return content.values();
-    }
-
     public Map<String, Object> getContent() {
         return content;
     }
