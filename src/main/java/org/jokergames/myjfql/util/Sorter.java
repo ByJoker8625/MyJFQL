@@ -28,9 +28,9 @@ public class Sorter {
 
         sorted.forEach(string -> {
             if (string.equals("null")) {
-                columns.stream().filter(col -> !col.containsContentKey(key) || (col.containsContentKey(key) && col.getContent(key).equals("null"))).findFirst().ifPresent(nullable::add);
+                columns.stream().filter(col -> (!col.containsContentKey(key) || (col.containsContentKey(key) && col.getContent(key).equals("null"))) && !nullable.contains(col)).findFirst().ifPresent(nullable::add);
             } else {
-                columns.stream().filter(col -> col.containsContentKey(key) && col.getContent(key).equals(string)).findFirst().ifPresent(list::add);
+                columns.stream().filter(col -> col.containsContentKey(key) && col.getContent(key).equals(string) && !list.contains(col)).findFirst().ifPresent(list::add);
             }
         });
 
