@@ -1,6 +1,7 @@
 package org.jokergames.myjfql.util;
 
 import jline.console.ConsoleReader;
+import jline.console.completer.CandidateListCompletionHandler;
 import jline.console.completer.StringsCompleter;
 import org.jetbrains.annotations.Nullable;
 import org.jokergames.myjfql.core.MyJFQL;
@@ -18,11 +19,9 @@ public class Console {
     private final ConsoleReader reader;
     private final PrintWriter writer;
 
-    private boolean input;
     private boolean finish;
 
     public Console() {
-        this.input = true;
         this.finish = false;
 
         try {
@@ -33,13 +32,12 @@ public class Console {
         }
 
         reader.setPrompt("");
+        reader.setExpandEvents(false);
 
         System.setErr(new PrintStream(System.err) {
             @Override
             public void print(final @Nullable String s) {
-                setInput(false);
                 printError(s);
-                setInput(true);
             }
 
             @Override
@@ -71,9 +69,11 @@ public class Console {
         else {
             writer.print("[" + getTime() + "] " + s);
 
-            if (!input && finish) {
+            if (finish) {
                 try {
-                    reader.redrawLine();
+                    String buffer = reader.getCursorBuffer().toString();
+
+                    CandidateListCompletionHandler.setBuffer(reader, buffer, buffer.length());
                 } catch (Exception ex) {
                     throw new CommandException(ex);
                 }
@@ -138,14 +138,5 @@ public class Console {
     private String getTime() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     }
-
-    public boolean isInput() {
-        return input;
-    }
-
-    public void setInput(boolean input) {
-        this.input = input;
-    }
-
 
 }

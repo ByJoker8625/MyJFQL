@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class ConditionHelper {
 
@@ -21,6 +23,8 @@ public class ConditionHelper {
         if (argument.size() == 0) {
             return null;
         }
+
+        long l = System.currentTimeMillis();
 
         try {
             final String[] where = Objects.requireNonNull(MyJFQL.getInstance().getCommandService().getFormatter().formatString(argument))
@@ -68,31 +72,27 @@ public class ConditionHelper {
                 conditions.add(requirements);
             }
 
-            List<Column> columns;
+            final Predicate<Column> predicate = column -> passConditions(conditions, table.getStructure(), column);
 
             if (type == Sorter.Type.CREATION) {
-                columns = table.getColumns();
-            } else {
-                columns = table.getColumns(type, order, sorter);
+                return table.getColumns().stream().filter(predicate).collect(Collectors.toList());
             }
 
-            columns.forEach(column -> {
-                if (conditions.stream().anyMatch(requirements -> handleRequirements(requirements, table, column) == requirements.size())) {
-                    requiredColumns.add(column);
-                }
-            });
+            return table.getColumns(type, order, sorter).stream().filter(predicate).collect(Collectors.toList());
         } catch (Exception ex) {
+            ex.printStackTrace();
             return null;
         }
 
-        return requiredColumns;
     }
 
-    private static int handleRequirements(final List<Requirement> requirements, final Table table, final Column column) {
-        final List<Integer> finishedRequirements = new ArrayList<>();
-        int finished = 0;
+    private static boolean passConditions(final List<List<Requirement>> conditions, final List<String> structure, final Column column) {
+        return conditions.stream().anyMatch(requirements -> passRequirements(requirements, structure, column));
+    }
 
-        final List<String> tableStructure = table.getStructure();
+    private static boolean passRequirements(final List<Requirement> requirements, final List<String> structure, final Column column) {
+        final List<Integer> passed = new ArrayList<>();
+        int amountPassed = 0;
 
         for (int j = 0; j < requirements.size(); j++) {
             final Requirement requirement = requirements.get(j);
@@ -105,109 +105,73 @@ public class ConditionHelper {
             final Map<String, Object> content = column.getContent();
 
             if (key.equals("*")) {
-                boolean accept = true;
+                boolean accept;
 
                 if (value.equals("null")) {
-                    accept = tableStructure.stream().noneMatch(str -> content.containsKey(str) && !content.get(str).toString().equals("null"));
+                    accept = structure.stream().noneMatch(str -> content.containsKey(str) && !content.get(str).toString().equals("null"));
                 } else {
-                    for (final String cck : tableStructure) {
-                        if (!content.containsKey(cck)) {
-                            accept = false;
-                            break;
-                        }
-                        final String contentValue = content.get(cck).toString();
-
-                        if (value.startsWith("$") && value.endsWith("$")) {
-                            final String crs = value.replace("$", "");
-
-                            if (!contentValue.contains(crs)) {
-                                accept = false;
-                                break;
-                            }
-                        } else if (!contentValue.equals(value)) {
-                            accept = false;
-                            break;
-                        }
-                    }
+                    accept = content.values().stream().allMatch(o -> adaptObject(o, value));
                 }
 
-                if (!finishedRequirements.contains(j)) {
+                if (!passed.contains(j)) {
                     if (adaptType(type, accept))
-                        finished++;
-                    finishedRequirements.add(j);
+                        amountPassed++;
+                    passed.add(j);
                 }
             } else if (key.equals("?")) {
-                boolean accept = false;
+                boolean accept;
 
                 if (value.equals("null")) {
-                    accept = tableStructure.stream().anyMatch(str -> !content.containsKey(str) || (content.containsKey(str) && content.get(str).toString().equals("null")));
+                    accept = structure.stream().anyMatch(str -> !content.containsKey(str) || (content.containsKey(str) && content.get(str).toString().equals("null")));
                 } else {
-                    for (final String cck : tableStructure) {
-                        String contentValue = null;
-
-                        if (!content.containsKey(cck)) {
-                            contentValue = "null";
-                        } else {
-                            contentValue = content.get(cck).toString();
-                        }
-
-                        if (value.startsWith("$") && value.endsWith("$")) {
-                            final String crs = value.replace("$", "");
-
-                            if (contentValue.contains(crs)) {
-                                accept = true;
-                                break;
-                            }
-                        } else if (contentValue.equals(value)) {
-                            accept = true;
-                            break;
-                        }
-                    }
+                    accept = content.values().stream().anyMatch(o -> adaptObject(o, value));
                 }
 
-                if (!finishedRequirements.contains(j)) {
+                if (!passed.contains(j)) {
                     if (adaptType(type, accept))
-                        finished++;
-                    finishedRequirements.add(j);
+                        amountPassed++;
+                    passed.add(j);
                 }
             } else {
-                boolean accept = false;
+                boolean accept;
 
                 if (value.equals("null")) {
-                    if (!content.containsKey(key)) {
-                        accept = true;
-                    } else if (content.get(key).toString().equals("null")) {
-                        accept = true;
-                    }
-                } else if (content.containsKey(key)) {
-                    final String contentValue = content.get(key).toString();
-
-                    if (value.startsWith("$") && value.endsWith("$")) {
-                        accept = contentValue.contains(value.replace("$", ""));
-                    } else {
-                        accept = contentValue.equals(value);
-                    }
+                    accept = !content.containsKey(key) || (content.containsKey(key) && content.get(key).toString().equals("null"));
+                } else {
+                    return adaptObject(content.get(key), value);
                 }
 
-                if (!finishedRequirements.contains(j)) {
+                if (!passed.contains(j)) {
                     if (adaptType(type, accept))
-                        finished++;
-                    finishedRequirements.add(j);
+                        amountPassed++;
+                    passed.add(j);
                 }
-
             }
-
         }
 
-        return finished;
+        return requirements.size() == amountPassed;
+    }
+
+    private static boolean adaptObject(Object o, String value) {
+        final String content = o.toString();
+
+        if (value.startsWith("$|") && value.endsWith("|$")) {
+            return content.toLowerCase().contains(value.substring(2, value.length() - 2).toLowerCase());
+        }
+
+        if (value.startsWith("$") && value.endsWith("$")) {
+            return content.contains(value.substring(1, value.length() - 1));
+        }
+
+        if (value.startsWith("|") && value.endsWith("|")) {
+            return content.equalsIgnoreCase(value.substring(1, value.length() - 1));
+        }
+
+        return content.equals(value);
     }
 
     private static boolean adaptType(Requirement.Type type, boolean accept) {
-        if (type == Requirement.Type.NEGATIVE) {
-            return !accept;
-        }
-
-        return accept;
+        return (type == Requirement.Type.NEGATIVE) != accept;
     }
 
 }
