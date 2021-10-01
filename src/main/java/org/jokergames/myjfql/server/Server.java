@@ -3,9 +3,9 @@ package org.jokergames.myjfql.server;
 import io.javalin.Javalin;
 import org.jokergames.myjfql.command.CommandService;
 import org.jokergames.myjfql.command.RemoteCommandSender;
+import org.jokergames.myjfql.console.Console;
 import org.jokergames.myjfql.core.MyJFQL;
 import org.jokergames.myjfql.user.UserService;
-import org.jokergames.myjfql.util.Console;
 import org.json.JSONObject;
 
 public class Server {
@@ -32,8 +32,12 @@ public class Server {
             context.header("Access-Control-Allow-Headers", "*");
             context.header("Access-Control-Allow-Credentials", "true");
             context.header("Access-Control-Allow-Credentials-Header", "*");
+            context.header("Content-Type", "application/json");
+
             context.result(jsonObject.toString());
         });
+
+        boolean showConnectionPacket = MyJFQL.getInstance().getConfiguration().showConnectionPacket();
 
         app.post("/query", context -> {
             RemoteCommandSender sender = new RemoteCommandSender(null, context.req.getRemoteAddr(), context);
@@ -53,6 +57,11 @@ public class Server {
                 if (userService.isCreated(name) && userService.getUser(name).getPassword().equals(request.getString("password"))) {
                     final String query = request.getString("query");
                     sender = sender.rename(name);
+
+                    if (query.equals("#connect") && !showConnectionPacket) {
+                        commandService.execute(sender, query);
+                        return;
+                    }
 
                     console.logInfo("[" + sender.getAddress() + "] [" + name + "] queried \"" + query + "\".");
                     commandService.execute(sender, query);

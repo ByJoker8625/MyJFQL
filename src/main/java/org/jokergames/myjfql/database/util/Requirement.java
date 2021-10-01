@@ -1,4 +1,4 @@
-package org.jokergames.myjfql.util;
+package org.jokergames.myjfql.database.util;
 
 import java.util.Arrays;
 
@@ -28,7 +28,7 @@ public class Requirement {
         return type;
     }
 
-    public static enum Type {
+    public enum Type {
         NEGATIVE,
         POSITIVE
     }

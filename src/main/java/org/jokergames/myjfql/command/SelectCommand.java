@@ -4,8 +4,8 @@ import org.jokergames.myjfql.core.MyJFQL;
 import org.jokergames.myjfql.database.Column;
 import org.jokergames.myjfql.database.Database;
 import org.jokergames.myjfql.database.Table;
-import org.jokergames.myjfql.util.ConditionHelper;
-import org.jokergames.myjfql.util.Sorter;
+import org.jokergames.myjfql.database.util.ConditionHelper;
+import org.jokergames.myjfql.database.util.Sorter;
 
 import java.util.*;
 import java.util.stream.Collectors;

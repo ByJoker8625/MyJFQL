@@ -4,8 +4,7 @@ import org.jokergames.myjfql.core.MyJFQL;
 import org.jokergames.myjfql.database.Database;
 import org.jokergames.myjfql.database.DatabaseService;
 import org.jokergames.myjfql.database.Table;
-import org.jokergames.myjfql.user.UserService;
-import org.jokergames.myjfql.util.Sorter;
+import org.jokergames.myjfql.database.util.Sorter;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,7 +18,6 @@ public class ListCommand extends Command {
     @Override
     public void handleCommand(final CommandSender sender, final Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
-        final UserService userService = MyJFQL.getInstance().getUserService();
 
         if (args.containsKey("DATABASES")) {
             if (sender.hasPermission("-use.database.*")) {

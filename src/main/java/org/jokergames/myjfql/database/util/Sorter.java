@@ -1,4 +1,4 @@
-package org.jokergames.myjfql.util;
+package org.jokergames.myjfql.database.util;
 
 import org.jokergames.myjfql.database.Column;
 

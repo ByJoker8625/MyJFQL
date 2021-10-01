@@ -94,7 +94,7 @@ public class RemoteCommandSender extends CommandSender {
         context.header("Access-Control-Allow-Headers", "*");
         context.header("Access-Control-Allow-Credentials", "true");
         context.header("Access-Control-Allow-Credentials-Header", "*");
-        context.header("ContentType: application/json");
+        context.header("Content-Type", "application/json");
 
         context.result(obj.toString().getBytes(StandardCharsets.UTF_8));
     }

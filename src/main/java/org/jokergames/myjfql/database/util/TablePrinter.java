@@ -1,4 +1,4 @@
-package org.jokergames.myjfql.util;
+package org.jokergames.myjfql.database.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +73,7 @@ public class TablePrinter {
     }
 
     public TablePrinter sortBy(int column) {
-        return this.compareWith((o1, o2) -> o1[column].compareTo(o2[column]));
+        return this.compareWith(Comparator.comparing(o -> o[column]));
     }
 
     public TablePrinter align(int column, Alignment align) {
@@ -125,8 +125,9 @@ public class TablePrinter {
                     line.append(TLINE);
                 }
             }
+            assert line != null;
             line.append(CORNER_TR);
-            System.out.println(line.toString());
+            System.out.println(line);
 
             line = null;
         }
@@ -141,9 +142,9 @@ public class TablePrinter {
                     line.append(gc(VERTICAL_TSEP));
                 }
             }
-            String part = descriptions[i];
+            StringBuilder part = new StringBuilder(descriptions[i]);
             while (part.length() < tableSizes[i] + spacing) {
-                part += " ";
+                part.append(" ");
             }
             for (int j = 0; j < spacing; j++) {
                 line.append(" ");
@@ -151,9 +152,11 @@ public class TablePrinter {
             line.append(part);
         }
         if (ucode) {
+            assert line != null;
             line.append(gc(VERTICAL_TSEP));
         }
-        System.out.println(line.toString());
+        assert line != null;
+        System.out.println(line);
 
         // print vertical seperator
         line = null;
@@ -171,9 +174,11 @@ public class TablePrinter {
             }
         }
         if (ucode) {
+            assert line != null;
             line.append(CROSSING_R);
         }
-        System.out.println(line.toString());
+        assert line != null;
+        System.out.println(line);
 
         line = null;
         ArrayList<String[]> localTable = table;
@@ -265,7 +270,7 @@ public class TablePrinter {
                 }
             }
             line.append(CORNER_BR);
-            System.out.println(line.toString());
+            System.out.println(line);
         }
 
     }
@@ -274,7 +279,7 @@ public class TablePrinter {
         return src[ucode ? 1 : 0];
     }
 
-    public static enum Alignment {
+    public enum Alignment {
         LEFT, CENTER, RIGHT
     }
 

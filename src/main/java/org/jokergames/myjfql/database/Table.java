@@ -1,6 +1,6 @@
 package org.jokergames.myjfql.database;
 
-import org.jokergames.myjfql.util.Sorter;
+import org.jokergames.myjfql.database.util.Sorter;
 
 import java.util.ArrayList;
 import java.util.List;

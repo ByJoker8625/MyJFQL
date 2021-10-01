@@ -12,7 +12,7 @@ public abstract class ConsoleCommand extends Command {
     public abstract void handleConsoleCommand(ConsoleCommandSender sender, final Map<String, List<String>> args);
 
     @Override
-    public void handleCommand(CommandSender sender, Map<String, List<String>> args) {
+    public final void handleCommand(CommandSender sender, Map<String, List<String>> args) {
         if (!(sender instanceof ConsoleCommandSender)) {
             sender.sendForbidden();
             return;

@@ -1,9 +1,9 @@
 package org.jokergames.myjfql.command;
 
+import org.jokergames.myjfql.console.Console;
 import org.jokergames.myjfql.database.Column;
+import org.jokergames.myjfql.database.util.TablePrinter;
 import org.jokergames.myjfql.exception.CommandException;
-import org.jokergames.myjfql.util.Console;
-import org.jokergames.myjfql.util.TablePrinter;
 
 import java.util.List;
 

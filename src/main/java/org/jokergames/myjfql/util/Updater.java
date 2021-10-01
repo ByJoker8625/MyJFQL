@@ -100,6 +100,10 @@ public class Updater {
         SAME
     }
 
+    public Downloader getDownloader() {
+        return new Downloader(this);
+    }
+
     public static class Downloader {
 
         private final Updater updater;

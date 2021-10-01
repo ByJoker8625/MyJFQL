@@ -1,16 +1,18 @@
 package org.jokergames.myjfql.core;
 
 import org.jokergames.myjfql.command.*;
+import org.jokergames.myjfql.config.Config;
+import org.jokergames.myjfql.config.ConfigService;
+import org.jokergames.myjfql.console.Console;
+import org.jokergames.myjfql.console.JLineConsole;
+import org.jokergames.myjfql.console.ScannerConsole;
 import org.jokergames.myjfql.database.DBSession;
 import org.jokergames.myjfql.database.DatabaseBackupService;
 import org.jokergames.myjfql.database.DatabaseService;
 import org.jokergames.myjfql.exception.NetworkException;
 import org.jokergames.myjfql.server.Server;
 import org.jokergames.myjfql.user.UserService;
-import org.jokergames.myjfql.util.ConfigService;
-import org.jokergames.myjfql.util.Console;
 import org.jokergames.myjfql.util.Updater;
-import org.json.JSONObject;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,21 +33,26 @@ public final class MyJFQL {
     private final DBSession dbSession;
     private final Server server;
 
-    private final String version = "1.5.0";
+    private final String version = "1.5.1";
 
-    private JSONObject configuration;
+    private Config configuration;
     private long lastRefresh;
 
     public MyJFQL() {
         instance = this;
-        this.console = new Console();
+        this.configService = new ConfigService();
+        this.configuration = configService.getConfig();
+
+        if (configuration.enabledJLine())
+            this.console = new JLineConsole();
+        else
+            this.console = new ScannerConsole();
+
         this.consoleCommandSender = new ConsoleCommandSender(console);
         this.updater = new Updater(version);
         this.commandService = new CommandService();
-        this.configService = new ConfigService();
         this.userService = new UserService(configService.getFactory());
-        this.configuration = configService.getConfiguration();
-        this.downloader = new Updater.Downloader(updater);
+        this.downloader = updater.getDownloader();
         this.databaseService = new DatabaseService(configService.getFactory());
         this.dbSession = new DBSession(userService, databaseService);
         this.databaseBackupService = new DatabaseBackupService(databaseService);
@@ -72,11 +79,11 @@ public final class MyJFQL {
         console.logInfo("Version > v" + version);
         console.clean();
 
-        {
-            console.logInfo("Connecting to " + configuration.getString("UpdateServer") + "...");
+        if (configuration.updateCheck()) {
+            console.logInfo("Connecting to " + configuration.getUpdateHost() + "...");
 
             try {
-                updater.fetch(configuration.getString("UpdateServer"));
+                updater.fetch(configuration.getUpdateHost());
             } catch (Exception ex) {
                 throw new NetworkException("Server connection failed!");
             }
@@ -85,13 +92,13 @@ public final class MyJFQL {
             console.clean();
         }
 
-        {
+        if (configuration.updateCheck()) {
             switch (updater.getCompatibilityStatus()) {
                 case SAME:
                     console.logInfo("Your are up to date with you MyJFQL version. You can enjoy all features of this system :D");
                     break;
                 case JUST_FINE:
-                    if (!configuration.getBoolean("AutoUpdate"))
+                    if (configuration.enabledUpdates())
                         downloader.downloadLatestVersion();
                     else
                         console.logInfo("You aren't up to date. Please download the latest version.");
@@ -125,19 +132,27 @@ public final class MyJFQL {
             commandService.register(new RemoveCommand());
         }
 
-        try {
-            server.start(configuration.getInt("Port"));
-        } catch (Exception ex) {
-            throw new NetworkException(ex);
-        }
+        if (configuration.enabledServer()) {
+            try {
+                server.start(configuration.getServerPort());
+            } catch (Exception ex) {
+                throw new NetworkException(ex);
+            }
 
-        console.clean();
+            console.clean();
+        }
 
         {
             console.logInfo("Loading databases and users (This can take a while)...");
             databaseService.load();
             userService.load();
             console.logInfo("Loading finished!");
+        }
+
+
+        if (configService.isNonCompatibleConfiguration(configService.getRawConfiguration())) {
+            console.clean();
+            console.logWarning("You are using a pretty old config version! Please refresh your config for a higher configurability.");
         }
 
         {
@@ -167,6 +182,7 @@ public final class MyJFQL {
             }, 1000 * 60, 1000 * 60);
         }
 
+
         console.clean();
         console.complete();
 
@@ -174,7 +190,7 @@ public final class MyJFQL {
             commandService.execute(consoleCommandSender, console.readPrompt());
     }
 
-    public void shutdown(boolean refresh) {
+    public void shutdown(final boolean refresh) {
         if (refresh)
             try {
                 console.logInfo("Shutdown (This can take a while)...");
@@ -198,21 +214,19 @@ public final class MyJFQL {
         lastRefresh = System.currentTimeMillis();
     }
 
-    public void reload() {
-        reloadConfig();
-        reloadUsers();
-        reloadDatabases();
-        restartServer();
-    }
-
     public void restartServer() {
-        server.setPort(configuration.getInt("Port"));
+        if (!configuration.enabledServer()) {
+            server.shutdown();
+            return;
+        }
+
+        server.setPort(configuration.getServerPort());
         server.restart();
     }
 
     public void reloadConfig() {
         configService.load();
-        configuration = configService.getConfiguration();
+        configuration = configService.getConfig();
     }
 
     public void reloadDatabases() {
@@ -275,7 +289,7 @@ public final class MyJFQL {
         return databaseBackupService;
     }
 
-    public JSONObject getConfiguration() {
+    public Config getConfiguration() {
         return configuration;
     }
 }

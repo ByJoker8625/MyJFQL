@@ -5,7 +5,7 @@ import org.jokergames.myjfql.database.Column;
 import org.jokergames.myjfql.database.Database;
 import org.jokergames.myjfql.database.DatabaseService;
 import org.jokergames.myjfql.database.Table;
-import org.jokergames.myjfql.util.ConditionHelper;
+import org.jokergames.myjfql.database.util.ConditionHelper;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -103,7 +103,7 @@ public class InsertCommand extends Command {
                 database.addTable(table);
                 databaseService.saveDataBase(database);
             } else if (args.containsKey("WHERE")) {
-                List<Column> columns = null;
+                List<Column> columns;
 
                 try {
                     columns = ConditionHelper.getRequiredColumns(table, args.get("WHERE"));
