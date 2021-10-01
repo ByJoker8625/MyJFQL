@@ -93,15 +93,15 @@ public class Updater {
         return serverConfiguration;
     }
 
+    public Downloader getDownloader() {
+        return new Downloader(this);
+    }
+
     public enum VersionCompatibilityStatus {
         PENSIONER,
         SOME_CHANGES,
         JUST_FINE,
         SAME
-    }
-
-    public Downloader getDownloader() {
-        return new Downloader(this);
     }
 
     public static class Downloader {

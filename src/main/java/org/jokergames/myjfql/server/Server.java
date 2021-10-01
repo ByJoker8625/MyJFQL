@@ -32,6 +32,8 @@ public class Server {
             context.header("Access-Control-Allow-Headers", "*");
             context.header("Access-Control-Allow-Credentials", "true");
             context.header("Access-Control-Allow-Credentials-Header", "*");
+            context.header("Access-Control-Allow-Private-Network", "true");
+            context.header("Access-Control-Allow-Private-Network", "true");
             context.header("Content-Type", "application/json");
 
             context.result(jsonObject.toString());
