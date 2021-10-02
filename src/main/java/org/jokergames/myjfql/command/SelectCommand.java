@@ -141,7 +141,6 @@ public class SelectCommand extends Command {
                     return;
                 }
 
-                column.getContent().keySet().stream().filter(key -> !values.contains(key)).forEach(column::removeContent);
                 sender.sendAnswer(Collections.singletonList(column), values);
             } else if (args.containsKey("WHERE")) {
                 List<Column> columns;
