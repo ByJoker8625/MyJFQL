@@ -18,13 +18,9 @@ public class ConditionHelper {
     }
 
     public static List<Column> getRequiredColumns(final Table table, final List<String> argument, final Sorter.Type type, final String sorter, final Sorter.Order order) {
-        final List<Column> requiredColumns = new ArrayList<>();
-
         if (argument.size() == 0) {
             return null;
         }
-
-        long l = System.currentTimeMillis();
 
         try {
             final String[] where = Objects.requireNonNull(MyJFQL.getInstance().getCommandService().getFormatter().formatString(argument))
@@ -80,7 +76,6 @@ public class ConditionHelper {
 
             return table.getColumns(type, order, sorter).stream().filter(predicate).collect(Collectors.toList());
         } catch (Exception ex) {
-            ex.printStackTrace();
             return null;
         }
 
@@ -138,7 +133,7 @@ public class ConditionHelper {
                 if (value.equals("null")) {
                     accept = !content.containsKey(key) || (content.containsKey(key) && content.get(key).toString().equals("null"));
                 } else {
-                    return adaptObject(content.get(key), value);
+                    accept = adaptObject(content.get(key), value);
                 }
 
                 if (!passed.contains(j)) {
