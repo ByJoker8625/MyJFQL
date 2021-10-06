@@ -1,7 +1,6 @@
 package org.jokergames.myjfql.console;
 
 import jline.console.ConsoleReader;
-import jline.console.completer.CandidateListCompletionHandler;
 import jline.console.completer.StringsCompleter;
 import org.jetbrains.annotations.Nullable;
 import org.jokergames.myjfql.core.MyJFQL;
@@ -73,9 +72,7 @@ public class JLineConsole implements Console {
 
             if (finish) {
                 try {
-                    String buffer = reader.getCursorBuffer().toString();
-
-                    CandidateListCompletionHandler.setBuffer(reader, buffer, buffer.length());
+                    reader.redrawLine();
                 } catch (Exception ex) {
                     throw new ConsoleException(ex);
                 }
