@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -38,6 +37,7 @@ public class DatabaseService {
 
     public void deleteDatabase(final String name) {
         databases.removeIf(database -> database.getName().equals(name));
+        new File("database/" + name + ".json").delete();
     }
 
     public Database getDataBase(final String name) {
@@ -95,9 +95,6 @@ public class DatabaseService {
     }
 
     public void update(final File databaseSpace) {
-        //noinspection ResultOfMethodCallIgnored
-        Arrays.stream(Objects.requireNonNull(databaseSpace.listFiles())).forEach(File::delete);
-
         databases.forEach(database -> {
             final File file = new File(databaseSpace.getPath() + "/" + database.getName() + ".json");
             final JSONObject jsonObject = new JSONObject();

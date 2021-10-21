@@ -17,7 +17,7 @@ public class Server {
         this.app = Javalin.create();
         this.port = port;
 
-        app.config.showJavalinBanner = false;
+        app._conf.showJavalinBanner = false;
 
         final Console console = MyJFQL.getInstance().getConsole();
         final CommandService commandService = MyJFQL.getInstance().getCommandService();

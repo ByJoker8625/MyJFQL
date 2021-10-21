@@ -5,6 +5,7 @@ import org.jokergames.myjfql.exception.CommandException;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Formatter {
 
@@ -82,13 +83,7 @@ public class Formatter {
         if (strings.size() == 0)
             return null;
 
-        final StringBuilder builder = new StringBuilder(strings.get(0));
-
-        for (int i = 1; i < strings.size(); i++) {
-            builder.append(" ").append(strings.get(i));
-        }
-
-        return builder.toString().replace("'", "");
+        return IntStream.range(1, strings.size()).mapToObj(i -> " " + strings.get(i)).collect(Collectors.joining("", strings.get(0), "")).replace("'", "");
     }
 
     public final List<String> formatList(final List<String> strings) {
@@ -102,39 +97,21 @@ public class Formatter {
         if (strings.size() == 0)
             return -1;
 
-        final StringBuilder builder = new StringBuilder(strings.get(0));
-
-        for (int i = 1; i < strings.size(); i++) {
-            builder.append(" ").append(strings.get(i));
-        }
-
-        return Integer.parseInt(builder.toString().replace("'", ""));
+        return Integer.parseInt(IntStream.range(1, strings.size()).mapToObj(i -> " " + strings.get(i)).collect(Collectors.joining("", strings.get(0), "")).replace("'", ""));
     }
 
     public final boolean formatBoolean(final List<String> strings) {
         if (strings.size() == 0)
             return false;
 
-        final StringBuilder builder = new StringBuilder(strings.get(0));
-
-        for (int i = 1; i < strings.size(); i++) {
-            builder.append(" ").append(strings.get(i));
-        }
-
-        return Boolean.parseBoolean(builder.toString());
+        return Boolean.parseBoolean(IntStream.range(1, strings.size()).mapToObj(i -> " " + strings.get(i)).collect(Collectors.joining("", strings.get(0), "")).replace("'", ""));
     }
 
     public final double formatDouble(final List<String> strings) {
         if (strings.size() == 0)
             return -1.0;
 
-        final StringBuilder builder = new StringBuilder(strings.get(0));
-
-        for (int i = 1; i < strings.size(); i++) {
-            builder.append(" ").append(strings.get(i));
-        }
-
-        return Double.parseDouble(builder.toString().replace("'", ""));
+        return Double.parseDouble(IntStream.range(1, strings.size()).mapToObj(i -> " " + strings.get(i)).collect(Collectors.joining("", strings.get(0), "")).replace("'", ""));
     }
 
 

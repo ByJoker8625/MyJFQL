@@ -23,7 +23,7 @@ public class CreateCommand extends Command {
 
         if (args.containsKey("TABLE") && args.containsKey("STRUCTURE")) {
             final String name = formatString(args.get("TABLE"));
-            final List<String> structure = args.get("STRUCTURE");
+            final List<String> structure = formatList(args.get("STRUCTURE"));
 
             if (name == null) {
                 sender.sendError("Undefined table!");

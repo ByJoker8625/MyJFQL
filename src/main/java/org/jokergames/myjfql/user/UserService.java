@@ -40,6 +40,7 @@ public class UserService {
 
     public void deleteUser(final String name) {
         users.removeIf(user -> user.getName().equals(name));
+        new File("user/" + name + ".json").delete();
     }
 
     public List<User> getUsers() {
@@ -64,9 +65,6 @@ public class UserService {
     }
 
     public void update() {
-        //noinspection ResultOfMethodCallIgnored
-        Arrays.stream(Objects.requireNonNull(new File("user").listFiles())).forEach(File::delete);
-
         users.forEach(user -> {
             final File file = new File("user/" + user.getName() + ".json");
             final JSONObject jsonObject = new JSONObject();
