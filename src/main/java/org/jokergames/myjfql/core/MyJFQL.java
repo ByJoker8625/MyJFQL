@@ -33,7 +33,7 @@ public final class MyJFQL {
     private final DBSession dbSession;
     private final Server server;
 
-    private final String version = "1.5.1";
+    private final String version = "1.5.2";
 
     private Config configuration;
     private long lastRefresh;
@@ -75,7 +75,7 @@ public final class MyJFQL {
                 "                                                                 __/ |                   __/ |             __/ |     \n" +
                 "                                                                |___/                   |___/             |___/      \n" +
                 "");
-        console.logInfo("Developer > joker-games.org");
+        console.logInfo("Developer > ByJoker");
         console.logInfo("Version > v" + version);
         console.clean();
 
