@@ -13,9 +13,11 @@ public class UserServiceImpl implements UserService {
 
     private final FileFactory factory;
     private final List<User> users;
+    private final List<String> unloaded;
 
     public UserServiceImpl(FileFactory fileFactory) {
         this.users = new ArrayList<>();
+        this.unloaded = new ArrayList<>();
         this.factory = fileFactory;
     }
 
@@ -58,12 +60,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void load() {
-        load(new File("user"));
+    public void loadAll() {
+        loadAll(new File("user"));
     }
 
     @Override
-    public void load(File space) {
+    public void loadAll(File space) {
         Arrays.stream(Objects.requireNonNull(space.listFiles())).map(factory::load).forEach(jsonObject -> {
             List<String> tables = new ArrayList<>();
 
@@ -81,12 +83,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void update() {
-        update(new File("user"));
+    public void load(String identifier) {
+        // TODO: 23.10.2021  
     }
 
     @Override
-    public void update(File space) {
+    public void unload(User entity) {
+
+    }
+
+    @Override
+    public void update(User entity) {
+
+    }
+
+    @Override
+    public void updateAll() {
+        updateAll(new File("user"));
+    }
+
+    @Override
+    public void updateAll(File space) {
         users.forEach(user -> {
             final File file = new File(space.getPath() + "/" + user.getName() + ".json");
             final JSONObject jsonObject = new JSONObject();
@@ -98,4 +115,12 @@ public class UserServiceImpl implements UserService {
         });
     }
 
+    @Override
+    public void collectGarbage() {
+
+    }
+
+    public List<String> getUnloaded() {
+        return unloaded;
+    }
 }

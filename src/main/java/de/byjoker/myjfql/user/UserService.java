@@ -1,10 +1,10 @@
 package de.byjoker.myjfql.user;
 
-import de.byjoker.myjfql.util.StorageService;
+import de.byjoker.myjfql.util.GarbageCollector;
 
 import java.util.List;
 
-public interface UserService extends StorageService {
+public interface UserService extends GarbageCollector<User> {
 
     void createUser(User user);
 

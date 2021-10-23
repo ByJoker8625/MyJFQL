@@ -54,12 +54,12 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public void load() {
-        load(new File("database"));
+    public void loadAll() {
+        loadAll(new File("database"));
     }
 
     @Override
-    public void load(File space) {
+    public void loadAll(File space) {
         databases.clear();
 
         for (final File file : Objects.requireNonNull(space.listFiles())) {
@@ -98,12 +98,27 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public void update() {
-        update(new File("database"));
+    public void load(String identifier) {
+        // TODO: 23.10.2021  
     }
 
     @Override
-    public void update(File space) {
+    public void unload(Database entity) {
+
+    }
+
+    @Override
+    public void update(Database entity) {
+
+    }
+
+    @Override
+    public void updateAll() {
+        updateAll(new File("database"));
+    }
+
+    @Override
+    public void updateAll(File space) {
         databases.forEach(database -> {
             final File file = new File(space.getPath() + "/" + database.getName() + ".json");
             final JSONObject jsonObject = new JSONObject();
@@ -111,6 +126,11 @@ public class DatabaseServiceImpl implements DatabaseService {
             jsonObject.put("tables", database.getTables());
             fileFactory.save(file, jsonObject);
         });
+    }
+
+    @Override
+    public void collectGarbage() {
+
     }
 
 }

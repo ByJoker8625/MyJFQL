@@ -1,9 +1,11 @@
 package de.byjoker.myjfql.user;
 
+import de.byjoker.myjfql.util.Garbage;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
+public class User implements Garbage {
 
     private final String name;
     private String password;
@@ -11,11 +13,14 @@ public class User {
     private List<String> permissions;
     private boolean staticDatabase;
 
+    private long utilization;
+
     public User(String name, String password) {
         this.name = name;
         this.password = password;
         this.permissions = new ArrayList<>();
         this.staticDatabase = false;
+        this.utilization = System.currentTimeMillis();
     }
 
     public boolean hasPermission(final String permission) {
@@ -71,5 +76,15 @@ public class User {
                 ", permissions=" + permissions +
                 ", staticDatabase=" + staticDatabase +
                 '}';
+    }
+
+    @Override
+    public void utilize() {
+        utilization = System.currentTimeMillis();
+    }
+
+    @Override
+    public long getUtilization() {
+        return utilization;
     }
 }

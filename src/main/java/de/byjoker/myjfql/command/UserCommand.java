@@ -24,7 +24,6 @@ public class UserCommand extends ConsoleCommand {
         final UserService userService = MyJFQL.getInstance().getUserService();
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
 
-
         if (args.containsKey("CREATE") && args.containsKey("PASSWORD")) {
             final String name = formatString(args.get("CREATE"));
             final String password = formatString(args.get("PASSWORD"));

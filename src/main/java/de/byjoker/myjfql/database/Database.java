@@ -1,17 +1,21 @@
 package de.byjoker.myjfql.database;
 
+import de.byjoker.myjfql.util.Garbage;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Database implements TableService {
+public class Database implements TableService, Garbage {
 
     private final String name;
     private final List<Table> tables;
+    private long utilization;
 
     public Database(String name) {
         this.name = name;
         this.tables = new ArrayList<>();
+        this.utilization = System.currentTimeMillis();
     }
 
     @Override
@@ -70,5 +74,14 @@ public class Database implements TableService {
                 '}';
     }
 
+    @Override
+    public void utilize() {
+        utilization = System.currentTimeMillis();
+    }
+
+    @Override
+    public long getUtilization() {
+        return utilization;
+    }
 }
 

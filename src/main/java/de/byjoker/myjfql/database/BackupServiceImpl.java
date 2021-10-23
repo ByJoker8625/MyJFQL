@@ -34,7 +34,7 @@ public class BackupServiceImpl implements BackupService {
         if (!file.exists())
             file.mkdir();
 
-        databaseService.update(file);
+        databaseService.updateAll(file);
     }
 
     @Override
@@ -48,8 +48,8 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public void loadBackup(String name) {
-        databaseService.load(new File("backup/" + name));
-        databaseService.update();
+        databaseService.loadAll(new File("backup/" + name));
+        databaseService.updateAll();
     }
 
     @Override
@@ -109,10 +109,10 @@ public class BackupServiceImpl implements BackupService {
         if (!space.exists())
             space.mkdir();
 
-        databaseService.update(space);
+        databaseService.updateAll(space);
 
-        this.databaseService.load(space);
-        this.databaseService.update();
+        this.databaseService.loadAll(space);
+        this.databaseService.updateAll();
     }
 
     @Override

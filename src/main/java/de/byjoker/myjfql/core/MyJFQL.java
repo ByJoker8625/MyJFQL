@@ -133,8 +133,8 @@ public final class MyJFQL {
 
         {
             console.logInfo("Loading databases and users (This can take a while)...");
-            databaseService.load();
-            userService.load();
+            databaseService.loadAll();
+            userService.loadAll();
             console.logInfo("Loading finished!");
         }
 
@@ -162,13 +162,23 @@ public final class MyJFQL {
                 console.logWarning("No databases exists!");
                 console.logWarning("No users exists!");
             }
+        }
 
+        {
             new Timer().scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
                     refresh();
                 }
             }, 1000 * 60, 1000 * 60);
+
+            new Timer().scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    userService.collectGarbage();
+                    databaseService.collectGarbage();
+                }
+            }, 1000 * 60 * 10, 1000 * 60 * 10);
         }
 
         console.complete();
@@ -177,27 +187,20 @@ public final class MyJFQL {
             commandService.execute(consoleCommandSender, console.readPrompt());
     }
 
-    public void shutdown(final boolean refresh) {
-        if (refresh)
-            try {
-                console.logInfo("Shutdown (This can take a while)...");
-                databaseService.update();
-                userService.update();
-            } catch (Exception ex) {
-                console.logError("Ignoring this exception: " + ex.getMessage());
-            }
-        else console.logInfo("Shutdown...");
+    public void shutdown() {
+        try {
+            console.logInfo("Shutdown (This can take a while)...");
+            databaseService.updateAll();
+            userService.updateAll();
+        } catch (Exception ignore) {
+        }
 
         System.exit(0);
     }
 
-    public void shutdown() {
-        shutdown(true);
-    }
-
     public void refresh() {
-        databaseService.update();
-        userService.update();
+        databaseService.updateAll();
+        userService.updateAll();
         lastRefresh = System.currentTimeMillis();
     }
 
@@ -217,11 +220,11 @@ public final class MyJFQL {
     }
 
     public void reloadDatabases() {
-        databaseService.load();
+        databaseService.loadAll();
     }
 
     public void reloadUsers() {
-        userService.load();
+        userService.loadAll();
     }
 
     public Console getConsole() {
