@@ -1,6 +1,5 @@
 package de.byjoker.myjfql.database;
 
-import de.byjoker.myjfql.core.MyJFQL;
 import org.apache.commons.io.FileUtils;
 import org.jokergames.jfql.connection.Connection;
 import org.jokergames.jfql.exception.ConnectorException;
@@ -57,9 +56,9 @@ public class BackupServiceImpl implements BackupService {
         final Connection connection = new Connection(host, new User(user, password));
         connection.connect();
 
-        final DatabaseService databaseService = new DatabaseServiceImpl(MyJFQL.getInstance().getConfigService().getFactory());
+        final DatabaseService databaseService = new DatabaseServiceImpl();
 
-        for (final String databaseName : connection.query("list databases").getColumns().stream().map(Column::getString).collect(Collectors.toList())) {
+        for (String databaseName : connection.query("list databases").getColumns().stream().map(Column::getString).collect(Collectors.toList())) {
             try {
                 List<String> tables = connection.query("list tables from %", databaseName).getColumns().stream().map(Column::getString).collect(Collectors.toList());
                 Database database = new Database(databaseName);

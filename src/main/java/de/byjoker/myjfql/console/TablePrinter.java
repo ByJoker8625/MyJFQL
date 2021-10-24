@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.util;
+package de.byjoker.myjfql.console;
 
 import java.util.ArrayList;
 import java.util.Arrays;

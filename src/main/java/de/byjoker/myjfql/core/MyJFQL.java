@@ -4,18 +4,22 @@ import de.byjoker.myjfql.command.CommandService;
 import de.byjoker.myjfql.command.CommandServiceImpl;
 import de.byjoker.myjfql.command.ConsoleCommandSender;
 import de.byjoker.myjfql.config.Config;
+import de.byjoker.myjfql.config.ConfigDefaults;
 import de.byjoker.myjfql.config.ConfigService;
+import de.byjoker.myjfql.config.ConfigServiceImpl;
 import de.byjoker.myjfql.console.Console;
 import de.byjoker.myjfql.console.JLineConsole;
 import de.byjoker.myjfql.console.ScannerConsole;
+import de.byjoker.myjfql.console.SystemConsole;
 import de.byjoker.myjfql.core.lang.Formatter;
 import de.byjoker.myjfql.core.lang.JFQLFormatter;
 import de.byjoker.myjfql.database.*;
+import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.exception.NetworkException;
 import de.byjoker.myjfql.server.Server;
 import de.byjoker.myjfql.user.UserService;
 import de.byjoker.myjfql.user.UserServiceImpl;
-import de.byjoker.myjfql.util.Updater;
+import de.byjoker.myjfql.util.*;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -24,40 +28,35 @@ public final class MyJFQL {
 
     private static MyJFQL instance;
 
-    private final Console console;
-    private final Updater updater;
-    private final Updater.Downloader downloader;
-    private final ConsoleCommandSender consoleCommandSender;
+    private final String version = "1.5.2";
     private final Formatter formatter;
     private final CommandService commandService;
     private final DatabaseService databaseService;
     private final ConfigService configService;
     private final BackupService databaseBackupService;
     private final UserService userService;
+    private final ConsoleCommandSender consoleCommandSender;
     private final DBSession dbSession;
     private final Server server;
-
-    private final String version = "1.5.2";
-
-    private final Config configuration;
+    private final Updater updater;
+    private final Downloader downloader;
+    private Config config;
+    private Console console;
+    private Encryptor encryptor;
 
     public MyJFQL() {
         instance = this;
-        this.configService = new ConfigService();
-        this.configuration = configService.getConfig();
-
-        if (configuration.enabledJLine())
-            this.console = new JLineConsole();
-        else
-            this.console = new ScannerConsole();
-
+        this.configService = new ConfigServiceImpl();
+        this.console = new SystemConsole();
+        this.config = new ConfigDefaults();
+        this.encryptor = new NoneEncryptor();
         this.formatter = new JFQLFormatter();
         this.consoleCommandSender = new ConsoleCommandSender(console);
         this.updater = new Updater(version);
         this.commandService = new CommandServiceImpl(formatter);
-        this.userService = new UserServiceImpl(configService.getFactory());
+        this.userService = new UserServiceImpl();
         this.downloader = updater.getDownloader();
-        this.databaseService = new DatabaseServiceImpl(configService.getFactory());
+        this.databaseService = new DatabaseServiceImpl();
         this.dbSession = new DBSession(userService, databaseService);
         this.databaseBackupService = new BackupServiceImpl(databaseService);
         this.server = new Server();
@@ -81,26 +80,53 @@ public final class MyJFQL {
         console.logInfo("Version > v" + version);
         console.clean();
 
-        if (configuration.updateCheck()) {
-            console.logInfo("Connecting to " + configuration.getUpdateHost() + "...");
+        try {
+            console.logInfo("Loading system configurations...");
+
+            {
+                configService.load();
+                configService.searchConfigBuilders("de.byjoker.myjfql.config");
+                config = configService.getConfig();
+            }
+
+            {
+                if (config.jline())
+                    console = new JLineConsole();
+                else
+                    console = new ScannerConsole();
+            }
+
+            {
+                if (config.encryption().equals("BASE64"))
+                    encryptor = new Base64Encryptor();
+                else
+                    encryptor = new NoneEncryptor();
+            }
+
+            console.logInfo("Successfully initialized config.");
+            console.clean();
+        } catch (Exception ex) {
+            throw new FileException(ex);
+        }
+
+        if (config.updates()) {
+            console.logInfo("Connecting to " + config.updateHost() + "...");
 
             try {
-                updater.fetch(configuration.getUpdateHost());
+                updater.fetch(config.updateHost());
             } catch (Exception ex) {
                 throw new NetworkException("Server connection failed!");
             }
 
             console.logInfo("Successfully connected.");
             console.clean();
-        }
 
-        if (configuration.updateCheck()) {
             switch (updater.getCompatibilityStatus()) {
                 case SAME:
                     console.logInfo("Your are up to date with you MyJFQL version. You can enjoy all features of this system :D");
                     break;
                 case JUST_FINE:
-                    if (configuration.enabledUpdates())
+                    if (config.autoUpdate())
                         downloader.downloadLatestVersion();
                     else
                         console.logWarning("You aren't up to date. Please download the latest version.");
@@ -109,7 +135,7 @@ public final class MyJFQL {
                     console.logWarning("You aren't up to date. Please download the latest version. But please make sure that the new version working you have to make some changes!");
                     break;
                 case PENSIONER:
-                    console.logWarning("You are using a really old version of MyJFQL! With this version you wouldn't be able to update to the latest version of MyJFQL.");
+                    console.logWarning("You are using a pretty old version of MyJFQL! With this version you wouldn't be able to update to the latest version without many heavy changes.");
                     break;
             }
 
@@ -118,9 +144,9 @@ public final class MyJFQL {
 
         commandService.searchCommands("de.byjoker.myjfql.command");
 
-        if (configuration.enabledServer()) {
+        if (config.server()) {
             try {
-                server.start(configuration.getServerPort());
+                server.start(config.port());
             } catch (Exception ex) {
                 throw new NetworkException(ex);
             }
@@ -135,11 +161,11 @@ public final class MyJFQL {
             console.logInfo("Loading finished!");
         }
 
-
-        if (configService.isNonCompatibleConfiguration(configService.getRawConfiguration())) {
+        /*
+        if (_configService.isNonCompatibleConfiguration(_configService.getRawConfiguration())) {
             console.clean();
             console.logWarning("You are using a pretty old config version! Please refresh your config for a higher configurability.");
-        }
+        }*/
 
         {
             if (databaseService.getDatabases().size() == 0
@@ -198,7 +224,7 @@ public final class MyJFQL {
         return updater;
     }
 
-    public Updater.Downloader getDownloader() {
+    public Downloader getDownloader() {
         return downloader;
     }
 
@@ -222,6 +248,10 @@ public final class MyJFQL {
         return server;
     }
 
+    public Encryptor getEncryptor() {
+        return encryptor;
+    }
+
     public Formatter getFormatter() {
         return formatter;
     }
@@ -238,7 +268,7 @@ public final class MyJFQL {
         return databaseBackupService;
     }
 
-    public Config getConfiguration() {
-        return configuration;
+    public Config getConfig() {
+        return config;
     }
 }

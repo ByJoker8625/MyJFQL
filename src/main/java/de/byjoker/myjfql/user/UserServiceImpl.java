@@ -16,9 +16,9 @@ public class UserServiceImpl implements UserService {
     private final FileFactory factory;
     private final List<User> users;
 
-    public UserServiceImpl(FileFactory factory) {
+    public UserServiceImpl() {
         this.users = new ArrayList<>();
-        this.factory = factory;
+        this.factory = new FileFactory();
     }
 
     @Override
@@ -26,6 +26,7 @@ public class UserServiceImpl implements UserService {
         if (getUser(user.getName()) != null)
             throw new FileException("File '" + user.getName() + ".json' already exists!");
 
+        user.setPassword(MyJFQL.getInstance().getEncryptor().encrypt(user.getPassword()));
         saveUser(user);
     }
 

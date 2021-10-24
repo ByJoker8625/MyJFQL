@@ -17,8 +17,8 @@ public class DatabaseServiceImpl implements DatabaseService {
     private final FileFactory factory;
     private final List<Database> databases;
 
-    public DatabaseServiceImpl(FileFactory factory) {
-        this.factory = factory;
+    public DatabaseServiceImpl() {
+        this.factory = new FileFactory();
         this.databases = new ArrayList<>();
     }
 

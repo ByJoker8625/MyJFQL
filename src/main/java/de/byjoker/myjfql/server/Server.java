@@ -2,6 +2,7 @@ package de.byjoker.myjfql.server;
 
 import de.byjoker.myjfql.command.CommandService;
 import de.byjoker.myjfql.command.RemoteCommandSender;
+import de.byjoker.myjfql.config.Config;
 import de.byjoker.myjfql.console.Console;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.user.UserService;
@@ -25,7 +26,7 @@ public class Server {
 
         app.error(404, context -> context.result(new JSONObject().put("type", RemoteCommandSender.ResponseType.SYNTAX_ERROR).toString()));
 
-        boolean showConnectionPacket = MyJFQL.getInstance().getConfiguration().showConnectionPacket();
+        final Config config = MyJFQL.getInstance().getConfig();
 
         app.post("/query", context -> {
             RemoteCommandSender sender = new RemoteCommandSender(null, context.req.getRemoteAddr(), context);
@@ -41,17 +42,19 @@ public class Server {
                 }
 
                 final String name = request.getString("name");
+                final String password = MyJFQL.getInstance().getEncryptor().encrypt(request.getString("password"));
 
-                if (userService.existsUser(name) && userService.getUser(name).getPassword().equals(request.getString("password"))) {
+                if (userService.existsUser(name) && userService.getUser(name).getPassword().equals(password)) {
                     final String query = request.getString("query");
                     sender = sender.rename(name);
 
-                    if (query.equals("#connect") && !showConnectionPacket) {
+                    if (query.equals("#connect") && !config.showConnections()) {
                         commandService.execute(sender, query);
                         return;
                     }
 
-                    console.logInfo("[" + sender.getAddress() + "] [" + name + "] queried \"" + query + "\".");
+                    if (config.showQueries())
+                        console.logInfo("[" + sender.getAddress() + "] [" + name + "] queried \"" + query + "\".");
                     commandService.execute(sender, query);
                     return;
                 }

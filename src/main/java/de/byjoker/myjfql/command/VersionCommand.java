@@ -1,6 +1,7 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
+import de.byjoker.myjfql.util.Downloader;
 import de.byjoker.myjfql.util.Updater;
 
 import java.util.Arrays;
@@ -18,7 +19,7 @@ public class VersionCommand extends ConsoleCommand {
     @Override
     public void handleConsoleCommand(ConsoleCommandSender sender, Map<String, List<String>> args) {
         final Updater updater = MyJFQL.getInstance().getUpdater();
-        final Updater.Downloader downloader = MyJFQL.getInstance().getDownloader();
+        final Downloader downloader = MyJFQL.getInstance().getDownloader();
 
         if (args.containsKey("DISPLAY")) {
             sender.sendAnswer(Collections.singletonList(MyJFQL.getInstance().getVersion()), new String[]{"Version"});

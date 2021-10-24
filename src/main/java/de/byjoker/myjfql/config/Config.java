@@ -1,19 +1,27 @@
 package de.byjoker.myjfql.config;
 
+import org.json.JSONObject;
+
 public interface Config {
 
-    String getUpdateHost();
+    int port();
 
-    int getServerPort();
+    boolean server();
 
-    boolean enabledServer();
+    boolean updates();
 
-    boolean enabledUpdates();
+    boolean autoUpdate();
 
-    boolean updateCheck();
+    String updateHost();
 
-    boolean enabledJLine();
+    String encryption();
 
-    boolean showConnectionPacket();
+    boolean jline();
+
+    boolean showConnections();
+
+    boolean showQueries();
+
+    JSONObject asJson();
 
 }
