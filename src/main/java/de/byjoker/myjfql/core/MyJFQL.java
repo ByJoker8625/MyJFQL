@@ -39,8 +39,7 @@ public final class MyJFQL {
 
     private final String version = "1.5.2";
 
-    private Config configuration;
-    private long lastRefresh;
+    private final Config configuration;
 
     public MyJFQL() {
         instance = this;
@@ -62,8 +61,6 @@ public final class MyJFQL {
         this.dbSession = new DBSession(userService, databaseService);
         this.databaseBackupService = new BackupServiceImpl(databaseService);
         this.server = new Server();
-
-        this.lastRefresh = -1;
     }
 
     public static MyJFQL getInstance() {
@@ -106,10 +103,10 @@ public final class MyJFQL {
                     if (configuration.enabledUpdates())
                         downloader.downloadLatestVersion();
                     else
-                        console.logInfo("You aren't up to date. Please download the latest version.");
+                        console.logWarning("You aren't up to date. Please download the latest version.");
                     break;
                 case SOME_CHANGES:
-                    console.logInfo("You aren't up to date. Please download the latest version. But please make sure that the new version working you have to make some changes!");
+                    console.logWarning("You aren't up to date. Please download the latest version. But please make sure that the new version working you have to make some changes!");
                     break;
                 case PENSIONER:
                     console.logWarning("You are using a really old version of MyJFQL! With this version you wouldn't be able to update to the latest version of MyJFQL.");
@@ -164,22 +161,13 @@ public final class MyJFQL {
             }
         }
 
-        {
-            new Timer().scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    refresh();
-                }
-            }, 1000 * 60, 1000 * 60);
-
-            new Timer().scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    userService.collectGarbage();
-                    databaseService.collectGarbage();
-                }
-            }, 1000 * 60 * 10, 1000 * 60 * 10);
-        }
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                databaseService.updateAll();
+                userService.updateAll();
+            }
+        }, 1000 * 60, 1000 * 60);
 
         console.complete();
 
@@ -196,35 +184,6 @@ public final class MyJFQL {
         }
 
         System.exit(0);
-    }
-
-    public void refresh() {
-        databaseService.updateAll();
-        userService.updateAll();
-        lastRefresh = System.currentTimeMillis();
-    }
-
-    public void restartServer() {
-        if (!configuration.enabledServer()) {
-            server.shutdown();
-            return;
-        }
-
-        server.setPort(configuration.getServerPort());
-        server.restart();
-    }
-
-    public void reloadConfig() {
-        configService.load();
-        configuration = configService.getConfig();
-    }
-
-    public void reloadDatabases() {
-        databaseService.loadAll();
-    }
-
-    public void reloadUsers() {
-        userService.loadAll();
     }
 
     public Console getConsole() {
@@ -257,10 +216,6 @@ public final class MyJFQL {
 
     public DBSession getDBSession() {
         return dbSession;
-    }
-
-    public long getLastRefresh() {
-        return lastRefresh;
     }
 
     public Server getServer() {

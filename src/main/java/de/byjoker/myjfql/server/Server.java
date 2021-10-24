@@ -23,21 +23,7 @@ public class Server {
         final CommandService commandService = MyJFQL.getInstance().getCommandService();
         final UserService userService = MyJFQL.getInstance().getUserService();
 
-        app.error(404, context -> {
-            final JSONObject jsonObject = new JSONObject();
-            jsonObject.put("type", RemoteCommandSender.ResponseType.SYNTAX_ERROR);
-
-            context.header("Access-Control-Allow-Origin", "*");
-            context.header("Access-Control-Allow-Methods", "GET, POST");
-            context.header("Access-Control-Allow-Headers", "*");
-            context.header("Access-Control-Allow-Credentials", "true");
-            context.header("Access-Control-Allow-Credentials-Header", "*");
-            context.header("Access-Control-Allow-Private-Network", "true");
-            context.header("Access-Control-Allow-Private-Network", "true");
-            context.header("Content-Type", "application/json");
-
-            context.result(jsonObject.toString());
-        });
+        app.error(404, context -> context.result(new JSONObject().put("type", RemoteCommandSender.ResponseType.SYNTAX_ERROR).toString()));
 
         boolean showConnectionPacket = MyJFQL.getInstance().getConfiguration().showConnectionPacket();
 
@@ -81,11 +67,6 @@ public class Server {
 
     public void shutdown() {
         app.stop();
-    }
-
-    public void restart() {
-        shutdown();
-        start(port);
     }
 
     public Javalin getApp() {

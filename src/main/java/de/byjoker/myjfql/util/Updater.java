@@ -22,7 +22,7 @@ public class Updater {
         this.version = version;
     }
 
-    public void fetch(final String url) throws Exception {
+    public void fetch(String url) throws Exception {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url).openStream(), StandardCharsets.UTF_8));
         final StringBuilder builder = new StringBuilder();
 
@@ -72,7 +72,7 @@ public class Updater {
         return VersionCompatibilityStatus.PENSIONER;
     }
 
-    private boolean compareVersion(final String versionA, final String versionB) {
+    private boolean compareVersion(String versionA, String versionB) {
         return versionA.compareTo(versionB) > 0;
     }
 
@@ -108,7 +108,7 @@ public class Updater {
 
         private final Updater updater;
 
-        public Downloader(final Updater updater) {
+        public Downloader(Updater updater) {
             this.updater = updater;
         }
 
@@ -116,11 +116,11 @@ public class Updater {
             downloadByVersion("v" + updater.getLatestVersion());
         }
 
-        public void downloadByVersion(final String version) {
+        public void downloadByVersion(String version) {
             downloadByURL(updater.getDownloads().get(version));
         }
 
-        public void downloadByURL(final String download) {
+        public void downloadByURL(String download) {
             final int j = 1024;
 
             try {

@@ -12,7 +12,7 @@ public class ConsoleCommandSender extends CommandSender {
     private final Console console;
 
     public ConsoleCommandSender(final Console console) {
-        super("Console", "127.0.0.1");
+        super("#CONSOLE", "127.0.0.1");
         this.console = console;
     }
 

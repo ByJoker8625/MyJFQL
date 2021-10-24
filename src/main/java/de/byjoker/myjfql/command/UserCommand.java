@@ -8,6 +8,7 @@ import de.byjoker.myjfql.user.User;
 import de.byjoker.myjfql.user.UserService;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,8 +34,8 @@ public class UserCommand extends ConsoleCommand {
                 return;
             }
 
-            if (name.equalsIgnoreCase(sender.getName())) {
-                sender.sendError("The named user is system-relevant and you can't create a user with the same name!");
+            if (name.contains("%") || name.contains("#") || name.contains("'")) {
+                sender.sendError("Unauthorized characters in the name!");
                 return;
             }
 
@@ -62,7 +63,7 @@ public class UserCommand extends ConsoleCommand {
                 user.setStaticDatabase(true);
             }
 
-            userService.saveUser(user);
+            userService.createUser(user);
             sender.sendSuccess();
             return;
         }
@@ -72,11 +73,6 @@ public class UserCommand extends ConsoleCommand {
 
             if (name == null) {
                 sender.sendError("Undefined name!");
-                return;
-            }
-
-            if (name.equalsIgnoreCase(sender.getName())) {
-                sender.sendError("The named user is system-relevant and you can't delete him!");
                 return;
             }
 
@@ -96,11 +92,6 @@ public class UserCommand extends ConsoleCommand {
 
             if (name == null) {
                 sender.sendError("Undefined name!");
-                return;
-            }
-
-            if (name.equalsIgnoreCase(sender.getName())) {
-                sender.sendError("The named user is system-relevant and nothing of him can be changed!");
                 return;
             }
 
@@ -131,11 +122,6 @@ public class UserCommand extends ConsoleCommand {
                 return;
             }
 
-            if (name.equalsIgnoreCase(sender.getName())) {
-                sender.sendError("The named user is system-relevant and nothing of him can be changed!");
-                return;
-            }
-
             if (permission == null) {
                 sender.sendError("Undefined permission!");
                 return;
@@ -160,11 +146,6 @@ public class UserCommand extends ConsoleCommand {
 
             if (name == null) {
                 sender.sendError("Undefined name!");
-                return;
-            }
-
-            if (name.equalsIgnoreCase(sender.getName())) {
-                sender.sendError("The named user is system-relevant and nothing of him can be changed!");
                 return;
             }
 
@@ -194,11 +175,6 @@ public class UserCommand extends ConsoleCommand {
                 return;
             }
 
-            if (name.equalsIgnoreCase(sender.getName())) {
-                sender.sendError("The named user is system-relevant and nothing of him can be displayed!");
-                return;
-            }
-
             if (!userService.existsUser(name)) {
                 sender.sendError("User doesn't exists!");
                 return;
@@ -210,7 +186,7 @@ public class UserCommand extends ConsoleCommand {
             column.putContent("Password", selectedUser.getPassword());
             column.putContent("Permissions", selectedUser.getPermissions().toString());
 
-            sender.sendAnswer(Arrays.asList(column), new String[]{"Name", "Password", "Permissions"});
+            sender.sendAnswer(Collections.singletonList(column), new String[]{"Name", "Password", "Permissions"});
             return;
         }
 

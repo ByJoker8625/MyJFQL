@@ -1,30 +1,31 @@
 package de.byjoker.myjfql.database;
 
-import de.byjoker.myjfql.util.Garbage;
+import de.byjoker.myjfql.exception.FileException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Database implements TableService, Garbage {
+public class Database implements TableService {
 
     private final String name;
     private final List<Table> tables;
-    private long utilization;
 
     public Database(String name) {
         this.name = name;
         this.tables = new ArrayList<>();
-        this.utilization = System.currentTimeMillis();
     }
 
     @Override
     public void createTable(Table table) {
-        // TODO: 23.10.2021
+        if (getTable(table.getName()) != null)
+            throw new FileException("Table '" + table.getName() + "' already exists in '" + name + ".json'!");
+
+        saveTable(table);
     }
 
     @Override
-    public void saveTable(final Table table) {
+    public void saveTable(Table table) {
         deleteTable(table.getName());
         tables.add(table);
     }
@@ -74,14 +75,5 @@ public class Database implements TableService, Garbage {
                 '}';
     }
 
-    @Override
-    public void utilize() {
-        utilization = System.currentTimeMillis();
-    }
-
-    @Override
-    public long getUtilization() {
-        return utilization;
-    }
 }
 

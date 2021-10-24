@@ -1,10 +1,12 @@
 package de.byjoker.myjfql.database;
 
-import de.byjoker.myjfql.util.GarbageCollector;
+import de.byjoker.myjfql.util.StorageService;
 
 import java.util.List;
 
-public interface DatabaseService extends GarbageCollector<Database> {
+public interface DatabaseService extends StorageService {
+
+    void createDatabase(Database database);
 
     void saveDatabase(Database database);
 

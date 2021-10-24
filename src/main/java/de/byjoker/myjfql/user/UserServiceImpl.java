@@ -1,5 +1,7 @@
 package de.byjoker.myjfql.user;
 
+import de.byjoker.myjfql.core.MyJFQL;
+import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.util.FileFactory;
 import org.json.JSONObject;
 
@@ -13,17 +15,18 @@ public class UserServiceImpl implements UserService {
 
     private final FileFactory factory;
     private final List<User> users;
-    private final List<String> unloaded;
 
-    public UserServiceImpl(FileFactory fileFactory) {
+    public UserServiceImpl(FileFactory factory) {
         this.users = new ArrayList<>();
-        this.unloaded = new ArrayList<>();
-        this.factory = fileFactory;
+        this.factory = factory;
     }
 
     @Override
     public void createUser(User user) {
-        // TODO: 23.10.2021
+        if (getUser(user.getName()) != null)
+            throw new FileException("File '" + user.getName() + ".json' already exists!");
+
+        saveUser(user);
     }
 
     @Override
@@ -78,23 +81,11 @@ public class UserServiceImpl implements UserService {
             user.setStaticDatabase(jsonObject.getBoolean("staticDatabase"));
             user.setPermissions(tables);
 
-            users.add(user);
+            if (!user.getName().contains("%") && !user.getName().contains("#") && !user.getName().contains("'"))
+                users.add(user);
+            else
+                MyJFQL.getInstance().getConsole().logWarning("User '" + user.getName() + "' used unauthorized characters in the name!");
         });
-    }
-
-    @Override
-    public void load(String identifier) {
-        // TODO: 23.10.2021  
-    }
-
-    @Override
-    public void unload(User entity) {
-
-    }
-
-    @Override
-    public void update(User entity) {
-
     }
 
     @Override
@@ -115,12 +106,4 @@ public class UserServiceImpl implements UserService {
         });
     }
 
-    @Override
-    public void collectGarbage() {
-
-    }
-
-    public List<String> getUnloaded() {
-        return unloaded;
-    }
 }

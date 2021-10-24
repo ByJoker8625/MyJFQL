@@ -87,6 +87,11 @@ public class CreateCommand extends Command {
 
             final Database database = databaseService.getDatabase(databaseName);
 
+            if (name.contains("%") || name.contains("#") || name.contains("'")) {
+                sender.sendError("Unauthorized characters in the name!");
+                return;
+            }
+
             if (database.existsTable(name)) {
                 sender.sendError("Table already exists!");
                 return;
@@ -94,8 +99,8 @@ public class CreateCommand extends Command {
 
             sender.sendSuccess();
 
-            database.saveTable(new Table(name, structure, primaryKey));
-            databaseService.saveDatabase(database);
+            database.createTable(new Table(name, structure, primaryKey));
+            databaseService.createDatabase(database);
             return;
         }
 
@@ -112,12 +117,17 @@ public class CreateCommand extends Command {
                 return;
             }
 
+            if (name.contains("%") || name.contains("#") || name.contains("'")) {
+                sender.sendError("Unauthorized characters in the name!");
+                return;
+            }
+
             if (databaseService.existsDatabase(name)) {
                 sender.sendError("Database already exists!");
                 return;
             }
 
-            databaseService.saveDatabase(new Database(name));
+            databaseService.createDatabase(new Database(name));
             sender.sendSuccess();
             return;
         }
