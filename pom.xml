@@ -10,6 +10,7 @@
     <name>MyJFQL</name>
     <description>Java based easy to use dbms for smaller applications</description>
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <java.version>1.8</java.version>
@@ -29,9 +30,9 @@
             <version>1.70</version>
         </dependency>
         <dependency>
-            <groupId>org.joker-games</groupId>
+            <groupId>de.byjoker</groupId>
             <artifactId>JFQLConnector</artifactId>
-            <version>1.1</version>
+            <version>1.3.2</version>
         </dependency>
         <dependency>
             <groupId>io.javalin</groupId>

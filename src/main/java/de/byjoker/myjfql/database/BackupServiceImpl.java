@@ -1,11 +1,11 @@
 package de.byjoker.myjfql.database;
 
+import de.byjoker.jfql.connection.Connection;
+import de.byjoker.jfql.exception.ConnectorException;
+import de.byjoker.jfql.util.Column;
+import de.byjoker.jfql.util.Result;
+import de.byjoker.jfql.util.User;
 import org.apache.commons.io.FileUtils;
-import org.jokergames.jfql.connection.Connection;
-import org.jokergames.jfql.exception.ConnectorException;
-import org.jokergames.jfql.util.Column;
-import org.jokergames.jfql.util.Result;
-import org.jokergames.jfql.util.User;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,7 +84,7 @@ public class BackupServiceImpl implements BackupService {
                             Table table = new Table(tableName, result.getStructureList(), primary);
 
                             for (Column column : result.getColumns()) {
-                                de.byjoker.myjfql.database.Column col = new de.byjoker.myjfql.database.Column(column.getJsonObject().getJSONObject("content").toMap());
+                                de.byjoker.myjfql.database.Column col = new de.byjoker.myjfql.database.Column(column.toJSONObject().getJSONObject("content").toMap());
                                 col.setCreation(column.getCreation());
                                 table.addColumn(col);
                             }

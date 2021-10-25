@@ -1,9 +1,9 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.console.Console;
+import de.byjoker.myjfql.console.TablePrinter;
 import de.byjoker.myjfql.database.Column;
 import de.byjoker.myjfql.exception.CommandException;
-import de.byjoker.myjfql.console.TablePrinter;
 
 import java.util.List;
 
