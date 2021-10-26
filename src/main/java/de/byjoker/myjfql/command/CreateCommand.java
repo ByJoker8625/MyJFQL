@@ -39,6 +39,11 @@ public class CreateCommand extends Command {
             String databaseName = session.get(sender.getName());
             String primaryKey = structure.get(0);
 
+            if (databaseName == null) {
+                sender.sendError("No database is in use for this user!");
+                return;
+            }
+
             if (args.containsKey("PRIMARY-KEY")) {
                 final String string = formatString(args.get("PRIMARY-KEY"));
 

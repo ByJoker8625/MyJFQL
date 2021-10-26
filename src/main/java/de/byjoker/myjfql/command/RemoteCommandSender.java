@@ -78,9 +78,9 @@ public class RemoteCommandSender extends CommandSender {
     @Override
     public void sendAnswer(final Object obj, final Object structure) {
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", ResponseType.REST);
+        jsonObject.put("type", ResponseType.RESULT);
         jsonObject.put("structure", structure);
-        jsonObject.put("answer", obj);
+        jsonObject.put("result", obj);
         this.send(jsonObject);
     }
 
@@ -105,7 +105,7 @@ public class RemoteCommandSender extends CommandSender {
 
     public enum ResponseType {
         ERROR,
-        REST,
+        RESULT,
         FORBIDDEN,
         SUCCESS,
         SYNTAX_ERROR

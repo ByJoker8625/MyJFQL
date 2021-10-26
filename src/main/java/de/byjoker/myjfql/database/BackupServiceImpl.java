@@ -1,11 +1,13 @@
 package de.byjoker.myjfql.database;
 
 import de.byjoker.jfql.connection.Connection;
+import de.byjoker.jfql.connection.JFQLConnection;
 import de.byjoker.jfql.exception.ConnectorException;
 import de.byjoker.jfql.util.Column;
 import de.byjoker.jfql.util.Result;
 import de.byjoker.jfql.util.User;
 import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +55,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public void fetchBackup(String user, String password, String host) throws ConnectorException {
-        final Connection connection = new Connection(host, new User(user, password));
+        final Connection connection = new JFQLConnection(host, new User(user, password));
         connection.connect();
 
         final DatabaseService databaseService = new DatabaseServiceImpl();
@@ -78,13 +80,13 @@ public class BackupServiceImpl implements BackupService {
                             Result result = connection.query("select value * from " + tableName);
 
                             if (primary == null) {
-                                primary = result.getStructureList().get(0);
+                                primary = result.getStructure().get(0);
                             }
 
-                            Table table = new Table(tableName, result.getStructureList(), primary);
+                            Table table = new Table(tableName, result.getStructure(), primary);
 
                             for (Column column : result.getColumns()) {
-                                de.byjoker.myjfql.database.Column col = new de.byjoker.myjfql.database.Column(column.toJSONObject().getJSONObject("content").toMap());
+                                de.byjoker.myjfql.database.Column col = new de.byjoker.myjfql.database.Column(new JSONObject(column.toString()).getJSONObject("content").toMap());
                                 col.setCreation(column.getCreation());
                                 table.addColumn(col);
                             }
