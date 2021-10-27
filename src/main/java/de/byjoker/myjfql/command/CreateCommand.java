@@ -105,7 +105,7 @@ public class CreateCommand extends Command {
             sender.sendSuccess();
 
             database.createTable(new Table(name, structure, primaryKey));
-            databaseService.createDatabase(database);
+            databaseService.saveDatabase(database);
             return;
         }
 
