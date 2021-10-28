@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.server;
+package de.byjoker.myjfql.security;
 
 import de.byjoker.myjfql.command.CommandService;
 import de.byjoker.myjfql.command.RemoteCommandSender;

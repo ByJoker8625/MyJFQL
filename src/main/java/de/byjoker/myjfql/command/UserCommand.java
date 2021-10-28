@@ -106,7 +106,7 @@ public class UserCommand extends ConsoleCommand {
             }
 
             final User user = userService.getUser(name);
-            user.setPassword(password);
+            user.setPassword(MyJFQL.getInstance().getEncryptor().encrypt(user.getPassword()));
             userService.saveUser(user);
 
             sender.sendSuccess();

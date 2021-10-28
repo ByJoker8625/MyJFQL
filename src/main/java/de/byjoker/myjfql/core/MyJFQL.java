@@ -16,10 +16,15 @@ import de.byjoker.myjfql.core.lang.JFQLFormatter;
 import de.byjoker.myjfql.database.*;
 import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.exception.NetworkException;
-import de.byjoker.myjfql.server.Server;
+import de.byjoker.myjfql.security.Server;
+import de.byjoker.myjfql.security.encryptor.Argon2Encryptor;
+import de.byjoker.myjfql.security.encryptor.Base64Encryptor;
+import de.byjoker.myjfql.security.encryptor.Encryptor;
+import de.byjoker.myjfql.security.encryptor.NoneEncryptor;
 import de.byjoker.myjfql.user.UserService;
 import de.byjoker.myjfql.user.UserServiceImpl;
-import de.byjoker.myjfql.util.*;
+import de.byjoker.myjfql.util.Downloader;
+import de.byjoker.myjfql.util.Updater;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -97,10 +102,17 @@ public final class MyJFQL {
             }
 
             {
-                if (config.encryption().equals("BASE64"))
-                    encryptor = new Base64Encryptor();
-                else
-                    encryptor = new NoneEncryptor();
+                switch (config.encryption().toUpperCase()) {
+                    case "BASE64":
+                        encryptor = new Base64Encryptor();
+                        break;
+                    case "ARGON2":
+                        encryptor = new Argon2Encryptor();
+                        break;
+                    default:
+                        encryptor = new NoneEncryptor();
+                        break;
+                }
             }
 
             console.logInfo("Successfully initialized config.");
@@ -113,7 +125,7 @@ public final class MyJFQL {
             console.logInfo("Connecting to " + config.updateHost() + "...");
 
             try {
-                updater.fetch(config.updateHost());
+                updater.connect(config.updateHost());
             } catch (Exception ex) {
                 throw new NetworkException("Server connection failed!");
             }
@@ -161,11 +173,10 @@ public final class MyJFQL {
             console.logInfo("Loading finished!");
         }
 
-        /*
-        if (_configService.isNonCompatibleConfiguration(_configService.getRawConfiguration())) {
+        if (encryptor.name().equals("NONE")) {
+            console.logWarning("You are using no encryption! This type of password storing is very insecure!");
             console.clean();
-            console.logWarning("You are using a pretty old config version! Please refresh your config for a higher configurability.");
-        }*/
+        }
 
         {
             if (databaseService.getDatabases().size() == 0
