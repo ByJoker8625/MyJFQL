@@ -99,30 +99,30 @@ public class ListCommand extends Command {
 
                 }
             } else {
-                final String name = formatString(args.get("FROM"));
+                final String identifier = formatString(args.get("FROM"));
 
-                if (!databaseService.existsDatabase(name)) {
+                if (!databaseService.existsDatabaseByIdentifier(identifier)) {
                     sender.sendError("Database was not found!");
                     return;
                 }
 
-                if ((!sender.hasPermission("use.database." + name)
+                if ((!sender.hasPermission("use.database." + identifier)
                         && !sender.hasPermission("use.database.*"))
-                        || sender.hasPermission("-use.database." + name)
+                        || sender.hasPermission("-use.database." + identifier)
                         || sender.hasPermission("-use.database.*")) {
                     sender.sendForbidden();
                     return;
                 }
 
-                final Database database = databaseService.getDatabase(name);
+                final Database database = databaseService.getDatabaseByIdentifier(identifier);
 
                 for (final Table table : database.getTables()) {
                     final String tableName = table.getName();
 
-                    if ((sender.hasPermission("use.table.*." + name)
-                            || sender.hasPermission("use.table." + tableName + "." + name))
-                            && !sender.hasPermission("-use.table.*." + name)
-                            && !sender.hasPermission("-use.table." + tableName + "." + name))
+                    if ((sender.hasPermission("use.table.*." + identifier)
+                            || sender.hasPermission("use.table." + tableName + "." + identifier))
+                            && !sender.hasPermission("-use.table.*." + identifier)
+                            && !sender.hasPermission("-use.table." + tableName + "." + identifier))
                         tables.add(table.getName());
                 }
             }

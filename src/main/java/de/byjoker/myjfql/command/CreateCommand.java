@@ -60,26 +60,8 @@ public class CreateCommand extends Command {
                 primaryKey = string;
             }
 
-            if (args.containsKey("INTO")) {
-                final String string = formatString(args.get("INTO"));
 
-                if (string == null) {
-                    sender.sendError("Undefined database!");
-                    return;
-                }
-
-                if ((!sender.hasPermission("use.database." + string)
-                        && !sender.hasPermission("use.database.*"))
-                        || sender.hasPermission("-use.database." + string)
-                        || sender.hasPermission("-use.database.*")) {
-                    sender.sendForbidden();
-                    return;
-                }
-
-                databaseName = string;
-            }
-
-            if (!databaseService.existsDatabase(databaseName)) {
+            if (!databaseService.existsDatabaseByName(databaseName)) {
                 sender.sendError("Database doesn't exists!");
                 return;
             }
@@ -90,7 +72,7 @@ public class CreateCommand extends Command {
                 return;
             }
 
-            final Database database = databaseService.getDatabase(databaseName);
+            final Database database = databaseService.getDatabaseByIdentifier(databaseName);
 
             if (name.contains("%") || name.contains("#") || name.contains("'")) {
                 sender.sendError("Unauthorized characters in the name!");
@@ -127,7 +109,7 @@ public class CreateCommand extends Command {
                 return;
             }
 
-            if (databaseService.existsDatabase(name)) {
+            if (databaseService.existsDatabaseByName(name)) {
                 sender.sendError("Database already exists!");
                 return;
             }

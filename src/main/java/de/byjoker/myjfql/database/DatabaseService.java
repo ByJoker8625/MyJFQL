@@ -10,11 +10,19 @@ public interface DatabaseService extends StorageService {
 
     void saveDatabase(Database database);
 
-    boolean existsDatabase(String name);
+    boolean existsDatabaseByIdentifier(String identifier);
 
-    void deleteDatabase(String name);
+    boolean existsDatabaseByName(String name);
 
-    Database getDatabase(String name);
+    boolean existsDatabase(String id);
+
+    void deleteDatabase(String id);
+
+    Database getDatabaseByIdentifier(String identifier);
+
+    Database getDatabaseByName(String name);
+
+    Database getDatabase(String id);
 
     List<Database> getDatabases();
 

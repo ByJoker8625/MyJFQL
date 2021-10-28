@@ -52,7 +52,7 @@ public class UserCommand extends ConsoleCommand {
             final User user = new User(name, password);
 
             if (args.containsKey("DATABASE")) {
-                if (databaseService.existsDatabase(name)) {
+                if (databaseService.existsDatabaseByName(name)) {
                     sender.sendError("Database already exists!");
                     return;
                 }

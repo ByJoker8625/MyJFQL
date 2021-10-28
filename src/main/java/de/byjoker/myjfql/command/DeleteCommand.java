@@ -49,7 +49,7 @@ public class DeleteCommand extends Command {
                 databaseName = string;
             }
 
-            if (!databaseService.existsDatabase(databaseName)) {
+            if (!databaseService.existsDatabaseByName(databaseName)) {
                 sender.sendError("Database doesn't exists!");
                 return;
             }
@@ -60,7 +60,7 @@ public class DeleteCommand extends Command {
                 return;
             }
 
-            final Database database = databaseService.getDatabase(databaseName);
+            final Database database = databaseService.getDatabaseByIdentifier(databaseName);
 
             if (!database.existsTable(name)) {
                 sender.sendError("Table doesn't exists!");
@@ -80,19 +80,19 @@ public class DeleteCommand extends Command {
                 return;
             }
 
-            final String name = formatString(args.get("DATABASE"));
+            final String identifier = formatString(args.get("DATABASE"));
 
-            if (name == null) {
+            if (identifier == null) {
                 sender.sendError("Undefined database!");
                 return;
             }
 
-            if (!databaseService.existsDatabase(name)) {
+            if (!databaseService.existsDatabaseByIdentifier(identifier)) {
                 sender.sendError("Database doesn't exists!");
                 return;
             }
 
-            databaseService.deleteDatabase(name);
+            databaseService.deleteDatabase(databaseService.getDatabaseByIdentifier(identifier).getId());
             sender.sendSuccess();
             return;
         }

@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void createUser(User user) {
         if (getUser(user.getName()) != null)
-            throw new FileException("File '" + user.getName() + ".json' already exists!");
+            throw new FileException("User already exists!");
 
         user.setPassword(MyJFQL.getInstance().getEncryptor().encrypt(user.getPassword()));
         saveUser(user);
@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
             if (!user.getName().contains("%") && !user.getName().contains("#") && !user.getName().contains("'"))
                 users.add(user);
             else
-                MyJFQL.getInstance().getConsole().logWarning("User '" + user.getName() + "' used unauthorized characters in the name!");
+                MyJFQL.getInstance().getConsole().logWarning("User used unauthorized characters in the name!");
         });
     }
 

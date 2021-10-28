@@ -50,7 +50,7 @@ public class DBSession {
             return null;
         }
 
-        return databaseService.getDatabase(databaseName);
+        return databaseService.getDatabaseByName(databaseName);
     }
 
     public String get(String name) {
@@ -80,7 +80,7 @@ public class DBSession {
         }
 
         if (user.isStaticDatabase()
-                && databaseService.existsDatabase(name)) {
+                && databaseService.existsDatabaseByName(name)) {
             put(name, name);
             return name;
         }

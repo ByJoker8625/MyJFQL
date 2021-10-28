@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class Table implements ColumnHandler {
 
-    private final String name;
+    private String name;
     private List<Column> columns;
     private List<String> structure;
     private String primary;
@@ -72,6 +72,10 @@ public class Table implements ColumnHandler {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public List<String> getStructure() {

@@ -33,7 +33,7 @@ public class UseCommand extends Command {
                 return;
             }
 
-            if (!databaseService.existsDatabase(name)) {
+            if (!databaseService.existsDatabaseByName(name)) {
                 sender.sendError("Database doesn't exists!");
                 return;
             }

@@ -1,5 +1,6 @@
 package de.byjoker.myjfql.database;
 
+import de.byjoker.jfql.util.ID;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.util.FileFactory;
@@ -24,8 +25,14 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public void createDatabase(Database database) {
-        if (getDatabase(database.getName()) != null)
-            throw new FileException("File '" + database.getName() + ".json' already exists!");
+        if (getDatabaseByName(database.getName()) != null)
+            throw new FileException("Database already exists!");
+
+        if (existsDatabase(database.getId())) {
+            database.setId(ID.generateNumber().toString());
+            createDatabase(database);
+            return;
+        }
 
         saveDatabase(database);
     }
@@ -43,19 +50,46 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public boolean existsDatabase(String name) {
+    public boolean existsDatabaseByIdentifier(String identifier) {
+        if (identifier.startsWith("#"))
+            return existsDatabase(identifier.replaceFirst("#", ""));
+
+        return existsDatabaseByName(identifier);
+    }
+
+    @Override
+    public boolean existsDatabaseByName(String name) {
         return databases.stream().anyMatch(database -> database.getName().equals(name));
     }
 
     @Override
-    public void deleteDatabase(String name) {
-        databases.removeIf(database -> database.getName().equals(name));
-        new File("database/" + name + ".json").delete();
+    public boolean existsDatabase(String id) {
+        return databases.stream().anyMatch(database -> database.getId().equals(id));
     }
 
     @Override
-    public Database getDatabase(String name) {
+    public void deleteDatabase(String id) {
+        databases.removeIf(database -> database.getId().equals(id));
+        new File("database/" + id + ".json").delete();
+    }
+
+    @Override
+    public Database getDatabaseByIdentifier(String identifier) {
+        if (identifier.startsWith("#")) {
+            return getDatabase(identifier.replaceFirst("#", ""));
+        }
+
+        return getDatabaseByName(identifier);
+    }
+
+    @Override
+    public Database getDatabaseByName(String name) {
         return databases.stream().filter(database -> database.getName().equals(name)).findFirst().orElse(null);
+    }
+
+    @Override
+    public Database getDatabase(String id) {
+        return databases.stream().filter(database -> database.getId().equals(id)).findFirst().orElse(null);
     }
 
     @Override
@@ -76,41 +110,46 @@ public class DatabaseServiceImpl implements DatabaseService {
             final JSONObject jsonDatabase = factory.load(file);
             final JSONArray jsonTables = jsonDatabase.getJSONArray("tables");
 
-            final Database database = new Database(jsonDatabase.getString("name"));
+            final String name = file.getName().replaceFirst(".json", "");
 
-            for (int j = 0; j < jsonTables.length(); j++) {
-                final JSONObject jsonTable = jsonTables.getJSONObject(j);
+            if (name.contains("%") || name.contains("#") || name.contains("'")) {
+                MyJFQL.getInstance().getConsole().logWarning("Database used unauthorized characters in the id!");
+            } else {
+                final Database database = new Database(name, jsonDatabase.getString("name"));
 
-                final Table table = new Table(jsonTable.getString("name"), null, jsonTable.getString("primary"));
-                final List<String> list = new ArrayList<>();
+                for (int j = 0; j < jsonTables.length(); j++) {
+                    final JSONObject jsonTable = jsonTables.getJSONObject(j);
 
-                for (final Object obj : jsonTable.getJSONArray("structure")) {
-                    list.add(obj.toString());
+                    final Table table = new Table(jsonTable.getString("name"), null, jsonTable.getString("primary"));
+                    final List<String> list = new ArrayList<>();
+
+                    for (final Object obj : jsonTable.getJSONArray("structure")) {
+                        list.add(obj.toString());
+                    }
+
+                    table.setStructure(list);
+
+                    final JSONArray jsonColumns = jsonTable.getJSONArray("columns");
+
+                    IntStream.range(0, jsonColumns.length()).mapToObj(jsonColumns::getJSONObject).forEach(jsonColumn -> {
+                        Column column = new Column();
+                        column.setCreation(jsonColumn.getLong("creation"));
+                        column.setContent(jsonColumn.getJSONObject("content").toMap());
+                        table.addColumn(column);
+                    });
+
+                    if (!table.getName().contains("%") && !table.getName().contains("#") && !table.getName().contains("'"))
+                        database.saveTable(table);
+                    else
+                        MyJFQL.getInstance().getConsole().logWarning("Table used unauthorized characters in the name!");
                 }
 
-                table.setStructure(list);
-
-                final JSONArray jsonColumns = jsonTable.getJSONArray("columns");
-
-                IntStream.range(0, jsonColumns.length()).mapToObj(jsonColumns::getJSONObject).forEach(jsonColumn -> {
-                    Column column = new Column();
-                    column.setCreation(jsonColumn.getLong("creation"));
-                    column.setContent(jsonColumn.getJSONObject("content").toMap());
-                    table.addColumn(column);
-                });
-
-                if (!table.getName().contains("%") && !table.getName().contains("#") && !table.getName().contains("'"))
-                    database.saveTable(table);
+                if (!database.getName().contains("%") && !database.getName().contains("#") && !database.getName().contains("'"))
+                    databases.add(database);
                 else
-                    MyJFQL.getInstance().getConsole().logWarning("Table '" + table.getName() + "' in '" + database.getName() + "' used unauthorized characters in the name!");
+                    MyJFQL.getInstance().getConsole().logWarning("Database used unauthorized characters in the name!");
             }
-
-            if (!database.getName().contains("%") && !database.getName().contains("#") && !database.getName().contains("'"))
-                databases.add(database);
-            else
-                MyJFQL.getInstance().getConsole().logWarning("Database '" + database.getName() + "' used unauthorized characters in the name!");
         }
-
     }
 
     @Override
@@ -121,7 +160,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public void updateAll(File space) {
         databases.forEach(database -> {
-            final File file = new File(space.getPath() + "/" + database.getName() + ".json");
+            final File file = new File(space.getPath() + "/" + database.getId() + ".json");
             final JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", database.getName());
             jsonObject.put("tables", database.getTables());
