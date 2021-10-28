@@ -125,7 +125,7 @@ public class StructureCommand extends Command {
             }
 
             if (args.containsKey("SET")) {
-                final List<String> newStructure = args.get("SET");
+                final List<String> newStructure = formatList(args.get("SET"));
 
                 if (newStructure.size() == 0) {
                     sender.sendError("Structures size cant be 0!");

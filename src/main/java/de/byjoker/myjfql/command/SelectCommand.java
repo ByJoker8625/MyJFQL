@@ -54,7 +54,7 @@ public class SelectCommand extends Command {
             final List<String> tableStructure = table.getStructure();
 
             {
-                List<String> strings = args.get("VALUE");
+                List<String> strings = formatList(args.get("VALUE"));
 
                 if (strings.size() == 0) {
                     sender.sendError("You need to specify the values!");
