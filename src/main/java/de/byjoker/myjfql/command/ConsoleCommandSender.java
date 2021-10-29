@@ -12,11 +12,9 @@ import java.util.List;
 
 public class ConsoleCommandSender extends CommandSender {
 
-    private final Console console;
 
-    public ConsoleCommandSender(Console console) {
+    public ConsoleCommandSender() {
         super("%CONSOLE%", null);
-        this.console = console;
     }
 
     @Override
@@ -26,22 +24,22 @@ public class ConsoleCommandSender extends CommandSender {
 
     @Override
     public void sendError(Object obj) {
-        console.logError(obj.toString());
+        getConsole().logError(obj.toString());
     }
 
     @Override
     public void sendForbidden() {
-        console.logError("You don't have the permissions to do that!");
+        getConsole().logError("You don't have the permissions to do that!");
     }
 
     @Override
     public void sendSyntax() {
-        console.logError("Unknown syntax!");
+        getConsole().logError("Unknown syntax!");
     }
 
     @Override
     public void sendSuccess() {
-        console.logInfo("Command successfully executed.");
+        getConsole().logInfo("Command successfully executed.");
     }
 
     @Override
@@ -93,7 +91,7 @@ public class ConsoleCommandSender extends CommandSender {
 
     @Override
     public void send(Object obj) {
-        console.println(obj.toString());
+        getConsole().println(obj.toString());
     }
 
     @Override
@@ -102,6 +100,6 @@ public class ConsoleCommandSender extends CommandSender {
     }
 
     public Console getConsole() {
-        return console;
+        return MyJFQL.getInstance().getConsole();
     }
 }

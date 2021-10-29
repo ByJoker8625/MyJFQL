@@ -63,7 +63,7 @@ public final class MyJFQL {
         this.encryptor = new NoneEncryptor();
         this.formatter = new JFQLFormatter();
         this.sessionService = new SessionServiceImpl();
-        this.consoleCommandSender = new ConsoleCommandSender(console);
+        this.consoleCommandSender = new ConsoleCommandSender();
         this.updater = new Updater(version);
         this.commandService = new CommandServiceImpl(formatter);
         this.userService = new UserServiceImpl();
