@@ -3,14 +3,13 @@ package de.byjoker.myjfql.security.server.handler;
 import de.byjoker.myjfql.command.RestCommandSender;
 import de.byjoker.myjfql.config.Config;
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.user.session.Session;
 import de.byjoker.myjfql.user.session.SessionService;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
-public class QueryHandler implements Handler {
+public class LogoutHandler implements Handler {
 
     private final Config config = MyJFQL.getInstance().getConfig();
     private final SessionService sessionService = MyJFQL.getInstance().getSessionService();
@@ -22,7 +21,7 @@ public class QueryHandler implements Handler {
         try {
             final JSONObject request = new JSONObject(context.body());
 
-            if (!request.has("query") || !request.has("token")) {
+            if (!request.has("token")) {
                 sender.sendError("Incomplete request authorization!");
                 return;
             }
@@ -34,21 +33,10 @@ public class QueryHandler implements Handler {
                 return;
             }
 
-            final Session session = sessionService.getSession(token);
-            session.setAddress(context.req.getRemoteAddr());
-
-            sender = sender.bind(session);
-            sessionService.saveSession(session);
-
-            final String query = request.getString("query");
-
-            if (config.showQueries())
-                MyJFQL.getInstance().getConsole().logInfo("User '" + sender.getName() + "' from " + session.getAddress() + " queried '" + query + "'.");
-
-            MyJFQL.getInstance().getCommandService().execute(sender, query);
+            sessionService.closeSession(token);
+            sender.sendSuccess();
         } catch (Exception ex) {
             sender.sendError(ex);
         }
     }
-
 }

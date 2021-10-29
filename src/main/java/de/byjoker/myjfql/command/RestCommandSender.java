@@ -27,10 +27,7 @@ public class RestCommandSender extends CommandSender {
     }
 
     @Override
-    public void sendError(final Object obj) {
-        if (!(obj instanceof Exception) && !(obj instanceof String))
-            throw new CommandException("Input must be an exception or a string!");
-
+    public void sendError(Object obj) {
         final JSONObject jsonObject = new JSONObject();
 
         if (obj instanceof String) {
@@ -75,9 +72,6 @@ public class RestCommandSender extends CommandSender {
 
     @Override
     public void send(final Object obj) {
-        if (!(obj instanceof JSONObject))
-            throw new CommandException("Input must be a JSONObject!");
-
         context.header("Access-Control-Allow-Origin", "*");
         context.header("Access-Control-Allow-Methods", "GET, POST");
         context.header("Access-Control-Allow-Headers", "*");

@@ -45,7 +45,6 @@ public final class MyJFQL {
     private final UserService userService;
     private final SessionService sessionService;
     private final ConsoleCommandSender consoleCommandSender;
-    private final DBSession dbSession;
     private final Server server;
     private final Updater updater;
     private final Downloader downloader;
@@ -67,7 +66,6 @@ public final class MyJFQL {
         this.userService = new UserServiceImpl();
         this.downloader = updater.getDownloader();
         this.databaseService = new DatabaseServiceImpl();
-        this.dbSession = new DBSession(userService, databaseService);
         this.databaseBackupService = new BackupServiceImpl(databaseService);
         this.server = new Server();
     }
@@ -257,10 +255,6 @@ public final class MyJFQL {
 
     public ConfigService getConfigService() {
         return configService;
-    }
-
-    public DBSession getDBSession() {
-        return dbSession;
     }
 
     public Server getServer() {

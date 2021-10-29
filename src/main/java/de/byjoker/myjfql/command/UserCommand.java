@@ -90,34 +90,6 @@ public class UserCommand extends ConsoleCommand {
             return;
         }
 
-        /*
-        if (args.containsKey("UPDATE") && args.containsKey("PASSWORD")) {
-            final String name = formatString(args.get("UPDATE"));
-            final String password = formatString(args.get("PASSWORD"));
-
-            if (name == null) {
-                sender.sendError("Undefined name!");
-                return;
-            }
-
-            if (password == null) {
-                sender.sendError("Undefined password!");
-                return;
-            }
-
-            if (!userService.existsUserByName(name)) {
-                sender.sendError("User doesn't exists!");
-                return;
-            }
-
-            final User user = userService.getUserByName(name);
-            user.setPassword(MyJFQL.getInstance().getEncryptor().encrypt(user.getPassword()));
-            userService.saveUser(user);
-
-            sender.sendSuccess();
-            return;
-        }*/
-
         if (args.containsKey("GRANT") && args.containsKey("ACCESS") && args.containsKey("AT")) {
             final String userIdentifier = formatString(args.get("GRANT"));
             final String access = formatString(args.get("ACCESS"));
@@ -217,8 +189,9 @@ public class UserCommand extends ConsoleCommand {
             column.putContent("Name", selectedUser.getName());
             column.putContent("Password", selectedUser.getPassword());
             column.putContent("Accesses", selectedUser.getAccesses().toString());
+            column.putContent("PreferredDatabase", "#" + selectedUser.getPreferredDatabase());
 
-            sender.sendResult(Collections.singletonList(column), new String[]{"Id", "Name", "Password", "Accesses"});
+            sender.sendResult(Collections.singletonList(column), new String[]{"Id", "Name", "Password", "Accesses", "PreferredDatabase"});
             return;
         }
 
