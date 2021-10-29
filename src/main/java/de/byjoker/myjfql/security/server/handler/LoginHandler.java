@@ -49,7 +49,7 @@ public class LoginHandler implements Handler {
             sessionService.openSession(new Session(token, user.getId(), (user.hasPreferredDatabase()) ? user.getPreferredDatabase() : null, context.req.getRemoteAddr()));
 
             if (config.showConnections() && config.showQueries())
-                MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " opened a session.");
+                MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " opened a session as '" + user.getName() + "'.");
 
             sender.sendResult(Collections.singletonList(token), new String[]{"Token"});
         } catch (Exception ex) {

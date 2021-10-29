@@ -40,12 +40,12 @@ public class ConfigDefaults implements Config {
 
     @Override
     public boolean showConnections() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean showQueries() {
-        return true;
+        return false;
     }
 
     @Override
