@@ -44,7 +44,7 @@ public class ConfigServiceImpl implements ConfigService {
                     try {
                         final Class<? extends ConfigBuilder> clazz = (Class<? extends ConfigBuilder>) info.load();
 
-                        if (clazz.isAnnotationPresent(ConfigFormer.class))
+                        if (clazz.isAnnotationPresent(ConfigHandler.class))
                             registerConfigBuilder(clazz.newInstance());
                     } catch (Exception ignore) {
                     }

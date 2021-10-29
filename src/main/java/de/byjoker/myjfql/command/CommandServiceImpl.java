@@ -41,7 +41,7 @@ public class CommandServiceImpl implements CommandService {
                     try {
                         final Class<? extends Command> clazz = (Class<? extends Command>) info.load();
 
-                        if (clazz.isAnnotationPresent(CommandExecutor.class))
+                        if (clazz.isAnnotationPresent(CommandHandler.class))
                             registerCommand(clazz.newInstance());
                     } catch (Exception ignore) {
                     }

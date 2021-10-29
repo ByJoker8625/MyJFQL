@@ -56,7 +56,12 @@ public class QueryEmulatorHandler implements Handler {
                 sessionService.openSession(new Session(token, user.getId(), (user.hasPreferredDatabase()) ? user.getPreferredDatabase() : null, context.req.getRemoteAddr()));
             }
 
+
             final Session session = sessionService.getSession(token);
+            session.setAddress(context.req.getRemoteAddr());
+            session.utilize();
+
+            sessionService.saveSession(session);
             sender = sender.bind(session);
 
             final String query = request.getString("query");

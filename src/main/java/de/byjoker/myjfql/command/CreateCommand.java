@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@CommandExecutor
+@CommandHandler
 public class CreateCommand extends Command {
 
     public CreateCommand() {

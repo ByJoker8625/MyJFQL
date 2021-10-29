@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-@CommandExecutor
+@CommandHandler
 public class StructureCommand extends Command {
 
     public StructureCommand() {

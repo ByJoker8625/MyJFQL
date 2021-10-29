@@ -48,6 +48,11 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
+    public void collectExpiresSessions() {
+        sessions.removeIf(Session::isExpired);
+    }
+
+    @Override
     public boolean existsSession(String token) {
         return sessions.stream().anyMatch(session -> session.getToken().equals(token));
     }

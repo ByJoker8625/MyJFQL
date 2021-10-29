@@ -204,13 +204,14 @@ public final class MyJFQL {
             }
         }
 
-        sessionService.openSession(new Session(consoleCommandSender.getName(), consoleCommandSender.getName(), null, "localhost"));
+        sessionService.openSession(new Session(consoleCommandSender.getName(), consoleCommandSender.getName(), null, "localhost", System.currentTimeMillis(), -1));
 
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 databaseService.updateAll();
                 userService.updateAll();
+                sessionService.collectExpiresSessions();
             }
         }, 1000 * 60, 1000 * 60);
 

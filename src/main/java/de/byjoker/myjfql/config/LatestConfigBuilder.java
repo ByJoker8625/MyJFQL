@@ -4,7 +4,7 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 
-@ConfigFormer
+@ConfigHandler
 public class LatestConfigBuilder extends ConfigBuilder {
 
     public LatestConfigBuilder() {

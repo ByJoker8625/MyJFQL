@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@CommandExecutor
+@CommandHandler
 public class DeleteCommand extends Command {
 
     public DeleteCommand() {

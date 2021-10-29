@@ -36,6 +36,7 @@ public class QueryHandler implements Handler {
 
             final Session session = sessionService.getSession(token);
             session.setAddress(context.req.getRemoteAddr());
+            session.utilize();
 
             sender = sender.bind(session);
             sessionService.saveSession(session);

@@ -10,7 +10,7 @@ import de.byjoker.myjfql.util.Sorter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@CommandExecutor
+@CommandHandler
 public class ListCommand extends Command {
 
     public ListCommand() {

@@ -12,6 +12,8 @@ public interface SessionService {
 
     void closeSessions(String userId);
 
+    void collectExpiresSessions();
+
     boolean existsSession(String token);
 
     Session getSession(String token);

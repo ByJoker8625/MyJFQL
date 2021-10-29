@@ -4,7 +4,7 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 
-@ConfigFormer
+@ConfigHandler
 public class PreRetiredConfigBuilder extends ConfigBuilder {
 
     public PreRetiredConfigBuilder() {
