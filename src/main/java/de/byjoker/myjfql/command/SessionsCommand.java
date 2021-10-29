@@ -1,5 +1,6 @@
 package de.byjoker.myjfql.command;
 
+import de.byjoker.jfql.util.ID;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Column;
 import de.byjoker.myjfql.database.DatabaseService;
@@ -15,7 +16,7 @@ import java.util.*;
 public class SessionsCommand extends ConsoleCommand {
 
     public SessionsCommand() {
-        super("sessions", Arrays.asList("COMMAND", "OF", "BIND", "TO", "CLOSE-ALL", "CLOSE"));
+        super("sessions", Arrays.asList("COMMAND", "OF", "BIND", "TO", "OPEN", "TOKEN", "CLOSE-ALL", "CLOSE"));
     }
 
     @Override
@@ -38,6 +39,44 @@ public class SessionsCommand extends ConsoleCommand {
             }
 
             final User user = userService.getUserByIdentifier(userIdentifier);
+
+            if (args.containsKey("OPEN")) {
+                final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                long expire = -1;
+
+                if (args.get("OPEN").size() != 0) {
+                    try {
+                        expire = dateFormat.parse(formatString(args.get("OPEN"))).getTime();
+                    } catch (Exception ex) {
+                        sender.sendError("Unknown date format!");
+                        return;
+                    }
+
+                    if (expire <= System.currentTimeMillis()) {
+                        sender.sendError("Session already expired!");
+                        return;
+                    }
+                }
+
+                String token = null;
+
+                if (args.containsKey("TOKEN"))
+                    token = formatString(args.get("TOKEN"));
+
+                if (token == null)
+                    token = ID.generateMixed().toString();
+
+                final Session session = new Session(token, user.getId(), null, "null", expire);
+                sessionService.openSession(session);
+
+                final Column column = new Column();
+                column.putContent("Token", session.getToken());
+                column.putContent("Start", dateFormat.format(new Date(session.getOpen())));
+                column.putContent("Expire", session.getExpire() == -1 ? "NEVER" : dateFormat.format(new Date(session.getExpire())));
+
+                sender.sendResult(Collections.singletonList(column), new String[]{"Token", "Start", "Expire"});
+                return;
+            }
 
             if (args.containsKey("CLOSE-ALL")) {
                 sessionService.closeSessions(user.getId());
@@ -99,14 +138,16 @@ public class SessionsCommand extends ConsoleCommand {
             final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
             sessionService.getSessionsByUserId(user.getId()).forEach(session -> {
-                Column column = new Column();
+                final Column column = new Column();
                 column.putContent("Token", session.getToken());
                 column.putContent("Address", session.getAddress());
+                column.putContent("Database", "#" + session.getDatabaseId());
                 column.putContent("Start", dateFormat.format(new Date(session.getOpen())));
-                column.putContent("Expire", dateFormat.format(new Date(session.getExpire())));
+                column.putContent("Expire", session.getExpire() == -1 ? "NEVER" : dateFormat.format(new Date(session.getExpire())));
+                sessions.add(column);
             });
 
-            sender.sendResult(sessions, new String[]{"Token", "Address", "Start", "Expire"});
+            sender.sendResult(sessions, new String[]{"Token", "Address", "Database", "Start", "Expire"});
             return;
         }
 

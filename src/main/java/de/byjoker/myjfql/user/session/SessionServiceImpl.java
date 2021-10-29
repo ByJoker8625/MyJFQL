@@ -54,22 +54,22 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public boolean existsSession(String token) {
-        return sessions.stream().anyMatch(session -> session.getToken().equals(token));
+        return sessions.stream().anyMatch(session -> session.getToken().equals(token) && !session.isExpired());
     }
 
     @Override
     public Session getSession(String token) {
-        return sessions.stream().filter(session -> session.getToken().equals(token)).findFirst().orElse(null);
+        return sessions.stream().filter(session -> session.getToken().equals(token) && !session.isExpired()).findFirst().orElse(null);
     }
 
     @Override
     public List<Session> getSessionsByUserId(String userId) {
-        return sessions.stream().filter(session -> session.getUserId().equals(userId)).collect(Collectors.toList());
+        return sessions.stream().filter(session -> session.getUserId().equals(userId) && !session.isExpired()).collect(Collectors.toList());
     }
 
     @Override
     public List<Session> getSessions() {
-        return sessions;
+        return sessions.stream().filter(session -> !session.isExpired()).collect(Collectors.toList());
     }
 
 }
