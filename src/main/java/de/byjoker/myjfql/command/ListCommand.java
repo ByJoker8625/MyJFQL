@@ -2,6 +2,7 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Database;
+import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.database.Table;
 import de.byjoker.myjfql.util.Sorter;
@@ -20,14 +21,14 @@ public class ListCommand extends Command {
     public void handleCommand(CommandSender sender, Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
 
-        if (args.containsKey("DATABASES")) {
-            if (sender.hasPermission("-use.database.*")) {
-                sender.sendForbidden();
-                return;
-            }
+        if (sender.getSession() == null) {
+            sender.sendError("Session of this user is invalid!");
+            return;
+        }
 
-            List<String> databases = databaseService.getDatabases().stream().map(Database::getName).filter(db ->
-                            !sender.hasPermission("-use.database." + db) && (sender.hasPermission("use.database." + db) || sender.hasPermission("use.database.*")))
+        if (args.containsKey("DATABASES")) {
+            List<String> databases = databaseService.getDatabases().stream().filter(database -> sender.allowed(database.getId(), DatabaseAction.READ))
+                    .map(Database::getName)
                     .collect(Collectors.toList());
 
             if (args.containsKey("LIMIT")) {
@@ -60,44 +61,23 @@ public class ListCommand extends Command {
                     return;
                 }
 
-                sender.sendAnswer(Sorter.sortList(databases, order), new String[]{"Database"});
+                sender.sendResult(Sorter.sortList(databases, order), new String[]{"Database"});
                 return;
             }
 
 
-            sender.sendAnswer(databases, new String[]{"Database"});
+            sender.sendResult(databases, new String[]{"Database"});
             return;
         }
 
         if (args.containsKey("TABLES")) {
-            if (sender.hasPermission("-use.table.*.*") || sender.hasPermission("-use.database.*")) {
-                sender.sendForbidden();
-                return;
-            }
-
             List<String> tables = new ArrayList<>();
 
             if (!args.containsKey("FROM")) {
-                for (final Database database : databaseService.getDatabases()) {
-                    final String databaseName = database.getName();
-
-                    if ((sender.hasPermission("use.database." + databaseName)
-                            || sender.hasPermission("use.database.*"))
-                            && !sender.hasPermission("-use.database." + databaseName)
-                            && !sender.hasPermission("-use.database.*")) {
-
-                        for (final Table table : database.getTables()) {
-                            final String tableName = table.getName();
-
-                            if ((sender.hasPermission("use.table.*." + databaseName)
-                                    || sender.hasPermission("use.table." + tableName + "." + databaseName))
-                                    && !sender.hasPermission("-use.table.*." + databaseName)
-                                    && !sender.hasPermission("-use.table." + tableName + "." + databaseName))
-                                tables.add(table.getName());
-                        }
-                    }
-
-                }
+                List<String> finalTables = tables;
+                databaseService.getDatabases().stream().filter(database -> sender.allowed(database.getId(), DatabaseAction.READ)).forEach(database -> {
+                    finalTables.addAll(database.getTables().stream().map(Table::getName).collect(Collectors.toList()));
+                });
             } else {
                 final String identifier = formatString(args.get("FROM"));
 
@@ -106,25 +86,14 @@ public class ListCommand extends Command {
                     return;
                 }
 
-                if ((!sender.hasPermission("use.database." + identifier)
-                        && !sender.hasPermission("use.database.*"))
-                        || sender.hasPermission("-use.database." + identifier)
-                        || sender.hasPermission("-use.database.*")) {
+                final Database database = databaseService.getDatabaseByIdentifier(identifier);
+
+                if (!sender.allowed(database.getId(), DatabaseAction.READ)) {
                     sender.sendForbidden();
                     return;
                 }
 
-                final Database database = databaseService.getDatabaseByIdentifier(identifier);
-
-                for (final Table table : database.getTables()) {
-                    final String tableName = table.getName();
-
-                    if ((sender.hasPermission("use.table.*." + identifier)
-                            || sender.hasPermission("use.table." + tableName + "." + identifier))
-                            && !sender.hasPermission("-use.table.*." + identifier)
-                            && !sender.hasPermission("-use.table." + tableName + "." + identifier))
-                        tables.add(table.getName());
-                }
+                tables.addAll(database.getTables().stream().map(Table::getName).collect(Collectors.toList()));
             }
 
             if (args.containsKey("LIMIT")) {
@@ -157,11 +126,11 @@ public class ListCommand extends Command {
                     return;
                 }
 
-                sender.sendAnswer(Sorter.sortList(tables, order), new String[]{"Table"});
+                sender.sendResult(Sorter.sortList(tables, order), new String[]{"Table"});
                 return;
             }
 
-            sender.sendAnswer(tables, new String[]{"Table"});
+            sender.sendResult(tables, new String[]{"Table"});
             return;
         }
 

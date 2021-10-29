@@ -2,8 +2,11 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.console.Console;
 import de.byjoker.myjfql.console.TablePrinter;
+import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Column;
+import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.exception.CommandException;
+import de.byjoker.myjfql.user.session.Session;
 
 import java.util.List;
 
@@ -11,29 +14,19 @@ public class ConsoleCommandSender extends CommandSender {
 
     private final Console console;
 
-    public ConsoleCommandSender(final Console console) {
-        super("#CONSOLE", "127.0.0.1");
+    public ConsoleCommandSender(Console console) {
+        super("%CONSOLE%", null);
         this.console = console;
     }
 
     @Override
-    public boolean hasPermission(String permission) {
-        return !permission.startsWith("-");
-    }
-
-    @Override
-    public boolean isStaticDatabase() {
-        return false;
+    public boolean allowed(String database, DatabaseAction action) {
+        return true;
     }
 
     @Override
     public void sendError(Object obj) {
         console.logError(obj.toString());
-    }
-
-    @Override
-    public void sendInfo(Object obj) {
-        console.logInfo(obj.toString());
     }
 
     @Override
@@ -51,9 +44,8 @@ public class ConsoleCommandSender extends CommandSender {
         console.logInfo("Command successfully executed.");
     }
 
-
     @Override
-    public void sendAnswer(Object obj, Object structure) {
+    public void sendResult(Object obj, Object structure) {
         if (!(structure instanceof String[]) && !(structure instanceof List))
             throw new CommandException("Input is not an array!");
 
@@ -102,6 +94,11 @@ public class ConsoleCommandSender extends CommandSender {
     @Override
     public void send(Object obj) {
         console.println(obj.toString());
+    }
+
+    @Override
+    public Session getSession() {
+        return MyJFQL.getInstance().getSessionService().getSession(super.getName());
     }
 
     public Console getConsole() {

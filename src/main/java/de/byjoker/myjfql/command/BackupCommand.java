@@ -24,7 +24,7 @@ public class BackupCommand extends ConsoleCommand {
             final String name = formatString(args.get("CREATE"));
 
             if (name == null) {
-                sender.sendError("Undefined name!");
+                sender.sendError("Undefined backup!");
                 return;
             }
 
@@ -163,12 +163,12 @@ public class BackupCommand extends ConsoleCommand {
                 return;
             }
 
-            sender.sendAnswer(Arrays.stream(files).map(File::getName).collect(Collectors.toList()), new String[]{"Backup"});
+            sender.sendResult(Arrays.stream(files).map(File::getName).collect(Collectors.toList()), new String[]{"Backup"});
             return;
         }
 
         if (args.containsKey("LIST")) {
-            sender.sendAnswer(backupService.getBackups(), new String[]{"Backup"});
+            sender.sendResult(backupService.getBackups(), new String[]{"Backup"});
             return;
         }
 

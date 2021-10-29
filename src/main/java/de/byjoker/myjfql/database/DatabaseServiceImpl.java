@@ -29,7 +29,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             throw new FileException("Database already exists!");
 
         if (existsDatabase(database.getId())) {
-            database.setId(ID.generateNumber().toString());
+            database.setId(ID.generateString().toString());
             createDatabase(database);
             return;
         }

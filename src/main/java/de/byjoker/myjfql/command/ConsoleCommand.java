@@ -18,6 +18,11 @@ public abstract class ConsoleCommand extends Command {
             return;
         }
 
+        if (sender.getSession() == null) {
+            sender.sendError("Session of this user is invalid!");
+            return;
+        }
+
         handleConsoleCommand((ConsoleCommandSender) sender, args);
     }
 }

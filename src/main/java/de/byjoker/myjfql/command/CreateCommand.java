@@ -1,10 +1,11 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.DBSession;
 import de.byjoker.myjfql.database.Database;
+import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.database.Table;
+import de.byjoker.myjfql.user.session.Session;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,13 +15,18 @@ import java.util.Map;
 public class CreateCommand extends Command {
 
     public CreateCommand() {
-        super("create", Arrays.asList("COMMAND", "DATABASE", "TABLE", "STRUCTURE", "PRIMARY-KEY", "INTO"));
+        super("create", Arrays.asList("COMMAND", "DATABASE", "TABLE", "STRUCTURE", "PRIMARY-KEY"));
     }
 
     @Override
     public void handleCommand(CommandSender sender, Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
-        final DBSession session = MyJFQL.getInstance().getDBSession();
+        final Session session = sender.getSession();
+
+        if (session == null) {
+            sender.sendError("Session of this user is invalid!");
+            return;
+        }
 
         if (args.containsKey("TABLE") && args.containsKey("STRUCTURE")) {
             final String name = formatString(args.get("TABLE"));
@@ -36,13 +42,14 @@ public class CreateCommand extends Command {
                 return;
             }
 
-            String databaseName = session.get(sender.getName());
-            String primaryKey = structure.get(0);
+            final Database database = session.getDatabase(MyJFQL.getInstance().getDatabaseService());
 
-            if (databaseName == null) {
+            if (database == null) {
                 sender.sendError("No database is in use for this user!");
                 return;
             }
+
+            String primaryKey = structure.get(0);
 
             if (args.containsKey("PRIMARY-KEY")) {
                 final String string = formatString(args.get("PRIMARY-KEY"));
@@ -60,19 +67,10 @@ public class CreateCommand extends Command {
                 primaryKey = string;
             }
 
-
-            if (!databaseService.existsDatabaseByName(databaseName)) {
-                sender.sendError("Database doesn't exists!");
-                return;
-            }
-
-            if ((sender.hasPermission("-use.table." + name + "." + databaseName) || sender.hasPermission("-use.table.*." + databaseName))
-                    || (!sender.hasPermission("use.table." + name + "." + databaseName) && !sender.hasPermission("use.table.*." + databaseName))) {
+            if (!sender.allowed(database.getId(), DatabaseAction.READ_WRITE)) {
                 sender.sendForbidden();
                 return;
             }
-
-            final Database database = databaseService.getDatabaseByIdentifier(databaseName);
 
             if (name.contains("%") || name.contains("#") || name.contains("'")) {
                 sender.sendError("Unauthorized characters in the name!");
@@ -92,7 +90,7 @@ public class CreateCommand extends Command {
         }
 
         if (args.containsKey("DATABASE")) {
-            if (sender instanceof RemoteCommandSender) {
+            if (sender instanceof RestCommandSender) {
                 sender.sendForbidden();
                 return;
             }

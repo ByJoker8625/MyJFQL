@@ -10,11 +10,19 @@ public interface UserService extends StorageService {
 
     void saveUser(User user);
 
-    User getUser(String name);
+    User getUserByIdentifier(String identifier);
 
-    boolean existsUser(String name);
+    User getUserByName(String name);
 
-    void deleteUser(String name);
+    User getUser(String id);
+
+    boolean existsUserByIdentifier(String identifier);
+
+    boolean existsUserByName(String name);
+
+    boolean existsUser(String id);
+
+    void deleteUser(String id);
 
     List<User> getUsers();
 

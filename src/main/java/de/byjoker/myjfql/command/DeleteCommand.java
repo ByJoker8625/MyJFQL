@@ -1,9 +1,10 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.DBSession;
 import de.byjoker.myjfql.database.Database;
+import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.DatabaseService;
+import de.byjoker.myjfql.user.session.Session;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,54 +14,32 @@ import java.util.Map;
 public class DeleteCommand extends Command {
 
     public DeleteCommand() {
-        super("delete", Arrays.asList("COMMAND", "DATABASE", "TABLE", "FROM"));
+        super("delete", Arrays.asList("COMMAND", "DATABASE", "TABLE"));
     }
 
     @Override
     public void handleCommand(CommandSender sender, Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
-        final DBSession session = MyJFQL.getInstance().getDBSession();
+        final Session session = sender.getSession();
+
+        if (session == null) {
+            sender.sendError("Session of this user is invalid!");
+            return;
+        }
 
         if (args.containsKey("TABLE")) {
             final String name = formatString(args.get("TABLE"));
-            String databaseName = session.get(sender.getName());
+            final Database database = session.getDatabase(MyJFQL.getInstance().getDatabaseService());
 
-            if (name == null) {
+            if (database == null) {
                 sender.sendError("No database is in use for this user!");
                 return;
             }
 
-            if (args.containsKey("FROM")) {
-                final String string = formatString(args.get("FROM"));
-
-                if (string == null) {
-                    sender.sendError("Undefined database!");
-                    return;
-                }
-
-                if ((!sender.hasPermission("use.database." + string)
-                        && !sender.hasPermission("use.database.*"))
-                        || sender.hasPermission("-use.database." + string)
-                        || sender.hasPermission("-use.database.*")) {
-                    sender.sendForbidden();
-                    return;
-                }
-
-                databaseName = string;
-            }
-
-            if (!databaseService.existsDatabaseByName(databaseName)) {
-                sender.sendError("Database doesn't exists!");
-                return;
-            }
-
-            if ((sender.hasPermission("-use.table." + name + "." + databaseName) || sender.hasPermission("-use.table.*." + databaseName))
-                    || (!sender.hasPermission("use.table." + name + "." + databaseName) && !sender.hasPermission("use.table.*." + databaseName))) {
+            if (!sender.allowed(database.getId(), DatabaseAction.READ_WRITE)) {
                 sender.sendForbidden();
                 return;
             }
-
-            final Database database = databaseService.getDatabaseByIdentifier(databaseName);
 
             if (!database.existsTable(name)) {
                 sender.sendError("Table doesn't exists!");
@@ -75,7 +54,7 @@ public class DeleteCommand extends Command {
         }
 
         if (args.containsKey("DATABASE")) {
-            if (sender instanceof RemoteCommandSender) {
+            if (sender instanceof RestCommandSender) {
                 sender.sendForbidden();
                 return;
             }

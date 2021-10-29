@@ -14,7 +14,7 @@ public class Database implements TableService {
     private String name;
 
     public Database(String name) {
-        this.id = ID.generateNumber().toString();
+        this.id = ID.generateString().toString();
         this.name = name;
         this.tables = new ArrayList<>();
     }

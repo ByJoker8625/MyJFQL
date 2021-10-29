@@ -2,8 +2,10 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Database;
+import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.database.Table;
+import de.byjoker.myjfql.user.session.Session;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,7 +22,14 @@ public class StructureCommand extends Command {
     @Override
     public void handleCommand(CommandSender sender, Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
-        final Database database = MyJFQL.getInstance().getDBSession().getDirectlyDatabase(sender.getName());
+        final Session session = sender.getSession();
+
+        if (session == null) {
+            sender.sendError("Session of this user is invalid!");
+            return;
+        }
+
+        final Database database = session.getDatabase(databaseService);
 
         if (database == null) {
             sender.sendError("No database is in use for this user!");
@@ -40,10 +49,8 @@ public class StructureCommand extends Command {
                 return;
             }
 
-            final String databaseName = database.getName();
 
-            if ((sender.hasPermission("-use.table." + name + "." + databaseName) || sender.hasPermission("-use.table.*." + databaseName))
-                    || (!sender.hasPermission("use.table." + name + "." + databaseName) && !sender.hasPermission("use.table.*." + databaseName))) {
+            if (!sender.allowed(database.getId(), DatabaseAction.READ)) {
                 sender.sendForbidden();
                 return;
             }
@@ -54,11 +61,16 @@ public class StructureCommand extends Command {
 
             if (!args.containsKey("ADD") && !args.containsKey("REMOVE") && !args.containsKey("SET") && !args.containsKey("MARK-PRIMARY")) {
                 if (args.containsKey("PRIMARY-KEY")) {
-                    sender.sendAnswer(Collections.singletonList(primary), new String[]{"Primary"});
+                    sender.sendResult(Collections.singletonList(primary), new String[]{"Primary"});
                     return;
                 }
 
-                sender.sendAnswer(structure, new String[]{"Structure"});
+                sender.sendResult(structure, new String[]{"Structure"});
+                return;
+            }
+
+            if (!sender.allowed(database.getId(), DatabaseAction.READ_WRITE)) {
+                sender.sendForbidden();
                 return;
             }
 

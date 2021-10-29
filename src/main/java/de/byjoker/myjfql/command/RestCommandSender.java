@@ -1,35 +1,29 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
+import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.exception.CommandException;
 import de.byjoker.myjfql.user.User;
+import de.byjoker.myjfql.user.session.Session;
 import io.javalin.http.Context;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 
-public class RemoteCommandSender extends CommandSender {
+public class RestCommandSender extends CommandSender {
 
     private final Context context;
     private final User user;
 
-    public RemoteCommandSender(final String name, final String address, final Context context) {
-        super(name, address);
-        this.user = MyJFQL.getInstance().getUserService().getUser(name);
+    public RestCommandSender(Session session, Context context) {
+        super(null, session);
+        this.user = (session == null) ? null : session.getUser(MyJFQL.getInstance().getUserService());
         this.context = context;
     }
 
     @Override
-    public boolean hasPermission(final String permission) {
-        if (user == null)
-            return false;
-
-        return user.hasPermission(permission);
-    }
-
-    @Override
-    public boolean isStaticDatabase() {
-        return user.isStaticDatabase();
+    public boolean allowed(String database, DatabaseAction action) {
+        return user.allowed(database, action);
     }
 
     @Override
@@ -47,11 +41,6 @@ public class RemoteCommandSender extends CommandSender {
 
         jsonObject.put("type", ResponseType.ERROR);
         this.send(jsonObject);
-    }
-
-    @Deprecated
-    @Override
-    public void sendInfo(final Object obj) {
     }
 
     @Override
@@ -76,7 +65,7 @@ public class RemoteCommandSender extends CommandSender {
     }
 
     @Override
-    public void sendAnswer(final Object obj, final Object structure) {
+    public void sendResult(final Object obj, final Object structure) {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", ResponseType.RESULT);
         jsonObject.put("structure", structure);
@@ -99,8 +88,15 @@ public class RemoteCommandSender extends CommandSender {
         context.result(obj.toString().getBytes(StandardCharsets.UTF_8));
     }
 
-    public RemoteCommandSender rename(final String name) {
-        return new RemoteCommandSender(name, getAddress(), context);
+    public RestCommandSender bind(Session session) {
+        return new RestCommandSender(session, context);
+    }
+
+    public String getName() {
+        if (user == null)
+            return null;
+
+        return user.getName();
     }
 
     public enum ResponseType {

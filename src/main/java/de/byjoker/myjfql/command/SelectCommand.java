@@ -3,7 +3,9 @@ package de.byjoker.myjfql.command;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Column;
 import de.byjoker.myjfql.database.Database;
+import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.Table;
+import de.byjoker.myjfql.user.session.Session;
 import de.byjoker.myjfql.util.ConditionHelper;
 import de.byjoker.myjfql.util.Sorter;
 
@@ -19,7 +21,14 @@ public class SelectCommand extends Command {
 
     @Override
     public void handleCommand(CommandSender sender, Map<String, List<String>> args) {
-        final Database database = MyJFQL.getInstance().getDBSession().getDirectlyDatabase(sender.getName());
+        final Session session = sender.getSession();
+
+        if (session == null) {
+            sender.sendError("Session of this user is invalid!");
+            return;
+        }
+
+        final Database database = session.getDatabase(MyJFQL.getInstance().getDatabaseService());
 
         if (database == null) {
             sender.sendError("No database is in use for this user!");
@@ -42,10 +51,8 @@ public class SelectCommand extends Command {
             }
 
             final Table table = database.getTable(name);
-            final String databaseName = database.getName();
 
-            if ((sender.hasPermission("-use.table." + name + "." + databaseName) || sender.hasPermission("-use.table.*." + databaseName))
-                    || (!sender.hasPermission("use.table." + name + "." + databaseName) && !sender.hasPermission("use.table.*." + databaseName))) {
+            if (!sender.allowed(database.getId(), DatabaseAction.READ)) {
                 sender.sendForbidden();
                 return;
             }
@@ -142,7 +149,7 @@ public class SelectCommand extends Command {
                     return;
                 }
 
-                sender.sendAnswer(Collections.singletonList(column), values);
+                sender.sendResult(Collections.singletonList(column), values);
             } else if (args.containsKey("WHERE")) {
                 List<Column> columns;
 
@@ -159,23 +166,23 @@ public class SelectCommand extends Command {
                 }
 
                 if (limit == -1)
-                    sender.sendAnswer(columns, values);
+                    sender.sendResult(columns, values);
                 else
-                    sender.sendAnswer(columns.stream().limit(limit).collect(Collectors.toList()), values);
+                    sender.sendResult(columns.stream().limit(limit).collect(Collectors.toList()), values);
             } else {
                 final List<Column> columns = table.getColumns(type, order, sorter);
 
                 if (columns.size() == 0) {
-                    sender.sendAnswer(new ArrayList<Column>(), values);
+                    sender.sendResult(new ArrayList<Column>(), values);
                     return;
                 }
 
                 if (limit != -1) {
-                    sender.sendAnswer(columns.stream().limit(limit).collect(Collectors.toList()), values);
+                    sender.sendResult(columns.stream().limit(limit).collect(Collectors.toList()), values);
                     return;
                 }
 
-                sender.sendAnswer(columns, values);
+                sender.sendResult(columns, values);
             }
 
             return;

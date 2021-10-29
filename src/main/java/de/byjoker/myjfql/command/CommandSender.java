@@ -1,22 +1,21 @@
 package de.byjoker.myjfql.command;
 
+import de.byjoker.myjfql.database.DatabaseAction;
+import de.byjoker.myjfql.user.session.Session;
+
 public abstract class CommandSender {
 
     private final String name;
-    private final String address;
+    private final Session session;
 
-    public CommandSender(String name, String address) {
+    public CommandSender(String name, Session session) {
         this.name = name;
-        this.address = address;
+        this.session = session;
     }
 
-    public abstract boolean hasPermission(String permission);
-
-    public abstract boolean isStaticDatabase();
+    public abstract boolean allowed(String database, DatabaseAction action);
 
     public abstract void sendError(Object obj);
-
-    public abstract void sendInfo(Object obj);
 
     public abstract void sendForbidden();
 
@@ -24,7 +23,7 @@ public abstract class CommandSender {
 
     public abstract void sendSuccess();
 
-    public abstract void sendAnswer(Object obj, Object structure);
+    public abstract void sendResult(Object obj, Object structure);
 
     public abstract void send(Object obj);
 
@@ -32,7 +31,7 @@ public abstract class CommandSender {
         return name;
     }
 
-    public String getAddress() {
-        return address;
+    public Session getSession() {
+        return session;
     }
 }

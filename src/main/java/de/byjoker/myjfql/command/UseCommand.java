@@ -1,8 +1,10 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.DBSession;
+import de.byjoker.myjfql.database.Database;
+import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.DatabaseService;
+import de.byjoker.myjfql.user.session.Session;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,35 +20,36 @@ public class UseCommand extends Command {
     @Override
     public void handleCommand(CommandSender sender, Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
-        final DBSession session = MyJFQL.getInstance().getDBSession();
+        final Session session = sender.getSession();
+
+        if (session == null) {
+            sender.sendError("Session of this user is invalid!");
+            return;
+        }
 
         if (args.containsKey("DATABASE")) {
-            if (sender.isStaticDatabase()) {
-                sender.sendError("You can't change your database!");
-                return;
-            }
+            final String databaseIdentifier = formatString(args.get("DATABASE"));
 
-            final String name = formatString(args.get("DATABASE"));
-
-            if (name == null) {
+            if (databaseIdentifier == null) {
                 sender.sendError("Undefined database!");
                 return;
             }
 
-            if (!databaseService.existsDatabaseByName(name)) {
+            if (!databaseService.existsDatabaseByIdentifier(databaseIdentifier)) {
                 sender.sendError("Database doesn't exists!");
                 return;
             }
 
-            if ((!sender.hasPermission("use.database." + name)
-                    && !sender.hasPermission("use.database.*"))
-                    || sender.hasPermission("-use.database." + name)
-                    || sender.hasPermission("-use.database.*")) {
+            final Database database = databaseService.getDatabaseByIdentifier(databaseIdentifier);
+
+            if (!sender.allowed(database.getId(), DatabaseAction.READ)) {
                 sender.sendForbidden();
                 return;
             }
 
-            session.put(sender.getName(), name);
+            session.setDatabaseId(database.getId());
+            MyJFQL.getInstance().getSessionService().saveSession(session);
+
             sender.sendSuccess();
             return;
         }

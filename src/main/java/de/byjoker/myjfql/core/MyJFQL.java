@@ -16,13 +16,16 @@ import de.byjoker.myjfql.core.lang.JFQLFormatter;
 import de.byjoker.myjfql.database.*;
 import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.exception.NetworkException;
-import de.byjoker.myjfql.security.Server;
 import de.byjoker.myjfql.security.encryptor.Argon2Encryptor;
 import de.byjoker.myjfql.security.encryptor.Base64Encryptor;
 import de.byjoker.myjfql.security.encryptor.Encryptor;
 import de.byjoker.myjfql.security.encryptor.NoneEncryptor;
+import de.byjoker.myjfql.security.server.Server;
 import de.byjoker.myjfql.user.UserService;
 import de.byjoker.myjfql.user.UserServiceImpl;
+import de.byjoker.myjfql.user.session.Session;
+import de.byjoker.myjfql.user.session.SessionService;
+import de.byjoker.myjfql.user.session.SessionServiceImpl;
 import de.byjoker.myjfql.util.Downloader;
 import de.byjoker.myjfql.util.Updater;
 
@@ -40,6 +43,7 @@ public final class MyJFQL {
     private final ConfigService configService;
     private final BackupService databaseBackupService;
     private final UserService userService;
+    private final SessionService sessionService;
     private final ConsoleCommandSender consoleCommandSender;
     private final DBSession dbSession;
     private final Server server;
@@ -56,6 +60,7 @@ public final class MyJFQL {
         this.config = new ConfigDefaults();
         this.encryptor = new NoneEncryptor();
         this.formatter = new JFQLFormatter();
+        this.sessionService = new SessionServiceImpl();
         this.consoleCommandSender = new ConsoleCommandSender(console);
         this.updater = new Updater(version);
         this.commandService = new CommandServiceImpl(formatter);
@@ -174,8 +179,8 @@ public final class MyJFQL {
         }
 
         if (encryptor.name().equals("NONE")) {
-            console.logWarning("You are using no encryption! This type of password storing is very insecure!");
             console.clean();
+            console.logWarning("You are using no encryption! This type of password storing is very insecure!");
         }
 
         {
@@ -198,6 +203,8 @@ public final class MyJFQL {
             }
         }
 
+        sessionService.openSession(new Session(consoleCommandSender.getName(), consoleCommandSender.getName(), null, "localhost"));
+
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -217,6 +224,7 @@ public final class MyJFQL {
             console.logInfo("Shutdown (This can take a while)...");
             databaseService.updateAll();
             userService.updateAll();
+            server.shutdown();
         } catch (Exception ignore) {
         }
 
@@ -281,5 +289,9 @@ public final class MyJFQL {
 
     public Config getConfig() {
         return config;
+    }
+
+    public SessionService getSessionService() {
+        return sessionService;
     }
 }

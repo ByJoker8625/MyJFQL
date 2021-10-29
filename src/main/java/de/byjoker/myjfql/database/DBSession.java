@@ -29,16 +29,11 @@ public class DBSession {
             return;
         }
 
-        final User user = userService.getUser(name);
+        final User user = userService.getUserByName(name);
 
         if (databases.containsKey(name)
                 && databases.get(name).equals(database))
             return;
-
-        if (!user.hasPermission("use.database." + database)
-                || user.hasPermission("-use.database." + database)) {
-            return;
-        }
 
         databases.put(name, database);
     }
@@ -58,33 +53,11 @@ public class DBSession {
             return databases.get(name);
         }
 
-        final User user = userService.getUser(name);
+        final User user = userService.getUserByName(name);
 
         if (user == null) {
             return null;
         }
-
-        if (user.hasPermission("-use.database.*")) {
-            return null;
-        }
-
-        if (databases.containsKey(name)) {
-            final String currentDatabase = databases.get(name);
-
-            if (!user.hasPermission("use.database." + currentDatabase)
-                    || user.hasPermission("-use.database." + currentDatabase)) {
-                return null;
-            }
-
-            return currentDatabase;
-        }
-
-        if (user.isStaticDatabase()
-                && databaseService.existsDatabaseByName(name)) {
-            put(name, name);
-            return name;
-        }
-
 
         if (databaseService.getDatabases().size() == 0) {
             throw new FileException("Can't load any database!");

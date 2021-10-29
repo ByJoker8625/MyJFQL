@@ -1,10 +1,8 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.Column;
-import de.byjoker.myjfql.database.Database;
-import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.database.Table;
+import de.byjoker.myjfql.database.*;
+import de.byjoker.myjfql.user.session.Session;
 import de.byjoker.myjfql.util.ConditionHelper;
 
 import java.util.ArrayList;
@@ -22,12 +20,20 @@ public class RemoveCommand extends Command {
     @Override
     public void handleCommand(CommandSender sender, Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
-        final Database database = MyJFQL.getInstance().getDBSession().getDirectlyDatabase(sender.getName());
+        final Session session = sender.getSession();
+
+        if (session == null) {
+            sender.sendError("Session of this user is invalid!");
+            return;
+        }
+
+        final Database database = session.getDatabase(databaseService);
 
         if (database == null) {
             sender.sendError("No database is in use for this user!");
             return;
         }
+
         if (args.containsKey("FROM")
                 && args.containsKey("COLUMN")) {
             final String name = formatString(args.get("FROM"));
@@ -48,10 +54,7 @@ public class RemoveCommand extends Command {
                 return;
             }
 
-            final String databaseName = database.getName();
-
-            if ((sender.hasPermission("-use.table." + name + "." + databaseName) || sender.hasPermission("-use.table.*." + databaseName))
-                    || (!sender.hasPermission("use.table." + name + "." + databaseName) && !sender.hasPermission("use.table.*." + databaseName))) {
+            if (!sender.allowed(database.getId(), DatabaseAction.READ_WRITE)) {
                 sender.sendForbidden();
                 return;
             }
