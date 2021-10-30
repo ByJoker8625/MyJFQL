@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(String id) {
-        users.removeIf(user -> user.getName().equals(id));
+        users.removeIf(user -> user.getId().equals(id));
         new File("user/" + id + ".json").delete();
     }
 

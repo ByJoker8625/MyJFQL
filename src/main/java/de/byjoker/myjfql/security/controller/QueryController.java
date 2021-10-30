@@ -27,11 +27,6 @@ public class QueryController implements Handler {
                 return;
             }
 
-            if (config.onlyManualSessionControl()) {
-                sender.sendForbidden();
-                return;
-            }
-
             final String token = request.getString("token");
 
             if (!sessionService.existsSession(token)) {
@@ -46,7 +41,9 @@ public class QueryController implements Handler {
                 return;
             }
 
-            session.setAddress(context.ip());
+            if (config.crossTokenRequests())
+                session.setAddress(context.ip());
+
             session.utilize();
 
             sender = sender.bind(session);
@@ -55,7 +52,7 @@ public class QueryController implements Handler {
             final String query = request.getString("query");
 
             if (config.showQueries())
-                MyJFQL.getInstance().getConsole().logInfo("User '" + sender.getName() + "' from " + session.getAddress() + " queried '" + query + "'.");
+                MyJFQL.getInstance().getConsole().logInfo("User '" + sender.getName() + "' from " + context.ip() + " queried '" + query + "'.");
 
             MyJFQL.getInstance().getCommandService().execute(sender, query);
         } catch (Exception ex) {

@@ -104,7 +104,9 @@ public class SessionServiceImpl implements SessionService {
                 if (userId.contains("%") || userId.contains("#") || userId.contains("'")) {
                     MyJFQL.getInstance().getConsole().logWarning("UserId used unauthorized characters in the id!");
                 } else {
-                    if (token.contains("%") || token.contains("#") || token.contains("'")) {
+                    if (!MyJFQL.getInstance().getUserService().existsUser(userId)) {
+                        MyJFQL.getInstance().getConsole().logWarning("Unknown userId in session!");
+                    } else if (token.contains("%") || token.contains("#") || token.contains("'")) {
                         MyJFQL.getInstance().getConsole().logWarning("Token used unauthorized characters in the id!");
                     } else {
                         sessions.add(new Session(token, userId, jsonSession.getString("databaseId"), jsonSession.getString("address"), jsonSession.getLong("open"), jsonSession.getLong("expire")));

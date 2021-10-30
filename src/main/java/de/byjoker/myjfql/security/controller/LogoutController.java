@@ -38,6 +38,9 @@ public class LogoutController implements Handler {
                 return;
             }
 
+            if (config.showConnections())
+                MyJFQL.getInstance().getConsole().logInfo("User '" + sender.getName() + "' from " + context.ip() + " closes his session.");
+
             sessionService.closeSession(token);
             sender.sendSuccess();
         } catch (Exception ex) {

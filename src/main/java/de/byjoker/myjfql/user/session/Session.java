@@ -5,6 +5,7 @@ import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.user.User;
 import de.byjoker.myjfql.user.UserService;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class Session {
@@ -44,7 +45,18 @@ public class Session {
     }
 
     public boolean validAddress(String address) {
-        return this.address.equals("*") || this.address.equals(address);
+        if (this.address.contains(",")) {
+            return Arrays.stream(this.address.split(",")).anyMatch(s -> validateAddress(s, address));
+        }
+
+        return validateAddress(this.address, address);
+    }
+
+    private boolean validateAddress(String addr, String address) {
+        if (addr.endsWith("*") && !addr.startsWith("*"))
+            return address.startsWith(addr.replace("*", ""));
+
+        return addr.equals("*") || addr.equals(address);
     }
 
     public long getExpire() {

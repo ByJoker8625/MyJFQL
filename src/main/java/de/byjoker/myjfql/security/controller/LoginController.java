@@ -43,10 +43,22 @@ public class LoginController implements Handler {
                     return;
                 }
 
-                if (!config.crossTokenRequests() && !sessionService.getSession(token).validAddress(context.ip())) {
+                final Session session = sessionService.getSession(token);
+
+                if (!config.crossTokenRequests() && !session.validAddress(context.ip())) {
                     sender.sendForbidden();
                     return;
                 }
+
+                if (config.crossTokenRequests()) {
+                    session.setAddress(context.ip());
+                    session.utilize();
+
+                    sessionService.saveSession(session);
+                }
+
+                if (config.showConnections())
+                    MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " joined the session '" + session.getToken() + "'.");
 
                 sender.sendResult(Collections.singletonList(token), new String[]{"Token"});
                 return;
@@ -72,7 +84,7 @@ public class LoginController implements Handler {
             final String token = ID.generateMixed().toString();
             sessionService.openSession(new Session(token, user.getId(), (user.hasPreferredDatabase()) ? user.getPreferredDatabase() : null, context.ip()));
 
-            if (config.showConnections() && config.showQueries())
+            if (config.showConnections())
                 MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " opened a session as '" + user.getName() + "'.");
 
             sender.sendResult(Collections.singletonList(token), new String[]{"Token"});

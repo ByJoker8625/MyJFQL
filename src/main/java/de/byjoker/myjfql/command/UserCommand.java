@@ -85,7 +85,10 @@ public class UserCommand extends ConsoleCommand {
                 return;
             }
 
-            userService.deleteUser(userService.getUserByIdentifier(userIdentifier).getId());
+            final String userId = userService.getUserByIdentifier(userIdentifier).getId();
+            MyJFQL.getInstance().getSessionService().closeSessions(userId);
+
+            userService.deleteUser(userId);
             sender.sendSuccess();
             return;
         }
