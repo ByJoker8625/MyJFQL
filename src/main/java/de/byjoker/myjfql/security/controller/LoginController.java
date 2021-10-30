@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.security.server.handler;
+package de.byjoker.myjfql.security.controller;
 
 import de.byjoker.jfql.util.ID;
 import de.byjoker.myjfql.command.RestCommandSender;
@@ -15,7 +15,7 @@ import org.json.JSONObject;
 
 import java.util.Collections;
 
-public class LoginHandler implements Handler {
+public class LoginController implements Handler {
 
     private final Config config = MyJFQL.getInstance().getConfig();
     private final UserService userService = MyJFQL.getInstance().getUserService();
@@ -33,12 +33,36 @@ public class LoginHandler implements Handler {
                 return;
             }
 
-            if (!userService.existsUserByIdentifier(request.getString("user"))) {
+            final String userIdentifier = request.getString("user");
+
+            if (userIdentifier.equals("%TOKEN%")) {
+                final String token = request.getString("password");
+
+                if (!sessionService.existsSession(token)) {
+                    sender.sendForbidden();
+                    return;
+                }
+
+                if (!config.crossTokenRequests() && !sessionService.getSession(token).validAddress(context.ip())) {
+                    sender.sendForbidden();
+                    return;
+                }
+
+                sender.sendResult(Collections.singletonList(token), new String[]{"Token"});
+                return;
+            }
+
+            if (config.onlyManualSessionControl()) {
                 sender.sendForbidden();
                 return;
             }
 
-            final User user = userService.getUserByIdentifier(request.getString("user"));
+            if (!userService.existsUserByIdentifier(userIdentifier)) {
+                sender.sendForbidden();
+                return;
+            }
+
+            final User user = userService.getUserByIdentifier(userIdentifier);
 
             if (!user.validPassword(request.getString("password"))) {
                 sender.sendForbidden();
@@ -46,7 +70,7 @@ public class LoginHandler implements Handler {
             }
 
             final String token = ID.generateMixed().toString();
-            sessionService.openSession(new Session(token, user.getId(), (user.hasPreferredDatabase()) ? user.getPreferredDatabase() : null, context.req.getRemoteAddr()));
+            sessionService.openSession(new Session(token, user.getId(), (user.hasPreferredDatabase()) ? user.getPreferredDatabase() : null, context.ip()));
 
             if (config.showConnections() && config.showQueries())
                 MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " opened a session as '" + user.getName() + "'.");

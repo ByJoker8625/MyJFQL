@@ -189,7 +189,7 @@ public class UserCommand extends ConsoleCommand {
             column.putContent("Name", selectedUser.getName());
             column.putContent("Password", selectedUser.getPassword());
             column.putContent("Accesses", selectedUser.getAccesses().toString());
-            column.putContent("PreferredDatabase", "#" + selectedUser.getPreferredDatabase());
+            column.putContent("PreferredDatabase", String.valueOf(selectedUser.getPreferredDatabase()));
 
             sender.sendResult(Collections.singletonList(column), new String[]{"Id", "Name", "Password", "Accesses", "PreferredDatabase"});
             return;

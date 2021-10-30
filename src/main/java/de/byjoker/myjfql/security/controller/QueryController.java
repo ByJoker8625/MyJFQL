@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.security.server.handler;
+package de.byjoker.myjfql.security.controller;
 
 import de.byjoker.myjfql.command.RestCommandSender;
 import de.byjoker.myjfql.config.Config;
@@ -10,7 +10,7 @@ import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
-public class QueryHandler implements Handler {
+public class QueryController implements Handler {
 
     private final Config config = MyJFQL.getInstance().getConfig();
     private final SessionService sessionService = MyJFQL.getInstance().getSessionService();
@@ -27,6 +27,11 @@ public class QueryHandler implements Handler {
                 return;
             }
 
+            if (config.onlyManualSessionControl()) {
+                sender.sendForbidden();
+                return;
+            }
+
             final String token = request.getString("token");
 
             if (!sessionService.existsSession(token)) {
@@ -35,7 +40,13 @@ public class QueryHandler implements Handler {
             }
 
             final Session session = sessionService.getSession(token);
-            session.setAddress(context.req.getRemoteAddr());
+
+            if (!config.crossTokenRequests() && !session.validAddress(context.ip())) {
+                sender.sendForbidden();
+                return;
+            }
+
+            session.setAddress(context.ip());
             session.utilize();
 
             sender = sender.bind(session);

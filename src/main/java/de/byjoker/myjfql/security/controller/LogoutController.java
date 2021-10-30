@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.security.server.handler;
+package de.byjoker.myjfql.security.controller;
 
 import de.byjoker.myjfql.command.RestCommandSender;
 import de.byjoker.myjfql.config.Config;
@@ -9,7 +9,7 @@ import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
-public class LogoutHandler implements Handler {
+public class LogoutController implements Handler {
 
     private final Config config = MyJFQL.getInstance().getConfig();
     private final SessionService sessionService = MyJFQL.getInstance().getSessionService();
@@ -29,6 +29,11 @@ public class LogoutHandler implements Handler {
             final String token = request.getString("token");
 
             if (!sessionService.existsSession(token)) {
+                sender.sendForbidden();
+                return;
+            }
+
+            if (!config.crossTokenRequests() && !sessionService.getSession(token).validAddress(context.ip())) {
                 sender.sendForbidden();
                 return;
             }

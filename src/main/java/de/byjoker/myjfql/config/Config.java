@@ -12,6 +12,12 @@ public interface Config {
 
     boolean autoUpdate();
 
+    boolean crossTokenRequests();
+
+    boolean memorySessions();
+
+    boolean onlyManualSessionControl();
+
     String updateHost();
 
     String encryption();

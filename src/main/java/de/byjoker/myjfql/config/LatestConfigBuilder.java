@@ -35,6 +35,21 @@ public class LatestConfigBuilder extends ConfigBuilder {
             }
 
             @Override
+            public boolean crossTokenRequests() {
+                return json.getJSONObject("security").getBoolean("crossTokenRequests");
+            }
+
+            @Override
+            public boolean memorySessions() {
+                return json.getJSONObject("security").getBoolean("memorySessions");
+            }
+
+            @Override
+            public boolean onlyManualSessionControl() {
+                return json.getJSONObject("security").getBoolean("onlyManualSessionControl");
+            }
+
+            @Override
             public String updateHost() {
                 return json.getJSONObject("updater").getString("host");
             }

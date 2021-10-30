@@ -43,6 +43,10 @@ public class Session {
         this.expire = open + 60000 * 15;
     }
 
+    public boolean validAddress(String address) {
+        return this.address.equals("*") || this.address.equals(address);
+    }
+
     public long getExpire() {
         return expire;
     }

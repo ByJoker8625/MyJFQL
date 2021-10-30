@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.reflect.ClassPath.from;
@@ -88,6 +89,11 @@ public class ConfigServiceImpl implements ConfigService {
 
         if (!file.exists())
             file.mkdir();
+
+        file = new File("sessions.json");
+
+        if (!file.exists())
+            factory.save(file, new JSONObject().put("sessions", Collections.emptyList()));
 
         file = new File("config.json");
 

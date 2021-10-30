@@ -1,8 +1,10 @@
 package de.byjoker.myjfql.user.session;
 
+import de.byjoker.myjfql.util.StorageService;
+
 import java.util.List;
 
-public interface SessionService {
+public interface SessionService extends StorageService {
 
     void openSession(Session session);
 

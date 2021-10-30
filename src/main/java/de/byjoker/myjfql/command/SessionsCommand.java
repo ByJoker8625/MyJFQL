@@ -16,7 +16,7 @@ import java.util.*;
 public class SessionsCommand extends ConsoleCommand {
 
     public SessionsCommand() {
-        super("sessions", Arrays.asList("COMMAND", "OF", "BIND", "TO", "OPEN", "TOKEN", "CLOSE-ALL", "CLOSE"));
+        super("sessions", Arrays.asList("COMMAND", "OF", "BIND", "TO", "OPEN", "TOKEN", "CLOSE-ALL", "CLOSE", "DATABASE", "ADDRESS", "EXPIRE"));
     }
 
     @Override
@@ -44,9 +44,9 @@ public class SessionsCommand extends ConsoleCommand {
                 final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 long expire = -1;
 
-                if (args.get("OPEN").size() != 0) {
+                if (args.containsKey("EXPIRE") && args.get("EXPIRE").size() != 0 && !Objects.requireNonNull(formatString(args.get("EXPIRE"))).equalsIgnoreCase("NEVER")) {
                     try {
-                        expire = dateFormat.parse(formatString(args.get("OPEN"))).getTime();
+                        expire = dateFormat.parse(formatString(args.get("EXPIRE"))).getTime();
                     } catch (Exception ex) {
                         sender.sendError("Unknown date format!");
                         return;
@@ -59,22 +59,40 @@ public class SessionsCommand extends ConsoleCommand {
                 }
 
                 String token = null;
+                String database = null;
+                String address = "127.0.0.1";
 
-                if (args.containsKey("TOKEN"))
+                if (args.containsKey("TOKEN") && args.get("TOKEN").size() != 0)
                     token = formatString(args.get("TOKEN"));
+
+                if (args.containsKey("DATABASE") && args.get("DATABASE").size() != 0) {
+                    database = formatString(args.get("DATABASE"));
+
+                    if (!databaseService.existsDatabaseByIdentifier(database)) {
+                        sender.sendError("Database doesn't exists!");
+                        return;
+                    }
+
+                    database = databaseService.getDatabaseByIdentifier(database).getId();
+                }
+
+                if (args.containsKey("ADDRESS") && args.get("ADDRESS").size() != 0)
+                    address = formatString(args.get("ADDRESS"));
 
                 if (token == null)
                     token = ID.generateMixed().toString();
 
-                final Session session = new Session(token, user.getId(), null, "null", expire);
+                final Session session = new Session(token, user.getId(), database, address, expire);
                 sessionService.openSession(session);
 
                 final Column column = new Column();
                 column.putContent("Token", session.getToken());
+                column.putContent("Address", session.getAddress());
+                column.putContent("Database", String.valueOf(session.getDatabaseId()));
                 column.putContent("Start", dateFormat.format(new Date(session.getOpen())));
                 column.putContent("Expire", session.getExpire() == -1 ? "NEVER" : dateFormat.format(new Date(session.getExpire())));
 
-                sender.sendResult(Collections.singletonList(column), new String[]{"Token", "Start", "Expire"});
+                sender.sendResult(Collections.singletonList(column), new String[]{"Token", "Address", "Database", "Start", "Expire"});
                 return;
             }
 
@@ -104,15 +122,9 @@ public class SessionsCommand extends ConsoleCommand {
 
             if (args.containsKey("BIND") && args.containsKey("TO")) {
                 final String token = formatString(args.get("BIND"));
-                final String databaseIdentifier = formatString(args.get("TO"));
 
                 if (token == null) {
                     sender.sendError("Undefined session!");
-                    return;
-                }
-
-                if (databaseIdentifier == null) {
-                    sender.sendError("Undefined database!");
                     return;
                 }
 
@@ -121,16 +133,81 @@ public class SessionsCommand extends ConsoleCommand {
                     return;
                 }
 
-                if (!databaseService.existsDatabaseByIdentifier(databaseIdentifier)) {
-                    sender.sendError("Database doesn't exists!");
+                if (args.containsKey("DATABASE")) {
+                    final String databaseIdentifier = formatString(args.get("DATABASE"));
+
+                    if (databaseIdentifier == null) {
+                        sender.sendError("Undefined database!");
+                        return;
+                    }
+
+                    if (!databaseService.existsDatabaseByIdentifier(databaseIdentifier)) {
+                        sender.sendError("Database doesn't exists!");
+                        return;
+                    }
+
+                    final Session session = sessionService.getSession(token);
+                    session.setDatabaseId(databaseService.getDatabaseByIdentifier(databaseIdentifier).getId());
+                    sessionService.saveSession(session);
+
+                    sender.sendSuccess();
                     return;
                 }
 
-                final Session session = sessionService.getSession(token);
-                session.setDatabaseId(databaseService.getDatabaseByIdentifier(databaseIdentifier).getId());
-                sessionService.saveSession(session);
+                if (args.containsKey("ADDRESS")) {
+                    final String address = formatString(args.get("ADDRESS"));
 
-                sender.sendSuccess();
+                    if (address == null) {
+                        sender.sendError("Undefined address!");
+                        return;
+                    }
+
+                    final Session session = sessionService.getSession(token);
+                    session.setAddress(address);
+                    sessionService.saveSession(session);
+
+                    sender.sendSuccess();
+                    return;
+                }
+
+                if (args.containsKey("EXPIRE")) {
+                    final String expire = formatString(args.get("EXPIRE"));
+
+                    if (expire == null) {
+                        sender.sendError("Undefined date!");
+                        return;
+                    }
+
+                    if (expire.equalsIgnoreCase("NEVER")) {
+                        final Session session = sessionService.getSession(token);
+                        session.setExpire(-1);
+                        sessionService.saveSession(session);
+                        sender.sendSuccess();
+                        return;
+                    }
+
+                    long date;
+
+                    try {
+                        date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(formatString(args.get("EXPIRE"))).getTime();
+                    } catch (Exception ex) {
+                        sender.sendError("Unknown date format!");
+                        return;
+                    }
+
+                    if (date <= System.currentTimeMillis()) {
+                        sender.sendError("Session already expired!");
+                        return;
+                    }
+
+                    final Session session = sessionService.getSession(token);
+                    session.setExpire(date);
+                    sessionService.saveSession(session);
+                    sender.sendSuccess();
+                    return;
+                }
+
+                sender.sendSyntax();
                 return;
             }
 
@@ -141,7 +218,7 @@ public class SessionsCommand extends ConsoleCommand {
                 final Column column = new Column();
                 column.putContent("Token", session.getToken());
                 column.putContent("Address", session.getAddress());
-                column.putContent("Database", "#" + session.getDatabaseId());
+                column.putContent("Database", String.valueOf(session.getDatabaseId()));
                 column.putContent("Start", dateFormat.format(new Date(session.getOpen())));
                 column.putContent("Expire", session.getExpire() == -1 ? "NEVER" : dateFormat.format(new Date(session.getExpire())));
                 sessions.add(column);

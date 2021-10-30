@@ -100,25 +100,21 @@ public final class MyJFQL {
                 config = configService.getConfig();
             }
 
-            {
-                if (config.jline())
-                    console = new JLineConsole();
-                else
-                    console = new ScannerConsole();
-            }
+            if (config.jline())
+                console = new JLineConsole();
+            else
+                console = new ScannerConsole();
 
-            {
-                switch (config.encryption().toUpperCase()) {
-                    case "BASE64":
-                        encryptor = new Base64Encryptor();
-                        break;
-                    case "ARGON2":
-                        encryptor = new Argon2Encryptor();
-                        break;
-                    default:
-                        encryptor = new NoneEncryptor();
-                        break;
-                }
+            switch (config.encryption().toUpperCase()) {
+                case "BASE64":
+                    encryptor = new Base64Encryptor();
+                    break;
+                case "ARGON2":
+                    encryptor = new Argon2Encryptor();
+                    break;
+                default:
+                    encryptor = new NoneEncryptor();
+                    break;
             }
 
             console.logInfo("Successfully initialized config.");
@@ -176,6 +172,7 @@ public final class MyJFQL {
             console.logInfo("Loading databases and users (This can take a while)...");
             databaseService.loadAll();
             userService.loadAll();
+            sessionService.loadAll();
             console.logInfo("Loading finished!");
         }
 
@@ -212,6 +209,7 @@ public final class MyJFQL {
                 databaseService.updateAll();
                 userService.updateAll();
                 sessionService.collectExpiresSessions();
+                sessionService.updateAll();
             }
         }, 1000 * 60, 1000 * 60);
 
@@ -226,6 +224,7 @@ public final class MyJFQL {
             console.logInfo("Shutdown (This can take a while)...");
             databaseService.updateAll();
             userService.updateAll();
+            sessionService.updateAll();
             server.shutdown();
         } catch (Exception ignore) {
         }

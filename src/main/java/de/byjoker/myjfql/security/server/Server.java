@@ -1,10 +1,9 @@
 package de.byjoker.myjfql.security.server;
 
 import de.byjoker.myjfql.command.RestCommandSender;
-import de.byjoker.myjfql.security.server.handler.LoginHandler;
-import de.byjoker.myjfql.security.server.handler.LogoutHandler;
-import de.byjoker.myjfql.security.server.handler.QueryEmulatorHandler;
-import de.byjoker.myjfql.security.server.handler.QueryHandler;
+import de.byjoker.myjfql.security.controller.LoginController;
+import de.byjoker.myjfql.security.controller.LogoutController;
+import de.byjoker.myjfql.security.controller.QueryController;
 import io.javalin.Javalin;
 import org.json.JSONObject;
 
@@ -20,10 +19,11 @@ public class Server {
         app._conf.showJavalinBanner = false;
 
         app.error(404, context -> context.result(new JSONObject().put("type", RestCommandSender.ResponseType.SYNTAX_ERROR).toString()));
-        app.post("api/v1/session/open", new LoginHandler());
-        app.post("api/v1/session/close", new LogoutHandler());
-        app.post("api/v1/query", new QueryHandler());
-        app.post("query", new QueryEmulatorHandler());
+        app.post("api/v1/session/open", new LoginController());
+        app.post("api/v1/login", new LoginController());
+        app.post("api/v1/session/close", new LogoutController());
+        app.post("api/v1/logout", new LogoutController());
+        app.post("api/v1/query", new QueryController());
 
         app.start(port);
     }
