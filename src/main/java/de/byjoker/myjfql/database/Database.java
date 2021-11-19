@@ -35,7 +35,13 @@ public class Database implements TableService {
 
     @Override
     public void saveTable(Table table) {
-        deleteTable(table.getName());
+        for (int i = 0; i < tables.size(); i++) {
+            if (tables.get(i).getName().equals(table.getName())) {
+                tables.set(i, table);
+                return;
+            }
+        }
+
         tables.add(table);
     }
 

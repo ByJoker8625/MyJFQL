@@ -41,7 +41,7 @@ public class Session {
         this.databaseId = databaseId;
         this.address = address;
         this.open = System.currentTimeMillis();
-        this.expire = open + 60000 * 15;
+        utilize();
     }
 
     public boolean validAddress(String address) {
@@ -86,7 +86,7 @@ public class Session {
         if (expire == -1)
             return;
 
-        expire = System.currentTimeMillis() + 60000 * 15;
+        expire = System.currentTimeMillis() + 60000 * 60 * 24 * 7;
     }
 
     public String getAddress() {

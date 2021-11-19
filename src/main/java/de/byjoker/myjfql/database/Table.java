@@ -26,16 +26,16 @@ public class Table implements ColumnHandler {
             return;
         }
 
-        final Column col = getColumn(column.getContent(primary).toString());
+        for (int i = 0; i < columns.size(); i++) {
+            final Column col = columns.get(i);
 
-        if (col == null) {
-            columns.add(column);
-            return;
+            if (col.getContent(primary).equals(column.getContent(primary))) {
+                column.setCreation(col.getCreation());
+                columns.set(i, column);
+                return;
+            }
         }
 
-        removeColumn(column.getContent(primary).toString());
-
-        column.setCreation(col.getCreation());
         columns.add(column);
     }
 
