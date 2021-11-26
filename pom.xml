@@ -4,58 +4,100 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.joker-games</groupId>
+    <groupId>de.byjoker</groupId>
     <artifactId>MyJFQL</artifactId>
-    <version>1.5.1</version>
-
+    <version>1.5.2</version>
+    <name>MyJFQL</name>
+    <description>Java based easy to use dbms for smaller applications</description>
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <java.version>1.8</java.version>
     </properties>
 
     <repositories>
         <repository>
-            <id>joker-games</id>
-            <url>https://joker-games.org/repository</url>
+            <id>byjoker-repo</id>
+            <url>https://byjoker.de/dl/repository</url>
         </repository>
     </repositories>
 
     <dependencies>
         <dependency>
-            <groupId>com.github.javadev</groupId>
-            <artifactId>underscore</artifactId>
-            <version>1.69</version>
+            <groupId>de.mkammerer</groupId>
+            <artifactId>argon2-jvm</artifactId>
+            <version>2.11</version>
         </dependency>
         <dependency>
-            <groupId>org.joker-games</groupId>
+            <groupId>com.github.javadev</groupId>
+            <artifactId>underscore</artifactId>
+            <version>1.71</version>
+        </dependency>
+        <dependency>
+            <groupId>de.byjoker</groupId>
             <artifactId>JFQLConnector</artifactId>
-            <version>1.1</version>
+            <version>1.3.2</version>
         </dependency>
         <dependency>
             <groupId>io.javalin</groupId>
             <artifactId>javalin</artifactId>
-            <version>3.11.2</version>
+            <version>4.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.26</version>
+            <version>1.7.32</version>
         </dependency>
         <dependency>
             <groupId>jline</groupId>
             <artifactId>jline</artifactId>
-            <version>2.14.2</version>
+            <version>2.14.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.0.1-jre</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20200518</version>
+            <version>20210307</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.5</version>
+            <version>20030203.000550</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>
+                                        de.byjoker.myjfql.core.boot.Boot
+                                    </mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

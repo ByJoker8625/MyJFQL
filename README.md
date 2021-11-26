@@ -6,12 +6,13 @@ is similar to SQL but is very simplified.
 
 ### Documentation
 
-To see detailed documentation on JFQL or MyJFQL clike [here](https://joker-games.org/documentation/jfql/create) for JFQL
+If you want to see detailed documentation on JFQL or MyJFQL
+clike [here](https://joker-games.org/documentation/jfql/create) for JFQL
 and [here](https://joker-games.org/documentation/myjfql/download/) for MyJFQL.
 
 ### License
 
 All files on this repository are subject to the MIT license. Please read
-the [LICENSE](https://github.com/joker-games/MyJFQL/blob/master/LICENSE) file at the root of the project.
+the [LICENSE](https://github.com/ByJoker8625/MyJFQL/blob/master/LICENSE) file at the root of the project.
 
 
