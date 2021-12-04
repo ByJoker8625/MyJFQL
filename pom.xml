@@ -19,7 +19,7 @@
     <repositories>
         <repository>
             <id>byjoker-repo</id>
-            <url>https://byjoker.de/dl/repository</url>
+            <url>https://cdn.byjoker.de/repository</url>
         </repository>
     </repositories>
 
@@ -32,7 +32,7 @@
         <dependency>
             <groupId>com.github.javadev</groupId>
             <artifactId>underscore</artifactId>
-            <version>1.71</version>
+            <version>1.72</version>
         </dependency>
         <dependency>
             <groupId>de.byjoker</groupId>

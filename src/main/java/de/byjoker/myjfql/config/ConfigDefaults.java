@@ -40,7 +40,7 @@ public class ConfigDefaults implements Config {
 
     @Override
     public String updateHost() {
-        return "https://byjoker.de/dl/json/myjfql.json";
+        return "https://cdn.byjoker.de/myjfql/myjfql.json";
     }
 
     @Override
@@ -68,6 +68,6 @@ public class ConfigDefaults implements Config {
         return new JSONObject()
                 .put("server", new JSONObject().put("enabled", true).put("port", 2291))
                 .put("security", new JSONObject().put("encryption", "NONE").put("onlyManualSessionControl", false).put("memorySessions", true).put("crossTokenRequests", false).put("jline", true).put("showConnections", true).put("showQueries", true))
-                .put("updater", new JSONObject().put("enabled", true).put("autoUpdate", false).put("host", "https://byjoker.de/dl/json/myjfql.json"));
+                .put("updater", new JSONObject().put("enabled", true).put("autoUpdate", false).put("host", "https://cdn.byjoker.de/myjfql/myjfql.json"));
     }
 }
