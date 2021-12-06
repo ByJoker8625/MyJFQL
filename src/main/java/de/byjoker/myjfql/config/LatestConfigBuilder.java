@@ -55,6 +55,11 @@ public class LatestConfigBuilder extends ConfigBuilder {
             }
 
             @Override
+            public String updateFile() {
+                return json.getJSONObject("updater").getString("file");
+            }
+
+            @Override
             public String encryption() {
                 return json.getJSONObject("security").getString("encryption");
             }

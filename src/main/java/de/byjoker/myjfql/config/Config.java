@@ -20,6 +20,8 @@ public interface Config {
 
     String updateHost();
 
+    String updateFile();
+
     String encryption();
 
     boolean jline();
