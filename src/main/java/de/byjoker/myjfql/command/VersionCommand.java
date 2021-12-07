@@ -29,9 +29,10 @@ public class VersionCommand extends ConsoleCommand {
         if (args.containsKey("UPDATE")) {
             final List<String> update = args.get("UPDATE");
 
-            if (update.size() == 0)
+            if (update.size() == 0) {
+                MyJFQL.getInstance().getServer().shutdown();
                 downloader.downloadLatestVersion();
-            else {
+            } else {
                 String version = formatString(update);
 
                 if (version == null) {
@@ -44,6 +45,7 @@ public class VersionCommand extends ConsoleCommand {
                     return;
                 }
 
+                MyJFQL.getInstance().getServer().shutdown();
                 downloader.downloadByVersion(version);
                 return;
             }

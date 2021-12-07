@@ -44,6 +44,11 @@ public class ConfigDefaults implements Config {
     }
 
     @Override
+    public String updateFile() {
+        return "MyJFQL.jar";
+    }
+
+    @Override
     public String encryption() {
         return "NONE";
     }
