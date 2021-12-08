@@ -59,11 +59,17 @@ public class SessionsCommand extends ConsoleCommand {
                 }
 
                 String token = null;
-                String database = null;
+                String database = user.getPreferredDatabase();
                 String address = "127.0.0.1";
 
-                if (args.containsKey("TOKEN") && args.get("TOKEN").size() != 0)
+                if (args.containsKey("TOKEN") && args.get("TOKEN").size() != 0) {
                     token = formatString(args.get("TOKEN"));
+                }
+
+                if (token != null && token.length() < 8) {
+                    sender.sendError("Token is to short! Minimum 8 characters!");
+                    return;
+                }
 
                 if (args.containsKey("DATABASE") && args.get("DATABASE").size() != 0) {
                     database = formatString(args.get("DATABASE"));
@@ -76,11 +82,13 @@ public class SessionsCommand extends ConsoleCommand {
                     database = databaseService.getDatabaseByIdentifier(database).getId();
                 }
 
-                if (args.containsKey("ADDRESS") && args.get("ADDRESS").size() != 0)
+                if (args.containsKey("ADDRESS") && args.get("ADDRESS").size() != 0) {
                     address = formatString(args.get("ADDRESS"));
+                }
 
-                if (token == null)
+                if (token == null) {
                     token = ID.generateMixed().toString();
+                }
 
                 final Session session = new Session(token, user.getId(), database, address, expire);
                 sessionService.openSession(session);
