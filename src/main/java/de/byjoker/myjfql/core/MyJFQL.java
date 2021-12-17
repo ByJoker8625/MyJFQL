@@ -19,11 +19,11 @@ import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.database.DatabaseServiceImpl;
 import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.exception.NetworkException;
-import de.byjoker.myjfql.security.encryptor.Argon2Encryptor;
-import de.byjoker.myjfql.security.encryptor.Base64Encryptor;
-import de.byjoker.myjfql.security.encryptor.Encryptor;
-import de.byjoker.myjfql.security.encryptor.NoneEncryptor;
-import de.byjoker.myjfql.security.server.Server;
+import de.byjoker.myjfql.server.Server;
+import de.byjoker.myjfql.server.encryptor.Argon2Encryptor;
+import de.byjoker.myjfql.server.encryptor.Base64Encryptor;
+import de.byjoker.myjfql.server.encryptor.Encryptor;
+import de.byjoker.myjfql.server.encryptor.NoneEncryptor;
 import de.byjoker.myjfql.user.UserService;
 import de.byjoker.myjfql.user.UserServiceImpl;
 import de.byjoker.myjfql.user.session.Session;
@@ -39,7 +39,7 @@ public final class MyJFQL {
 
     private static MyJFQL instance;
 
-    private final String version = "1.5.2";
+    private final String version = "1.5.3";
     private final Formatter formatter;
     private final CommandService commandService;
     private final DatabaseService databaseService;
@@ -178,7 +178,7 @@ public final class MyJFQL {
 
         if (encryptor.name().equals("NONE")) {
             console.clean();
-            console.logWarning("You are using no encryption! This type of password storing is very insecure!");
+            console.logWarning("You are using no encryption! This state of password storing is very insecure!");
         }
 
         {

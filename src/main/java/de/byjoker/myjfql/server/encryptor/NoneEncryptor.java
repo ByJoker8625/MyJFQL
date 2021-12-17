@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.security.encryptor;
+package de.byjoker.myjfql.server.encryptor;
 
 public class NoneEncryptor implements Encryptor {
 

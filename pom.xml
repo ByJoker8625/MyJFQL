@@ -6,7 +6,7 @@
 
     <groupId>de.byjoker</groupId>
     <artifactId>MyJFQL</artifactId>
-    <version>1.5.2</version>
+    <version>1.5.3</version>
     <name>MyJFQL</name>
     <description>Java based easy to use dbms for smaller applications</description>
     <properties>
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>20030203.000550</version>
+            <version>2.11.0</version>
         </dependency>
     </dependencies>
 

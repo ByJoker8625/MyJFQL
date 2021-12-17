@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.core.lang;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.exception.CommandException;
+import de.byjoker.myjfql.exception.LanguageException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -66,7 +66,7 @@ public class JFQLFormatter implements Formatter {
                 arguments.put(section, new ArrayList<>());
             } else {
                 if (section == null) {
-                    throw new CommandException();
+                    throw new LanguageException();
                 }
 
                 if (!arguments.containsKey(section)) {

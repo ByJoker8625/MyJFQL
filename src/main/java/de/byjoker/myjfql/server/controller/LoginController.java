@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.security.controller;
+package de.byjoker.myjfql.server.controller;
 
 import de.byjoker.jfql.util.ID;
 import de.byjoker.myjfql.command.RestCommandSender;

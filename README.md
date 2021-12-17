@@ -120,13 +120,13 @@ request.
 
 | Field |     Type      | Description                                                         |
 |:------|:-------------:|---------------------------------------------------------------------|
-| type  | response type | the type of the response *(RESULT, FORBIDDEN, ERROR, SYNTAX_ERROR)* |
+| state  | response state | the state of the response *(RESULT, FORBIDDEN, ERROR, SYNTAX_ERROR)* |
 
 ##### GeneralResponse example
 
 ```json
 {
-  "type": "FORBIDDEN"
+  "state": "FORBIDDEN"
 }
 ```
 
@@ -134,14 +134,14 @@ request.
 
 | Field   |     Type      | Description              |
 |:--------|:-------------:|--------------------------|
-| type    | response type | the type of the response |
+| state    | response state | the state of the response |
 | message |    string     | the error message        |
 
 ##### ErrorResponse example
 
 ```json
 {
-  "type": "ERROR",
+  "state": "ERROR",
   "message": "Some error happened!"
 }
 ```
@@ -150,7 +150,7 @@ request.
 
 | Field     |     Type      | Description                                                |
 |:----------|:-------------:|------------------------------------------------------------|
-| type      | response type | the type of the response                                   |
+| state      | response state | the state of the response                                   |
 | structure | string array  | the table structure of response                            |
 | result    | column array  | the actual content *(a standalone string or column based)* |
 
@@ -169,7 +169,7 @@ request.
       "creation": 1637341356130
     }
   ],
-  "type": "RESULT",
+  "state": "RESULT",
   "structure": [
     "id",
     "name",
@@ -186,7 +186,7 @@ request.
   "result": [
     "N99EXfcurUP+IZHB3rFb"
   ],
-  "type": "RESULT",
+  "state": "RESULT",
   "structure": [
     "Token"
   ]
@@ -216,7 +216,7 @@ request.
 
 | Field                    |  Type   | Description                                                |
 |:-------------------------|:-------:|------------------------------------------------------------|
-| encryption               | string  | the encryption type of passwords                           |
+| encryption               | string  | the encryption state of passwords                           |
 | crossTokenRequests       | boolean | if requests at same session from different ips get blocked |
 | memorySessions           | boolean | if sessions saved in memory not in file                    |
 | onlyManualSessionControl | boolean | if client can create own sessions                          |

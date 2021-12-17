@@ -1,12 +1,12 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
+import de.byjoker.myjfql.core.lang.ConditionFormatter;
 import de.byjoker.myjfql.database.Column;
 import de.byjoker.myjfql.database.Database;
 import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.Table;
 import de.byjoker.myjfql.user.session.Session;
-import de.byjoker.myjfql.util.ConditionHelper;
 import de.byjoker.myjfql.util.Sorter;
 
 import java.util.*;
@@ -154,9 +154,9 @@ public class SelectCommand extends Command {
                 List<Column> columns;
 
                 try {
-                    columns = ConditionHelper.getRequiredColumns(table, args.get("WHERE"), type, sorter, order);
+                    columns = ConditionFormatter.getRequiredColumns(table, args.get("WHERE"), type, sorter, order);
                 } catch (Exception ex) {
-                    sender.sendError("Unknown statement error!");
+                    sender.sendError(ex);
                     return;
                 }
 

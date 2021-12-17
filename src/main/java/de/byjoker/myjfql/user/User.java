@@ -65,6 +65,10 @@ public class User {
     }
 
     public boolean validPassword(String password) {
+        if (password.length() < 8) {
+            return false;
+        }
+
         return this.password.equals(MyJFQL.getInstance().getEncryptor().encrypt(password));
     }
 

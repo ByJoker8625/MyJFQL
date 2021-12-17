@@ -45,6 +45,11 @@ public class UserCommand extends ConsoleCommand {
                 return;
             }
 
+            if (password.length() < 8) {
+                sender.sendError("Password to short!");
+                return;
+            }
+
             if (userService.existsUserByName(name)) {
                 sender.sendError("User already exists!");
                 return;

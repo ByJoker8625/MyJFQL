@@ -5,7 +5,7 @@ import de.byjoker.myjfql.console.TablePrinter;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Column;
 import de.byjoker.myjfql.database.DatabaseAction;
-import de.byjoker.myjfql.exception.CommandException;
+import de.byjoker.myjfql.exception.LanguageException;
 import de.byjoker.myjfql.user.session.Session;
 
 import java.util.List;
@@ -45,10 +45,10 @@ public class ConsoleCommandSender extends CommandSender {
     @Override
     public void sendResult(Object obj, Object structure) {
         if (!(structure instanceof String[]) && !(structure instanceof List))
-            throw new CommandException("Input is not an array!");
+            throw new LanguageException("Input is not an array!");
 
         if (!(obj instanceof List))
-            throw new CommandException("Input is not an list!");
+            throw new LanguageException("Input is not an list!");
 
         String[] array;
 

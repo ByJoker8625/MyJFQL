@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.lang.Formatter;
-import de.byjoker.myjfql.exception.CommandException;
+import de.byjoker.myjfql.exception.LanguageException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -81,7 +81,7 @@ public class CommandServiceImpl implements CommandService {
 
             command.handleCommand(sender, arguments);
         } catch (Exception ex) {
-            new CommandException(ex).printStackTrace();
+            new LanguageException(ex).printStackTrace();
         }
     }
 

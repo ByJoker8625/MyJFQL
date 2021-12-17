@@ -59,8 +59,8 @@ public class Table implements ColumnHandler {
     }
 
     @Override
-    public List<Column> getColumns(Sorter.Type type, Sorter.Order order, String... strings) {
-        switch (type) {
+    public List<Column> getColumns(Sorter.Type state, Sorter.Order order, String... strings) {
+        switch (state) {
             case CREATION:
                 return Sorter.sortColumns(columns);
             case CUSTOM:

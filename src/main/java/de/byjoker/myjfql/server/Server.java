@@ -1,9 +1,9 @@
-package de.byjoker.myjfql.security.server;
+package de.byjoker.myjfql.server;
 
 import de.byjoker.myjfql.command.RestCommandSender;
-import de.byjoker.myjfql.security.controller.LoginController;
-import de.byjoker.myjfql.security.controller.LogoutController;
-import de.byjoker.myjfql.security.controller.QueryController;
+import de.byjoker.myjfql.server.controller.LoginController;
+import de.byjoker.myjfql.server.controller.LogoutController;
+import de.byjoker.myjfql.server.controller.QueryController;
 import io.javalin.Javalin;
 import org.json.JSONObject;
 

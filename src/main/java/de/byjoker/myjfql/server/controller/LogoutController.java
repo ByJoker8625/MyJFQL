@@ -1,16 +1,15 @@
-package de.byjoker.myjfql.security.controller;
+package de.byjoker.myjfql.server.controller;
 
 import de.byjoker.myjfql.command.RestCommandSender;
 import de.byjoker.myjfql.config.Config;
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.user.session.Session;
 import de.byjoker.myjfql.user.session.SessionService;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
-public class QueryController implements Handler {
+public class LogoutController implements Handler {
 
     private final Config config = MyJFQL.getInstance().getConfig();
     private final SessionService sessionService = MyJFQL.getInstance().getSessionService();
@@ -22,7 +21,7 @@ public class QueryController implements Handler {
         try {
             final JSONObject request = new JSONObject(context.body());
 
-            if (!request.has("query") || !request.has("token")) {
+            if (!request.has("token")) {
                 sender.sendError("Incomplete request authorization!");
                 return;
             }
@@ -34,30 +33,18 @@ public class QueryController implements Handler {
                 return;
             }
 
-            final Session session = sessionService.getSession(token);
-
-            if (!config.crossTokenRequests() && !session.validAddress(context.ip())) {
+            if (!config.crossTokenRequests() && !sessionService.getSession(token).validAddress(context.ip())) {
                 sender.sendForbidden();
                 return;
             }
 
-            if (config.crossTokenRequests())
-                session.setAddress(context.ip());
+            if (config.showConnections())
+                MyJFQL.getInstance().getConsole().logInfo("User '" + sender.getName() + "' from " + context.ip() + " closes his session.");
 
-            session.utilize();
-
-            sender = sender.bind(session);
-            sessionService.saveSession(session);
-
-            final String query = request.getString("query");
-
-            if (config.showQueries())
-                MyJFQL.getInstance().getConsole().logInfo("User '" + sender.getName() + "' from " + context.ip() + " queried '" + query + "'.");
-
-            MyJFQL.getInstance().getCommandService().execute(sender, query);
+            sessionService.closeSession(token);
+            sender.sendSuccess();
         } catch (Exception ex) {
             sender.sendError(ex);
         }
     }
-
 }

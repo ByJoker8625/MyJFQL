@@ -1,9 +1,9 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
+import de.byjoker.myjfql.core.lang.ConditionFormatter;
 import de.byjoker.myjfql.database.*;
 import de.byjoker.myjfql.user.session.Session;
-import de.byjoker.myjfql.util.ConditionHelper;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -109,9 +109,9 @@ public class InsertCommand extends Command {
                 List<Column> columns;
 
                 try {
-                    columns = ConditionHelper.getRequiredColumns(table, args.get("WHERE"));
+                    columns = ConditionFormatter.getRequiredColumns(table, args.get("WHERE"));
                 } catch (Exception ex) {
-                    sender.sendError("Unknown statement error!");
+                    sender.sendError(ex);
                     return;
                 }
 

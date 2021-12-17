@@ -2,7 +2,7 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.DatabaseAction;
-import de.byjoker.myjfql.exception.CommandException;
+import de.byjoker.myjfql.exception.LanguageException;
 import de.byjoker.myjfql.user.User;
 import de.byjoker.myjfql.user.session.Session;
 import io.javalin.http.Context;
@@ -31,7 +31,7 @@ public class RestCommandSender extends CommandSender {
         final JSONObject jsonObject = new JSONObject();
 
         if (obj instanceof String) {
-            jsonObject.put("exception", new CommandException(obj.toString()));
+            jsonObject.put("exception", new LanguageException(obj.toString()));
         } else {
             jsonObject.put("exception", obj);
         }
