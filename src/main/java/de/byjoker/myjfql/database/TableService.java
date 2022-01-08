@@ -1,8 +1,10 @@
 package de.byjoker.myjfql.database;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface TableService {
+
+    void regenerateId();
 
     void createTable(Table table);
 
@@ -14,6 +16,10 @@ public interface TableService {
 
     Table getTable(String name);
 
-    List<Table> getTables();
+    Collection<Table> getTables();
+
+    String getName();
+
+    String getId();
 
 }

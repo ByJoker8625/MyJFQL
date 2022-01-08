@@ -1,6 +1,5 @@
 package de.byjoker.myjfql.database;
 
-import de.byjoker.jfql.util.ID;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.util.FileFactory;
@@ -8,19 +7,17 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class DatabaseServiceImpl implements DatabaseService {
 
     private final FileFactory factory;
-    private final List<Database> databases;
+    private final Map<String, Database> databases;
 
     public DatabaseServiceImpl() {
         this.factory = new FileFactory();
-        this.databases = new ArrayList<>();
+        this.databases = new HashMap<>();
     }
 
     @Override
@@ -29,7 +26,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             throw new FileException("Database already exists!");
 
         if (existsDatabase(database.getId())) {
-            database.setId(ID.generateString().toString());
+            database.regenerateId();
             createDatabase(database);
             return;
         }
@@ -39,14 +36,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public void saveDatabase(Database database) {
-        for (int i = 0, databasesSize = databases.size(); i < databasesSize; i++) {
-            if (databases.get(i).getName().equals(database.getName())) {
-                databases.set(i, database);
-                return;
-            }
-        }
-
-        databases.add(database);
+        databases.put(database.getId(), database);
     }
 
     @Override
@@ -59,18 +49,18 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public boolean existsDatabaseByName(String name) {
-        return databases.stream().anyMatch(database -> database.getName().equals(name));
+        return databases.values().stream().anyMatch(database -> database.getName().equals(name));
     }
 
     @Override
     public boolean existsDatabase(String id) {
-        return databases.stream().anyMatch(database -> database.getId().equals(id));
+        return databases.containsKey(id);
     }
 
     @Override
     public void deleteDatabase(String id) {
-        databases.removeIf(database -> database.getId().equals(id));
         new File("database/" + id + ".json").delete();
+        databases.remove(id);
     }
 
     @Override
@@ -84,17 +74,17 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Database getDatabaseByName(String name) {
-        return databases.stream().filter(database -> database.getName().equals(name)).findFirst().orElse(null);
+        return databases.values().stream().filter(database -> database.getName().equals(name)).findFirst().orElse(null);
     }
 
     @Override
     public Database getDatabase(String id) {
-        return databases.stream().filter(database -> database.getId().equals(id)).findFirst().orElse(null);
+        return databases.get(id);
     }
 
     @Override
-    public List<Database> getDatabases() {
-        return databases;
+    public Collection<Database> getDatabases() {
+        return databases.values();
     }
 
     @Override
@@ -145,7 +135,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                 }
 
                 if (!database.getName().contains("%") && !database.getName().contains("#") && !database.getName().contains("'"))
-                    databases.add(database);
+                    databases.put(database.getId(), database);
                 else
                     MyJFQL.getInstance().getConsole().logWarning("Database used unauthorized characters in the name!");
             }
@@ -159,7 +149,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public void updateAll(File space) {
-        databases.forEach(database -> {
+        databases.values().forEach(database -> {
             final File file = new File(space.getPath() + "/" + database.getId() + ".json");
             final JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", database.getName());

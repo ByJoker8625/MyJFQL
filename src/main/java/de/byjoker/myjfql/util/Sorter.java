@@ -2,16 +2,13 @@ package de.byjoker.myjfql.util;
 
 import de.byjoker.myjfql.database.Column;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class Sorter {
 
 
-    public static List<Column> sortColumns(final String key, final List<Column> columns, final Order order) {
-        final List<String> strings = new ArrayList<>();
+    public static Collection<Column> sortColumns(String key, Collection<Column> columns, Order order) {
+        List<String> strings = new ArrayList<>();
 
         columns.forEach(col -> {
             if (!col.containsContentKey(key)) {
@@ -21,10 +18,10 @@ public class Sorter {
             }
         });
 
-        final List<String> sorted = sortList(strings, order);
+        List<String> sorted = sortList(strings, order);
 
-        final List<Column> nullable = new ArrayList<>();
-        final List<Column> list = new ArrayList<>();
+        List<Column> nullable = new ArrayList<>();
+        List<Column> list = new ArrayList<>();
 
         sorted.forEach(string -> {
             if (string.equals("null")) {
@@ -40,10 +37,10 @@ public class Sorter {
         return list;
     }
 
-    public static List<String> sortList(final List<String> strings, final Order order) {
-        final List<String> characters = new ArrayList<>();
-        final List<String> nullable = new ArrayList<>();
-        final List<String> digits = new ArrayList<>();
+    public static List<String> sortList(List<String> strings, Order order) {
+        List<String> characters = new ArrayList<>();
+        List<String> nullable = new ArrayList<>();
+        List<String> digits = new ArrayList<>();
 
         strings.forEach(string -> {
             if (string.equals("null")) {
@@ -58,7 +55,7 @@ public class Sorter {
         digits.sort(Comparator.comparingLong(Long::parseLong));
         characters.sort(Comparator.naturalOrder());
 
-        final List<String> list = new ArrayList<>();
+        List<String> list = new ArrayList<>();
         list.addAll(digits);
         list.addAll(characters);
         list.addAll(nullable);
@@ -70,13 +67,13 @@ public class Sorter {
         return list;
     }
 
-    public static List<Column> sortColumns(final List<Column> columns) {
+    public static Collection<Column> sortColumns(Collection<Column> columns) {
         List<Column> list = new ArrayList<>(columns);
         list.sort(Comparator.comparingLong(Column::getCreation));
         return list;
     }
 
-    public static boolean isNumber(final String s) {
+    public static boolean isNumber(String s) {
         try {
             Long.parseLong(s);
             return true;

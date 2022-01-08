@@ -6,7 +6,7 @@
 
     <groupId>de.byjoker</groupId>
     <artifactId>MyJFQL</artifactId>
-    <version>1.5.3</version>
+    <version>1.5.4</version>
     <name>MyJFQL</name>
     <description>Java based easy to use dbms for smaller applications</description>
     <properties>

@@ -3,26 +3,32 @@ package de.byjoker.myjfql.database;
 import de.byjoker.jfql.util.ID;
 import de.byjoker.myjfql.exception.FileException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class Database implements TableService {
 
+    private final String name;
     private String id;
-    private List<Table> tables;
-    private String name;
+    private Map<String, Table> tables;
 
     public Database(String name) {
         this.id = ID.generateString().toString();
         this.name = name;
-        this.tables = new ArrayList<>();
+        this.tables = new HashMap<>();
     }
 
     public Database(String id, String name) {
         this.id = id;
         this.name = name;
-        this.tables = new ArrayList<>();
+        this.tables = new HashMap<>();
+    }
+
+    @Override
+    public void regenerateId() {
+        this.id = ID.generateString().toString();
     }
 
     @Override
@@ -35,54 +41,41 @@ public class Database implements TableService {
 
     @Override
     public void saveTable(Table table) {
-        for (int i = 0; i < tables.size(); i++) {
-            if (tables.get(i).getName().equals(table.getName())) {
-                tables.set(i, table);
-                return;
-            }
-        }
-
-        tables.add(table);
+        tables.put(table.getName(), table);
     }
 
     @Override
     public boolean existsTable(String name) {
-        return tables.stream().anyMatch(table -> table.getName().equals(name));
+        return tables.containsKey(name);
     }
 
     @Override
     public void deleteTable(String name) {
-        tables.removeIf(table -> table.getName().equals(name));
+        tables.remove(name);
     }
 
     @Override
     public Table getTable(String name) {
-        return tables.stream().filter(table -> table.getName().equals(name)).findFirst().orElse(null);
+        return tables.get(name);
     }
 
     @Override
-    public List<Table> getTables() {
-        return tables;
+    public Collection<Table> getTables() {
+        return tables.values();
     }
 
-    public void setTables(List<Table> tables) {
+    public void setTables(Map<String, Table> tables) {
         this.tables = tables;
     }
 
+    @Override
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
+    @Override
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override
@@ -102,7 +95,7 @@ public class Database implements TableService {
     public String toString() {
         return "Database{" +
                 "id='" + id + '\'' +
-                ", tables=" + tables +
+                ", tables=" + tables.values() +
                 ", name='" + name + '\'' +
                 '}';
     }

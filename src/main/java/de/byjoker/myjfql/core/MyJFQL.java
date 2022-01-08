@@ -39,7 +39,7 @@ public final class MyJFQL {
 
     private static MyJFQL instance;
 
-    private final String version = "1.5.3";
+    private final String version = "1.5.4";
     private final Formatter formatter;
     private final CommandService commandService;
     private final DatabaseService databaseService;

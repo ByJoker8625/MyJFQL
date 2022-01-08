@@ -5,10 +5,7 @@ import de.byjoker.myjfql.core.lang.ConditionFormatter;
 import de.byjoker.myjfql.database.*;
 import de.byjoker.myjfql.user.session.Session;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @CommandHandler
 public class InsertCommand extends Command {
@@ -64,7 +61,7 @@ public class InsertCommand extends Command {
 
             final Table table = database.getTable(name);
 
-            final List<String> tableStructure = table.getStructure();
+            final Collection<String> tableStructure = table.getStructure();
             final String primary = table.getPrimary();
 
             final Map<String, String> content = new HashMap<>();

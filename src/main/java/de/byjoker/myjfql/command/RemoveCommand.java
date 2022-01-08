@@ -5,8 +5,8 @@ import de.byjoker.myjfql.core.lang.ConditionFormatter;
 import de.byjoker.myjfql.database.*;
 import de.byjoker.myjfql.user.session.Session;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -93,7 +93,7 @@ public class RemoveCommand extends Command {
                 if (!column.equals("*")) {
                     table.removeColumn(column);
                 } else {
-                    table.setColumns(new ArrayList<>());
+                    table.setColumns(new HashMap<>());
                 }
 
                 sender.sendSuccess();

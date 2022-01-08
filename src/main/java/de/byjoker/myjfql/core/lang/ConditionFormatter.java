@@ -7,10 +7,7 @@ import de.byjoker.myjfql.exception.LanguageException;
 import de.byjoker.myjfql.util.Requirement;
 import de.byjoker.myjfql.util.Sorter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -105,11 +102,11 @@ public class ConditionFormatter {
         }
     }
 
-    private static boolean passConditions(List<List<Requirement>> conditions, List<String> structure, Column column) {
+    private static boolean passConditions(List<List<Requirement>> conditions, Collection<String> structure, Column column) {
         return conditions.stream().anyMatch(requirements -> passRequirements(requirements, structure, column));
     }
 
-    private static boolean passRequirements(List<Requirement> requirements, List<String> structure, Column column) {
+    private static boolean passRequirements(List<Requirement> requirements, Collection<String> structure, Column column) {
         final List<Integer> passed = new ArrayList<>();
         int amountPassed = 0;
 

@@ -2,7 +2,7 @@ package de.byjoker.myjfql.database;
 
 import de.byjoker.myjfql.util.Sorter;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface ColumnHandler {
 
@@ -12,8 +12,18 @@ public interface ColumnHandler {
 
     Column getColumn(String identifier);
 
-    List<Column> getColumns();
+    Collection<Column> getColumns();
 
-    List<Column> getColumns(Sorter.Type type, Sorter.Order order, String... strings);
+    Collection<Column> getColumns(Sorter.Type type, Sorter.Order order, String... sortedBy);
+
+    Collection<String> getStructure();
+
+    void setStructure(Collection<String> structure);
+
+    String getPrimary();
+
+    void setPrimary(String primary);
+
+    String getName();
 
 }

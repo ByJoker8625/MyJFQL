@@ -7,10 +7,7 @@ import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.database.Table;
 import de.byjoker.myjfql.user.session.Session;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @CommandHandler
 public class StructureCommand extends Command {
@@ -56,7 +53,7 @@ public class StructureCommand extends Command {
             }
 
             final Table table = database.getTable(name);
-            final List<String> structure = table.getStructure();
+            final Collection<String> structure = table.getStructure();
             final String primary = table.getPrimary();
 
             if (!args.containsKey("ADD") && !args.containsKey("REMOVE") && !args.containsKey("SET") && !args.containsKey("MARK-PRIMARY")) {

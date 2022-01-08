@@ -2,96 +2,93 @@ package de.byjoker.myjfql.database;
 
 import de.byjoker.myjfql.util.Sorter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class Table implements ColumnHandler {
 
-    private String name;
-    private List<Column> columns;
-    private List<String> structure;
+    private final String name;
+    private Map<String, Column> columns;
+    private Collection<String> structure;
     private String primary;
 
     public Table(String name, List<String> structure, String primary) {
         this.name = name;
         this.structure = structure;
         this.primary = primary;
-        this.columns = new ArrayList<>();
+        this.columns = new HashMap<>();
     }
 
     @Override
     public void addColumn(Column column) {
-        if (column.getContent(primary) == null) {
+        if (String.valueOf(column.getContent(primary)).equals("null")) {
             return;
         }
 
-        for (int i = 0; i < columns.size(); i++) {
-            final Column col = columns.get(i);
-
-            if (col.getContent(primary).equals(column.getContent(primary))) {
-                column.setCreation(col.getCreation());
-                columns.set(i, column);
-                return;
-            }
-        }
-
-        columns.add(column);
+        columns.put(column.getContent(primary).toString(), column);
     }
 
     @Override
-    public void removeColumn(String key) {
-        columns.removeIf(col -> col.getContent(primary).toString().equals(key));
+    public void removeColumn(String primary) {
+        columns.remove(primary);
     }
 
     @Override
     public Column getColumn(String key) {
-        return columns.stream().filter(col -> col.getContent(primary).toString().equals(key)).findFirst().orElse(null);
+        return columns.get(key);
     }
 
     @Override
-    public List<Column> getColumns() {
+    public Collection<Column> getColumns() {
         return getColumns(Sorter.Type.CREATION, Sorter.Order.ASC);
     }
 
-    public void setColumns(List<Column> columns) {
+    public void setColumns(Map<String, Column> columns) {
         this.columns = columns;
     }
 
     @Override
-    public List<Column> getColumns(Sorter.Type state, Sorter.Order order, String... strings) {
+    public Collection<Column> getColumns(Sorter.Type state, Sorter.Order order, String... sortedBy) {
         switch (state) {
             case CREATION:
-                return Sorter.sortColumns(columns);
+                return Sorter.sortColumns(columns.values());
             case CUSTOM:
-                return Sorter.sortColumns(strings[0], columns, order);
+                return Sorter.sortColumns(sortedBy[0], columns.values(), order);
         }
 
-        return columns;
+        return columns.values();
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<String> getStructure() {
+    @Override
+    public Collection<String> getStructure() {
         return structure;
     }
 
-    public void setStructure(final List<String> structure) {
+    @Override
+    public void setStructure(Collection<String> structure) {
         this.structure = structure;
+        reindexColumns();
     }
 
+    @Override
     public String getPrimary() {
         return primary;
     }
 
-    public void setPrimary(final String primary) {
+    @Override
+    public void setPrimary(String primary) {
         this.primary = primary;
+        reindexColumns();
+    }
+
+    public void reindexColumns() {
+        final Collection<Column> columns = new ArrayList<>(this.columns.values());
+        this.columns.clear();
+        columns.forEach(this::addColumn);
     }
 
     @Override
@@ -99,9 +96,7 @@ public class Table implements ColumnHandler {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Table table = (Table) o;
-        return Objects.equals(name, table.name) &&
-                Objects.equals(structure, table.structure) &&
-                Objects.equals(primary, table.primary);
+        return Objects.equals(name, table.name);
     }
 
     @Override
@@ -115,7 +110,7 @@ public class Table implements ColumnHandler {
                 "name='" + name + '\'' +
                 ", structure=" + structure +
                 ", primary='" + primary + '\'' +
-                ", columns=" + columns +
+                ", columns=" + columns.values() +
                 '}';
     }
 }

@@ -2,7 +2,7 @@ package de.byjoker.myjfql.database;
 
 import de.byjoker.myjfql.util.StorageService;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface DatabaseService extends StorageService {
 
@@ -24,6 +24,6 @@ public interface DatabaseService extends StorageService {
 
     Database getDatabase(String id);
 
-    List<Database> getDatabases();
+    Collection<Database> getDatabases();
 
 }

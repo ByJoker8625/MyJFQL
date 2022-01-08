@@ -58,7 +58,7 @@ public class SelectCommand extends Command {
             }
 
             final List<String> values = new ArrayList<>();
-            final List<String> tableStructure = table.getStructure();
+            final Collection<String> tableStructure = table.getStructure();
 
             {
                 List<String> strings = formatList(args.get("VALUE"));
@@ -71,7 +71,7 @@ public class SelectCommand extends Command {
                 strings = formatList(strings);
 
                 if (!strings.contains("*")) {
-                    for (final String key : strings) {
+                    for (String key : strings) {
                         if (!tableStructure.contains(key)) {
                             sender.sendError("Key doesn't exists!");
                             return;
@@ -170,7 +170,7 @@ public class SelectCommand extends Command {
                 else
                     sender.sendResult(columns.stream().limit(limit).collect(Collectors.toList()), values);
             } else {
-                final List<Column> columns = table.getColumns(type, order, sorter);
+                final Collection<Column> columns = table.getColumns(type, order, sorter);
 
                 if (columns.size() == 0) {
                     sender.sendResult(new ArrayList<Column>(), values);
