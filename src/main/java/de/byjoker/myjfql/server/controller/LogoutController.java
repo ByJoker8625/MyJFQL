@@ -3,7 +3,7 @@ package de.byjoker.myjfql.server.controller;
 import de.byjoker.myjfql.command.RestCommandSender;
 import de.byjoker.myjfql.config.Config;
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.user.session.SessionService;
+import de.byjoker.myjfql.server.session.SessionService;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;

@@ -1,9 +1,9 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.core.lang.ConditionFormatter;
 import de.byjoker.myjfql.database.*;
-import de.byjoker.myjfql.user.session.Session;
+import de.byjoker.myjfql.lang.ColumnFilter;
+import de.byjoker.myjfql.server.session.Session;
 
 import java.util.*;
 
@@ -11,7 +11,7 @@ import java.util.*;
 public class InsertCommand extends Command {
 
     public InsertCommand() {
-        super("insert", Arrays.asList("COMMAND", "INTO", "KEY", "VALUE", "PRIMARY-KEY", "WHERE"));
+        super("insert", Arrays.asList("COMMAND", "INTO", "KEY", "VALUE", "PRIMARY-KEY", "WHERE", "FULLY"));
     }
 
     @Override
@@ -88,13 +88,13 @@ public class InsertCommand extends Command {
                 Column column = table.getColumn(primaryKey);
 
                 if (column == null) {
-                    column = new Column();
+                    column = new SimpleColumn();
                 }
 
                 column.getContent().putAll(content);
 
-                if (column.getContent(primary) == null) {
-                    column.putContent(primary, primaryKey);
+                if (!column.containsOrNotNullItem(primary)) {
+                    column.setItem(primary, primaryKey);
                 }
 
                 sender.sendSuccess();
@@ -106,7 +106,7 @@ public class InsertCommand extends Command {
                 List<Column> columns;
 
                 try {
-                    columns = ConditionFormatter.getRequiredColumns(table, args.get("WHERE"));
+                    columns = ColumnFilter.filter(table, args.get("WHERE"));
                 } catch (Exception ex) {
                     sender.sendError(ex);
                     return;
@@ -117,7 +117,7 @@ public class InsertCommand extends Command {
                     return;
                 }
 
-                for (final Column column : columns) {
+                for (Column column : columns) {
                     column.getContent().putAll(content);
                     table.addColumn(column);
                 }
@@ -135,7 +135,11 @@ public class InsertCommand extends Command {
                 Column column = table.getColumn(content.get(primary));
 
                 if (column == null) {
-                    column = new Column();
+                    column = new SimpleColumn();
+                }
+
+                if (args.containsKey("FULLY")) {
+                    column.getContent().clear();
                 }
 
                 column.getContent().putAll(content);

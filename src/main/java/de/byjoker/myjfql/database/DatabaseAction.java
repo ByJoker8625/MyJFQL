@@ -16,4 +16,7 @@ public enum DatabaseAction {
         return level >= action.level;
     }
 
+    public int getLevel() {
+        return level;
+    }
 }

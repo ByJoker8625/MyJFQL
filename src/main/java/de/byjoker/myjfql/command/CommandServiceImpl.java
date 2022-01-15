@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.command;
 
-import de.byjoker.myjfql.core.lang.Formatter;
 import de.byjoker.myjfql.exception.LanguageException;
+import de.byjoker.myjfql.lang.CommandFormatter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,9 +14,9 @@ import static com.google.common.reflect.ClassPath.from;
 public class CommandServiceImpl implements CommandService {
 
     private final List<Command> commands;
-    private final Formatter formatter;
+    private final CommandFormatter formatter;
 
-    public CommandServiceImpl(Formatter formatter) {
+    public CommandServiceImpl(CommandFormatter formatter) {
         this.commands = new ArrayList<>();
         this.formatter = formatter;
     }

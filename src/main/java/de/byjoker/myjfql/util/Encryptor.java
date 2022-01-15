@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.server.encryptor;
+package de.byjoker.myjfql.util;
 
 public interface Encryptor {
 

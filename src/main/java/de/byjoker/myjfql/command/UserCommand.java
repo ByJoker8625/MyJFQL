@@ -1,10 +1,7 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.Column;
-import de.byjoker.myjfql.database.Database;
-import de.byjoker.myjfql.database.DatabaseAction;
-import de.byjoker.myjfql.database.DatabaseService;
+import de.byjoker.myjfql.database.*;
 import de.byjoker.myjfql.user.User;
 import de.byjoker.myjfql.user.UserService;
 
@@ -65,7 +62,7 @@ public class UserCommand extends ConsoleCommand {
                     return;
                 }
 
-                final Database database = new Database(databaseName);
+                final Database database = new MapManagedDatabase(databaseName);
                 databaseService.createDatabase(database);
 
                 user.grantAccess(database.getId(), DatabaseAction.READ_WRITE);
@@ -191,20 +188,19 @@ public class UserCommand extends ConsoleCommand {
             }
 
             final User selectedUser = userService.getUserByIdentifier(userIdentifier);
-            final Column column = new Column();
+            final Column column = new SimpleColumn();
 
-            column.putContent("Id", selectedUser.getId());
-            column.putContent("Name", selectedUser.getName());
-            column.putContent("Password", selectedUser.getPassword());
-            column.putContent("Accesses", selectedUser.getAccesses().toString());
-            column.putContent("PreferredDatabase", String.valueOf(selectedUser.getPreferredDatabase()));
+            column.setItem("id", selectedUser.getId());
+            column.setItem("name", selectedUser.getName());
+            column.setItem("accesses", selectedUser.getAccesses().toString());
+            column.setItem("preferred_database_id", String.valueOf(selectedUser.getPreferredDatabase()));
 
-            sender.sendResult(Collections.singletonList(column), new String[]{"Id", "Name", "Password", "Accesses", "PreferredDatabase"});
+            sender.sendResult(Collections.singletonList(column), new String[]{"id", "name", "accesses", "preferred_database_id"});
             return;
         }
 
         if (args.containsKey("LIST")) {
-            sender.sendResult(userService.getUsers().stream().map(User::getName).collect(Collectors.toList()), new String[]{"User"});
+            sender.sendResult(userService.getUsers().stream().map(User::getName).collect(Collectors.toList()), new String[]{"user_names"});
             return;
         }
 

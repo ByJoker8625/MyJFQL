@@ -6,7 +6,7 @@ import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Column;
 import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.exception.LanguageException;
-import de.byjoker.myjfql.user.session.Session;
+import de.byjoker.myjfql.server.session.Session;
 
 import java.util.List;
 
@@ -66,11 +66,11 @@ public class ConsoleCommandSender extends CommandSender {
         try {
             final List<Column> columns = (List<Column>) obj;
 
-            for (final Column column : columns) {
+            for (Column column : columns) {
                 final String[] row = new String[array.length];
 
                 for (int i = 0; i < array.length; i++) {
-                    final Object value = column.getContent(array[i]);
+                    final Object value = column.getItem(array[i]);
 
                     if (value != null)
                         row[i] = value.toString();

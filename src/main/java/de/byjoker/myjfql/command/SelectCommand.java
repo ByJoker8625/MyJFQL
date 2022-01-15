@@ -1,13 +1,11 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.core.lang.ConditionFormatter;
-import de.byjoker.myjfql.database.Column;
-import de.byjoker.myjfql.database.Database;
-import de.byjoker.myjfql.database.DatabaseAction;
-import de.byjoker.myjfql.database.Table;
-import de.byjoker.myjfql.user.session.Session;
-import de.byjoker.myjfql.util.Sorter;
+import de.byjoker.myjfql.database.*;
+import de.byjoker.myjfql.lang.ColumnComparator;
+import de.byjoker.myjfql.lang.ColumnFilter;
+import de.byjoker.myjfql.lang.SortingOrder;
+import de.byjoker.myjfql.server.session.Session;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -84,9 +82,8 @@ public class SelectCommand extends Command {
                 }
             }
 
-            Sorter.Type type = Sorter.Type.CREATION;
-            Sorter.Order order = Sorter.Order.ASC;
-            String sorter = null;
+            SortingOrder order = null;
+            String sortedBy = null;
             int limit = -1;
 
             if (args.containsKey("LIMIT")) {
@@ -115,23 +112,19 @@ public class SelectCommand extends Command {
                     sender.sendError("Sort item doesn't exist!");
                 }
 
-                type = Sorter.Type.CUSTOM;
-                sorter = sort;
+                sortedBy = sort;
             }
 
             if (args.containsKey("ORDER")) {
                 try {
-                    order = Sorter.Order.valueOf(formatString(args.get("ORDER")));
+                    order = SortingOrder.valueOf(formatString(args.get("ORDER")));
                 } catch (Exception ex) {
                     sender.sendError("Unknown sort order!");
                     return;
                 }
 
-                if (type != Sorter.Type.CUSTOM)
-                    type = Sorter.Type.CUSTOM;
-
-                if (sorter == null)
-                    sorter = table.getPrimary();
+                if (sortedBy == null)
+                    sortedBy = table.getPrimary();
             }
 
             if (args.containsKey("PRIMARY-KEY")) {
@@ -154,7 +147,7 @@ public class SelectCommand extends Command {
                 List<Column> columns;
 
                 try {
-                    columns = ConditionFormatter.getRequiredColumns(table, args.get("WHERE"), type, sorter, order);
+                    columns = ColumnFilter.filter(table, args.get("WHERE"), new ColumnComparator(sortedBy), order);
                 } catch (Exception ex) {
                     sender.sendError(ex);
                     return;
@@ -165,15 +158,17 @@ public class SelectCommand extends Command {
                     return;
                 }
 
-                if (limit == -1)
-                    sender.sendResult(columns, values);
-                else
+                if (limit != -1) {
                     sender.sendResult(columns.stream().limit(limit).collect(Collectors.toList()), values);
+                    return;
+                }
+
+                sender.sendResult(columns, values);
             } else {
-                final Collection<Column> columns = table.getColumns(type, order, sorter);
+                final Collection<Column> columns = sortedBy == null ? table.getColumns() : table.getColumns(new ColumnComparator(sortedBy), order);
 
                 if (columns.size() == 0) {
-                    sender.sendResult(new ArrayList<Column>(), values);
+                    sender.sendResult(new ArrayList<SimpleColumn>(), values);
                     return;
                 }
 

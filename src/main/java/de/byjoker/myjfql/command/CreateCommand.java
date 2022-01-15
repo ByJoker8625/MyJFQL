@@ -1,11 +1,8 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.Database;
-import de.byjoker.myjfql.database.DatabaseAction;
-import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.database.Table;
-import de.byjoker.myjfql.user.session.Session;
+import de.byjoker.myjfql.database.*;
+import de.byjoker.myjfql.server.session.Session;
 
 import java.util.Arrays;
 import java.util.List;
@@ -84,7 +81,7 @@ public class CreateCommand extends Command {
 
             sender.sendSuccess();
 
-            database.createTable(new Table(name, structure, primaryKey));
+            database.createTable(new MapManagedTable(name, structure, primaryKey));
             databaseService.saveDatabase(database);
             return;
         }
@@ -112,7 +109,7 @@ public class CreateCommand extends Command {
                 return;
             }
 
-            databaseService.createDatabase(new Database(name));
+            databaseService.createDatabase(new MapManagedDatabase(name));
             sender.sendSuccess();
             return;
         }

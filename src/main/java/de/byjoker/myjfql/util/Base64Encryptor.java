@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.server.encryptor;
+package de.byjoker.myjfql.util;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;

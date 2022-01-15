@@ -1,10 +1,10 @@
 package de.byjoker.myjfql.user;
 
-import de.byjoker.jfql.util.ID;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.util.FileFactory;
+import de.byjoker.myjfql.util.IDGenerator;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
             throw new FileException("User already exists!");
 
         if (existsUser(user.getId())) {
-            user.setId(ID.generateNumber().toString());
+            user.setId(IDGenerator.generateDigits(8));
             createUser(user);
             return;
         }

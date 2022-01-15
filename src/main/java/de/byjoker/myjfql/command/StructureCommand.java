@@ -5,7 +5,7 @@ import de.byjoker.myjfql.database.Database;
 import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.database.Table;
-import de.byjoker.myjfql.user.session.Session;
+import de.byjoker.myjfql.server.session.Session;
 
 import java.util.*;
 

@@ -1,8 +1,8 @@
 package de.byjoker.myjfql.user;
 
-import de.byjoker.jfql.util.ID;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.DatabaseAction;
+import de.byjoker.myjfql.util.IDGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +17,7 @@ public class User {
     private String preferredDatabase;
 
     public User(String name, String password) {
-        this.id = ID.generateNumber().toString();
+        this.id = IDGenerator.generateDigits(8);
         this.name = name;
         this.password = password;
         this.accesses = new HashMap<>();

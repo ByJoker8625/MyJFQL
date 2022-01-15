@@ -1,79 +1,30 @@
 package de.byjoker.myjfql.database;
 
-import java.util.HashMap;
+import de.byjoker.myjfql.lang.Requirement;
+
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-public class Column {
+public interface Column {
 
-    private long creation;
-    private Map<String, Object> content;
+    Object getItem(String key);
 
-    public Column() {
-        this.content = new HashMap<>();
-        this.creation = System.currentTimeMillis();
-    }
+    String getStringifyItem(String key);
 
-    public Column(Map<String, Object> content) {
-        this.content = content;
-        this.creation = System.currentTimeMillis();
-    }
+    void setItem(String key, Object value);
 
-    public long getCreation() {
-        return creation;
-    }
+    void removeItem(String key);
 
-    public void setCreation(final long creation) {
-        this.creation = creation;
-    }
+    boolean containsItem(String key);
 
-    public Object getContent(final String key) {
-        return content.get(key);
-    }
+    boolean containsOrNotNullItem(String key);
 
-    public void putContent(final String key, final Object o) {
-        content.put(key, o);
-    }
+    boolean matches(List<List<Requirement>> conditions);
 
-    public void removeContent(final String key) {
-        content.remove(key);
-    }
+    Map<String, Object> getContent();
 
-    public boolean containsContentKey(final String key) {
-        return content.containsKey(key);
-    }
+    void setContent(Map<String, Object> content);
 
-    public boolean containsContentValue(final String value) {
-        return content.containsValue(value);
-    }
+    long getCreatedAt();
 
-    public Map<String, Object> getContent() {
-        return content;
-    }
-
-    public void setContent(final Map<String, Object> content) {
-        this.content = content;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Column column = (Column) o;
-        return creation == column.creation &&
-                Objects.equals(content, column.content);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(creation, content);
-    }
-
-    @Override
-    public String toString() {
-        return "Column{" +
-                "creation=" + creation +
-                ", content=" + content +
-                '}';
-    }
 }

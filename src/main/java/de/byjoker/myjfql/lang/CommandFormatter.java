@@ -1,9 +1,9 @@
-package de.byjoker.myjfql.core.lang;
+package de.byjoker.myjfql.lang;
 
 import java.util.List;
 import java.util.Map;
 
-public interface Formatter {
+public interface CommandFormatter {
 
     Map<String, List<String>> formatCommand(String command);
 

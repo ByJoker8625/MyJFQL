@@ -1,12 +1,11 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.core.lang.ConditionFormatter;
 import de.byjoker.myjfql.database.*;
-import de.byjoker.myjfql.user.session.Session;
+import de.byjoker.myjfql.lang.ColumnFilter;
+import de.byjoker.myjfql.server.session.Session;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +70,7 @@ public class RemoveCommand extends Command {
                 List<Column> columns;
 
                 try {
-                    columns = ConditionFormatter.getRequiredColumns(table, args.get("WHERE"));
+                    columns = ColumnFilter.filter(table, args.get("WHERE"));
                 } catch (Exception ex) {
                     sender.sendError(ex);
                     return;
@@ -83,7 +82,7 @@ public class RemoveCommand extends Command {
                 }
 
                 final String primary = table.getPrimary();
-                columns.stream().map(col -> col.getContent(primary).toString()).forEach(table::removeColumn);
+                columns.stream().map(col -> col.getStringifyItem(primary)).forEach(table::removeColumn);
 
                 sender.sendSuccess();
 
@@ -93,7 +92,7 @@ public class RemoveCommand extends Command {
                 if (!column.equals("*")) {
                     table.removeColumn(column);
                 } else {
-                    table.setColumns(new HashMap<>());
+                    table.clear();
                 }
 
                 sender.sendSuccess();

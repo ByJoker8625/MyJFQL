@@ -3,8 +3,8 @@ package de.byjoker.myjfql.command;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.exception.LanguageException;
+import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.user.User;
-import de.byjoker.myjfql.user.session.Session;
 import io.javalin.http.Context;
 import org.json.JSONObject;
 

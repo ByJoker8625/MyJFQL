@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.user.session;
+package de.byjoker.myjfql.server.session;
 
 import de.byjoker.myjfql.database.Database;
 import de.byjoker.myjfql.database.DatabaseService;

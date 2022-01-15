@@ -12,8 +12,6 @@ public interface BackupService {
 
     void loadBackup(String name);
 
-    void fetchBackup(String user, String password, String host);
-
     List<String> getBackups();
 
 }

@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.database.DatabaseAction;
-import de.byjoker.myjfql.user.session.Session;
+import de.byjoker.myjfql.server.session.Session;
 
 public abstract class CommandSender {
 

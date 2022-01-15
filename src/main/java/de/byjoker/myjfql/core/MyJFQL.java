@@ -11,26 +11,21 @@ import de.byjoker.myjfql.console.Console;
 import de.byjoker.myjfql.console.JLineConsole;
 import de.byjoker.myjfql.console.ScannerConsole;
 import de.byjoker.myjfql.console.SystemConsole;
-import de.byjoker.myjfql.core.lang.Formatter;
-import de.byjoker.myjfql.core.lang.JFQLFormatter;
 import de.byjoker.myjfql.database.BackupService;
 import de.byjoker.myjfql.database.BackupServiceImpl;
 import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.database.DatabaseServiceImpl;
+import de.byjoker.myjfql.database.MapManagedDatabaseService;
 import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.exception.NetworkException;
+import de.byjoker.myjfql.lang.CommandFormatter;
+import de.byjoker.myjfql.lang.JFQLCommandFormatter;
 import de.byjoker.myjfql.server.Server;
-import de.byjoker.myjfql.server.encryptor.Argon2Encryptor;
-import de.byjoker.myjfql.server.encryptor.Base64Encryptor;
-import de.byjoker.myjfql.server.encryptor.Encryptor;
-import de.byjoker.myjfql.server.encryptor.NoneEncryptor;
+import de.byjoker.myjfql.server.session.Session;
+import de.byjoker.myjfql.server.session.SessionService;
+import de.byjoker.myjfql.server.session.SessionServiceImpl;
 import de.byjoker.myjfql.user.UserService;
 import de.byjoker.myjfql.user.UserServiceImpl;
-import de.byjoker.myjfql.user.session.Session;
-import de.byjoker.myjfql.user.session.SessionService;
-import de.byjoker.myjfql.user.session.SessionServiceImpl;
-import de.byjoker.myjfql.util.Downloader;
-import de.byjoker.myjfql.util.Updater;
+import de.byjoker.myjfql.util.*;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -40,7 +35,7 @@ public final class MyJFQL {
     private static MyJFQL instance;
 
     private final String version = "1.5.4";
-    private final Formatter formatter;
+    private final CommandFormatter formatter;
     private final CommandService commandService;
     private final DatabaseService databaseService;
     private final ConfigService configService;
@@ -61,14 +56,14 @@ public final class MyJFQL {
         this.console = new SystemConsole();
         this.config = new ConfigDefaults();
         this.encryptor = new NoneEncryptor();
-        this.formatter = new JFQLFormatter();
+        this.formatter = new JFQLCommandFormatter();
         this.sessionService = new SessionServiceImpl();
         this.consoleCommandSender = new ConsoleCommandSender();
         this.updater = new Updater(version);
         this.commandService = new CommandServiceImpl(formatter);
         this.userService = new UserServiceImpl();
         this.downloader = updater.getDownloader();
-        this.databaseService = new DatabaseServiceImpl();
+        this.databaseService = new MapManagedDatabaseService();
         this.databaseBackupService = new BackupServiceImpl(databaseService);
         this.server = new Server();
     }
@@ -268,7 +263,7 @@ public final class MyJFQL {
         return encryptor;
     }
 
-    public Formatter getFormatter() {
+    public CommandFormatter getFormatter() {
         return formatter;
     }
 

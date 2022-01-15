@@ -1,15 +1,18 @@
-package de.byjoker.myjfql.util;
+package de.byjoker.myjfql.lang;
 
 import java.util.Arrays;
 
 public class Requirement {
 
-    private final String[] attributes;
     private final Filter filter;
     private final State state;
 
+    private final String key;
+    private final String value;
+
     public Requirement(String[] attributes, Filter filter, State state) {
-        this.attributes = attributes;
+        this.key = attributes[0];
+        this.value = attributes[1];
         this.filter = filter;
         this.state = state;
     }
@@ -17,14 +20,19 @@ public class Requirement {
     @Override
     public String toString() {
         return "Requirement{" +
-                "attributes=" + Arrays.toString(attributes) +
-                ", filter=" + filter +
-                ", type=" + state +
+                "filter=" + filter +
+                ", state=" + state +
+                ", key='" + key + '\'' +
+                ", value='" + value + '\'' +
                 '}';
     }
 
-    public String[] getAttributes() {
-        return attributes;
+    public String getValue() {
+        return value;
+    }
+
+    public String getKey() {
+        return key;
     }
 
     public Filter getFilter() {

@@ -6,7 +6,7 @@
 
     <groupId>de.byjoker</groupId>
     <artifactId>MyJFQL</artifactId>
-    <version>1.5.4</version>
+    <version>1.5.4-expanded</version>
     <name>MyJFQL</name>
     <description>Java based easy to use dbms for smaller applications</description>
     <properties>
@@ -15,13 +15,6 @@
         <maven.compiler.target>8</maven.compiler.target>
         <java.version>1.8</java.version>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>byjoker-repo</id>
-            <url>https://cdn.byjoker.de/repository</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -35,14 +28,9 @@
             <version>1.72</version>
         </dependency>
         <dependency>
-            <groupId>de.byjoker</groupId>
-            <artifactId>JFQLConnector</artifactId>
-            <version>1.3.2</version>
-        </dependency>
-        <dependency>
             <groupId>io.javalin</groupId>
             <artifactId>javalin</artifactId>
-            <version>4.1.1</version>
+            <version>4.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

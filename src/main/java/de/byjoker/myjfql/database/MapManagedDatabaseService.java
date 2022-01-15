@@ -10,12 +10,12 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.IntStream;
 
-public class DatabaseServiceImpl implements DatabaseService {
+public class MapManagedDatabaseService implements DatabaseService {
 
     private final FileFactory factory;
     private final Map<String, Database> databases;
 
-    public DatabaseServiceImpl() {
+    public MapManagedDatabaseService() {
         this.factory = new FileFactory();
         this.databases = new HashMap<>();
     }
@@ -104,41 +104,42 @@ public class DatabaseServiceImpl implements DatabaseService {
 
             if (name.contains("%") || name.contains("#") || name.contains("'")) {
                 MyJFQL.getInstance().getConsole().logWarning("Database used unauthorized characters in the id!");
-            } else {
-                final Database database = new Database(name, jsonDatabase.getString("name"));
+                continue;
+            }
 
-                for (int j = 0; j < jsonTables.length(); j++) {
-                    final JSONObject jsonTable = jsonTables.getJSONObject(j);
+            final MapManagedDatabase database = new MapManagedDatabase(name, jsonDatabase.getString("name"));
 
-                    final Table table = new Table(jsonTable.getString("name"), null, jsonTable.getString("primary"));
-                    final List<String> list = new ArrayList<>();
+            for (int j = 0; j < jsonTables.length(); j++) {
+                final JSONObject jsonTable = jsonTables.getJSONObject(j);
 
-                    for (final Object obj : jsonTable.getJSONArray("structure")) {
-                        list.add(obj.toString());
-                    }
+                final MapManagedTable table = new MapManagedTable(jsonTable.getString("name"), null, jsonTable.getString("primary"));
+                final List<String> list = new ArrayList<>();
 
-                    table.setStructure(list);
-
-                    final JSONArray jsonColumns = jsonTable.getJSONArray("columns");
-
-                    IntStream.range(0, jsonColumns.length()).mapToObj(jsonColumns::getJSONObject).forEach(jsonColumn -> {
-                        Column column = new Column();
-                        column.setCreation(jsonColumn.getLong("creation"));
-                        column.setContent(jsonColumn.getJSONObject("content").toMap());
-                        table.addColumn(column);
-                    });
-
-                    if (!table.getName().contains("%") && !table.getName().contains("#") && !table.getName().contains("'"))
-                        database.saveTable(table);
-                    else
-                        MyJFQL.getInstance().getConsole().logWarning("Table used unauthorized characters in the name!");
+                for (final Object obj : jsonTable.getJSONArray("structure")) {
+                    list.add(obj.toString());
                 }
 
-                if (!database.getName().contains("%") && !database.getName().contains("#") && !database.getName().contains("'"))
-                    databases.put(database.getId(), database);
+                table.setStructure(list);
+
+                final JSONArray jsonColumns = jsonTable.getJSONArray("columns");
+
+                IntStream.range(0, jsonColumns.length()).mapToObj(jsonColumns::getJSONObject).forEach(jsonColumn -> {
+                    SimpleColumn column = new SimpleColumn();
+                    column.setCreatedAt(jsonColumn.getLong("creation"));
+                    column.setContent(jsonColumn.getJSONObject("content").toMap());
+                    table.addColumn(column);
+                });
+
+                if (!table.getName().contains("%") && !table.getName().contains("#") && !table.getName().contains("'"))
+                    database.saveTable(table);
                 else
-                    MyJFQL.getInstance().getConsole().logWarning("Database used unauthorized characters in the name!");
+                    MyJFQL.getInstance().getConsole().logWarning("Table used unauthorized characters in the name!");
             }
+
+            if (!database.getName().contains("%") && !database.getName().contains("#") && !database.getName().contains("'"))
+                databases.put(database.getId(), database);
+            else
+                MyJFQL.getInstance().getConsole().logWarning("Database used unauthorized characters in the name!");
         }
     }
 

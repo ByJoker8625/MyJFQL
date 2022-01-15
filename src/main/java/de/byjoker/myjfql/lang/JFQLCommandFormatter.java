@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.core.lang;
+package de.byjoker.myjfql.lang;
 
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.exception.LanguageException;
@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class JFQLFormatter implements Formatter {
+public class JFQLCommandFormatter implements CommandFormatter {
 
     @Override
     public Map<String, List<String>> formatCommand(String command) {

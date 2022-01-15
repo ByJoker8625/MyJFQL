@@ -1,13 +1,13 @@
 package de.byjoker.myjfql.server.controller;
 
-import de.byjoker.jfql.util.ID;
 import de.byjoker.myjfql.command.RestCommandSender;
 import de.byjoker.myjfql.config.Config;
 import de.byjoker.myjfql.core.MyJFQL;
+import de.byjoker.myjfql.server.session.Session;
+import de.byjoker.myjfql.server.session.SessionService;
 import de.byjoker.myjfql.user.User;
 import de.byjoker.myjfql.user.UserService;
-import de.byjoker.myjfql.user.session.Session;
-import de.byjoker.myjfql.user.session.SessionService;
+import de.byjoker.myjfql.util.IDGenerator;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
@@ -81,7 +81,7 @@ public class LoginController implements Handler {
                 return;
             }
 
-            final String token = ID.generateMixed().toString();
+            final String token = IDGenerator.generateMixed(25);
             sessionService.openSession(new Session(token, user.getId(), (user.hasPreferredDatabase()) ? user.getPreferredDatabase() : null, context.ip()));
 
             if (config.showConnections())

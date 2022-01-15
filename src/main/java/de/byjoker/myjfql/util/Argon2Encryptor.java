@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.server.encryptor;
+package de.byjoker.myjfql.util;
 
 import de.mkammerer.argon2.Argon2Advanced;
 import de.mkammerer.argon2.Argon2Factory;

@@ -1,8 +1,8 @@
-package de.byjoker.myjfql.user.session;
+package de.byjoker.myjfql.server.session;
 
-import de.byjoker.jfql.util.ID;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.util.FileFactory;
+import de.byjoker.myjfql.util.IDGenerator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -24,7 +24,7 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public void openSession(Session session) {
         if (existsSession(session.getToken())) {
-            session.setToken(ID.generateMixed().toString());
+            session.setToken(IDGenerator.generateMixed(25));
             openSession(session);
             return;
         }
