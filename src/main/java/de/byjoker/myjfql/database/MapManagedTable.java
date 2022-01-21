@@ -25,7 +25,8 @@ public class MapManagedTable implements Table {
             return;
         }
 
-        columns.put(column.getStringifyItem(primary), column);
+        column.compile();
+        columns.put(column.selectStringify(primary), column);
     }
 
     @Override

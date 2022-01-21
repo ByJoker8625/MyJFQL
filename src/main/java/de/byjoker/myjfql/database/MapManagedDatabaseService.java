@@ -124,7 +124,7 @@ public class MapManagedDatabaseService implements DatabaseService {
                 final JSONArray jsonColumns = jsonTable.getJSONArray("columns");
 
                 IntStream.range(0, jsonColumns.length()).mapToObj(jsonColumns::getJSONObject).forEach(jsonColumn -> {
-                    SimpleColumn column = new SimpleColumn();
+                    Column column = new CompiledColumn();
                     column.setCreatedAt(jsonColumn.getLong("creation"));
                     column.setContent(jsonColumn.getJSONObject("content").toMap());
                     table.addColumn(column);

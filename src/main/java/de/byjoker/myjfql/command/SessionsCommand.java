@@ -3,7 +3,7 @@ package de.byjoker.myjfql.command;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Column;
 import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.database.SimpleColumn;
+import de.byjoker.myjfql.database.LegacyColumn;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.server.session.SessionService;
 import de.byjoker.myjfql.user.User;
@@ -96,12 +96,12 @@ public class SessionsCommand extends ConsoleCommand {
                 final Session session = new Session(token, user.getId(), database, address, expire);
                 sessionService.openSession(session);
 
-                final Column column = new SimpleColumn();
-                column.setItem("token", session.getToken());
-                column.setItem("address", session.getAddress());
-                column.setItem("database_id", String.valueOf(session.getDatabaseId()));
-                column.setItem("start", dateFormat.format(new Date(session.getOpen())));
-                column.setItem("expire", session.getExpire() == -1 ? "never" : dateFormat.format(new Date(session.getExpire())));
+                final Column column = new LegacyColumn();
+                column.insert("token", session.getToken());
+                column.insert("address", session.getAddress());
+                column.insert("database_id", String.valueOf(session.getDatabaseId()));
+                column.insert("start", dateFormat.format(new Date(session.getOpen())));
+                column.insert("expire", session.getExpire() == -1 ? "never" : dateFormat.format(new Date(session.getExpire())));
 
                 sender.sendResult(Collections.singletonList(column), new String[]{"token", "address", "database_id", "start", "expire"});
                 return;
@@ -226,12 +226,12 @@ public class SessionsCommand extends ConsoleCommand {
             final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
             sessionService.getSessionsByUserId(user.getId()).forEach(session -> {
-                final Column column = new SimpleColumn();
-                column.setItem("token", session.getToken());
-                column.setItem("address", session.getAddress());
-                column.setItem("database_id", String.valueOf(session.getDatabaseId()));
-                column.setItem("start", dateFormat.format(new Date(session.getOpen())));
-                column.setItem("expire", session.getExpire() == -1 ? "never" : dateFormat.format(new Date(session.getExpire())));
+                final Column column = new LegacyColumn();
+                column.insert("token", session.getToken());
+                column.insert("address", session.getAddress());
+                column.insert("database_id", String.valueOf(session.getDatabaseId()));
+                column.insert("start", dateFormat.format(new Date(session.getOpen())));
+                column.insert("expire", session.getExpire() == -1 ? "never" : dateFormat.format(new Date(session.getExpire())));
 
                 sessions.add(column);
             });

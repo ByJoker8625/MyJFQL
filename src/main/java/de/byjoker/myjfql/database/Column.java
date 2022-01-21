@@ -1,30 +1,44 @@
 package de.byjoker.myjfql.database;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.byjoker.myjfql.lang.Requirement;
+import org.json.JSONPropertyIgnore;
+import org.json.JSONPropertyName;
 
 import java.util.List;
 import java.util.Map;
 
 public interface Column {
 
-    Object getItem(String key);
+    Object select(String key);
 
-    String getStringifyItem(String key);
+    String selectStringify(String key);
 
-    void setItem(String key, Object value);
+    void insert(String key, Object value);
 
-    void removeItem(String key);
+    void remove(String key);
 
-    boolean containsItem(String key);
+    void compile();
+
+    boolean contains(String key);
 
     boolean containsOrNotNullItem(String key);
 
     boolean matches(List<List<Requirement>> conditions);
 
+    @JsonIgnore
+    @JSONPropertyIgnore
+    String json();
+
     Map<String, Object> getContent();
 
     void setContent(Map<String, Object> content);
 
+    @JsonGetter(value = "creation")
+    @JSONPropertyName("creation")
     long getCreatedAt();
+
+    void setCreatedAt(long createdAt);
 
 }

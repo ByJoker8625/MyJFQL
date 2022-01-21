@@ -1,7 +1,10 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.*;
+import de.byjoker.myjfql.database.Column;
+import de.byjoker.myjfql.database.Database;
+import de.byjoker.myjfql.database.DatabaseAction;
+import de.byjoker.myjfql.database.Table;
 import de.byjoker.myjfql.lang.ColumnComparator;
 import de.byjoker.myjfql.lang.ColumnFilter;
 import de.byjoker.myjfql.lang.SortingOrder;
@@ -147,7 +150,7 @@ public class SelectCommand extends Command {
                 List<Column> columns;
 
                 try {
-                    columns = ColumnFilter.filter(table, args.get("WHERE"), new ColumnComparator(sortedBy), order);
+                    columns = ColumnFilter.filter(table, args.get("WHERE"), sortedBy == null ? null : new ColumnComparator(sortedBy), order);
                 } catch (Exception ex) {
                     sender.sendError(ex);
                     return;
@@ -168,7 +171,7 @@ public class SelectCommand extends Command {
                 final Collection<Column> columns = sortedBy == null ? table.getColumns() : table.getColumns(new ColumnComparator(sortedBy), order);
 
                 if (columns.size() == 0) {
-                    sender.sendResult(new ArrayList<SimpleColumn>(), values);
+                    sender.sendResult(new ArrayList<Column>(), values);
                     return;
                 }
 

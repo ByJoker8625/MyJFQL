@@ -88,14 +88,19 @@ public class InsertCommand extends Command {
                 Column column = table.getColumn(primaryKey);
 
                 if (column == null) {
-                    column = new SimpleColumn();
+                    column = new CompiledColumn();
+                }
+
+                if (args.containsKey("FULLY")) {
+                    column.getContent().clear();
                 }
 
                 column.getContent().putAll(content);
 
                 if (!column.containsOrNotNullItem(primary)) {
-                    column.setItem(primary, primaryKey);
+                    column.insert(primary, primaryKey);
                 }
+
 
                 sender.sendSuccess();
 
@@ -135,7 +140,7 @@ public class InsertCommand extends Command {
                 Column column = table.getColumn(content.get(primary));
 
                 if (column == null) {
-                    column = new SimpleColumn();
+                    column = new CompiledColumn();
                 }
 
                 if (args.containsKey("FULLY")) {

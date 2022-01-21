@@ -8,7 +8,7 @@ import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.exception.LanguageException;
 import de.byjoker.myjfql.server.session.Session;
 
-import java.util.List;
+import java.util.Collection;
 
 public class ConsoleCommandSender extends CommandSender {
 
@@ -44,16 +44,16 @@ public class ConsoleCommandSender extends CommandSender {
 
     @Override
     public void sendResult(Object obj, Object structure) {
-        if (!(structure instanceof String[]) && !(structure instanceof List))
+        if (!(structure instanceof String[]) && !(structure instanceof Collection))
             throw new LanguageException("Input is not an array!");
 
-        if (!(obj instanceof List))
-            throw new LanguageException("Input is not an list!");
+        if (!(obj instanceof Collection))
+            throw new LanguageException("Input is not an collection!");
 
         String[] array;
 
         if (!(structure instanceof String[])) {
-            List<String> strings = (List<String>) structure;
+            Collection<String> strings = (Collection<String>) structure;
             array = new String[strings.size()];
             array = strings.toArray(array);
         } else {
@@ -64,13 +64,13 @@ public class ConsoleCommandSender extends CommandSender {
         final TablePrinter printer = new TablePrinter(array);
 
         try {
-            final List<Column> columns = (List<Column>) obj;
+            final Collection<Column> columns = (Collection<Column>) obj;
 
             for (Column column : columns) {
                 final String[] row = new String[array.length];
 
                 for (int i = 0; i < array.length; i++) {
-                    final Object value = column.getItem(array[i]);
+                    final Object value = column.select(array[i]);
 
                     if (value != null)
                         row[i] = value.toString();
@@ -82,7 +82,7 @@ public class ConsoleCommandSender extends CommandSender {
             }
 
         } catch (Exception ex) {
-            final List<String> strings = (List<String>) obj;
+            final Collection<String> strings = (Collection<String>) obj;
             strings.forEach(printer::addRow);
         }
 

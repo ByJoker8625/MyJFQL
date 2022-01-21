@@ -188,12 +188,12 @@ public class UserCommand extends ConsoleCommand {
             }
 
             final User selectedUser = userService.getUserByIdentifier(userIdentifier);
-            final Column column = new SimpleColumn();
+            final Column column = new LegacyColumn();
 
-            column.setItem("id", selectedUser.getId());
-            column.setItem("name", selectedUser.getName());
-            column.setItem("accesses", selectedUser.getAccesses().toString());
-            column.setItem("preferred_database_id", String.valueOf(selectedUser.getPreferredDatabase()));
+            column.insert("id", selectedUser.getId());
+            column.insert("name", selectedUser.getName());
+            column.insert("accesses", selectedUser.getAccesses().toString());
+            column.insert("preferred_database_id", String.valueOf(selectedUser.getPreferredDatabase()));
 
             sender.sendResult(Collections.singletonList(column), new String[]{"id", "name", "accesses", "preferred_database_id"});
             return;

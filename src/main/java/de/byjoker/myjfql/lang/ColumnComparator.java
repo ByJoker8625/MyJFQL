@@ -19,7 +19,19 @@ public class ColumnComparator implements Comparator<Column> {
         if (key == null)
             return Long.compare(o1.getCreatedAt(), o2.getCreatedAt());
 
-        return !o1.containsOrNotNullItem(key) ? !o2.containsOrNotNullItem(key) ? 0 : 1 : !o2.containsOrNotNullItem(key) ? -1 : comparator.compare(o1.getStringifyItem(key), o1.getStringifyItem(key));
+        if (!o1.containsOrNotNullItem(key)) {
+            if (o2.containsOrNotNullItem(key)) {
+                return 1;
+            }
+
+            return 0;
+        }
+
+        if (!o2.containsOrNotNullItem(key)) {
+            return -1;
+        }
+
+        return comparator.compare(o1.selectStringify(key), o2.selectStringify(key));
     }
 
     public String getKey() {

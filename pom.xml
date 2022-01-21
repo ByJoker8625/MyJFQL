@@ -6,7 +6,7 @@
 
     <groupId>de.byjoker</groupId>
     <artifactId>MyJFQL</artifactId>
-    <version>1.5.4-expanded</version>
+    <version>1.5.5</version>
     <name>MyJFQL</name>
     <description>Java based easy to use dbms for smaller applications</description>
     <properties>
@@ -31,6 +31,11 @@
             <groupId>io.javalin</groupId>
             <artifactId>javalin</artifactId>
             <version>4.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.13.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

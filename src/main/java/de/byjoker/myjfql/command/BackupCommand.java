@@ -126,7 +126,7 @@ public class BackupCommand extends ConsoleCommand {
         }
 
         if (args.containsKey("LIST")) {
-            sender.sendResult(backupService.getBackups(), new String[]{"Backup"});
+            sender.sendResult(backupService.getBackups(), new String[]{"backup"});
             return;
         }
 

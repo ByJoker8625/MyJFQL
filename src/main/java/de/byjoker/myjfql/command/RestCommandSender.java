@@ -1,14 +1,17 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
+import de.byjoker.myjfql.database.Column;
 import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.exception.LanguageException;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.user.User;
+import de.byjoker.myjfql.util.JsonColumnParser;
 import io.javalin.http.Context;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
 public class RestCommandSender extends CommandSender {
 
@@ -62,24 +65,26 @@ public class RestCommandSender extends CommandSender {
     }
 
     @Override
-    public void sendResult(final Object obj, final Object structure) {
-        final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", ResponseType.RESULT);
-        jsonObject.put("structure", structure);
-        jsonObject.put("result", obj);
-        this.send(jsonObject);
+    public void sendResult(Object obj, Object structure) {
+        if (!(obj instanceof Collection<?>)) {
+            return;
+        }
+
+        try {
+            send(JsonColumnParser.stringifyCompiledColumns((Collection<Column>) obj, structure));
+        } catch (Exception ex) {
+            send(JsonColumnParser.stringifySingletonColumn((Collection<String>) obj, structure));
+        }
     }
 
     @Override
-    public void send(final Object obj) {
-        context.header("Access-Control-Allow-Origin", "*");
-        context.header("Access-Control-Allow-Methods", "GET, POST");
-        context.header("Access-Control-Allow-Headers", "*");
-        context.header("Access-Control-Allow-Credentials", "true");
-        context.header("Access-Control-Allow-Credentials-Header", "*");
-        context.header("Content-Type", "application/json");
+    public void send(Object obj) {
+        sendBytes(obj.toString().getBytes(StandardCharsets.UTF_8));
+    }
 
-        context.result(obj.toString().getBytes(StandardCharsets.UTF_8));
+    public void sendBytes(byte[] bytes) {
+        context.header("Content-Type", "application/json");
+        context.result(bytes);
     }
 
     public RestCommandSender bind(Session session) {

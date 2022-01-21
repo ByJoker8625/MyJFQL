@@ -58,11 +58,11 @@ public class StructureCommand extends Command {
 
             if (!args.containsKey("ADD") && !args.containsKey("REMOVE") && !args.containsKey("SET") && !args.containsKey("MARK-PRIMARY")) {
                 if (args.containsKey("PRIMARY-KEY")) {
-                    sender.sendResult(Collections.singletonList(primary), new String[]{"Primary"});
+                    sender.sendResult(Collections.singletonList(primary), new String[]{"primary"});
                     return;
                 }
 
-                sender.sendResult(structure, new String[]{"Structure"});
+                sender.sendResult(structure, new String[]{"structure"});
                 return;
             }
 

@@ -1,12 +1,14 @@
 package de.byjoker.myjfql.database;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import de.byjoker.myjfql.lang.Requirement;
+import org.json.JSONPropertyName;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SimpleColumn implements Column {
+public abstract class SimpleColumn implements Column {
 
     private Map<String, Object> content;
     private long createdAt;
@@ -21,28 +23,33 @@ public class SimpleColumn implements Column {
         this.createdAt = System.currentTimeMillis();
     }
 
+    public SimpleColumn(Column column) {
+        this.content = column.getContent();
+        this.createdAt = column.getCreatedAt();
+    }
+
     @Override
-    public Object getItem(String key) {
+    public Object select(String key) {
         return content.get(key);
     }
 
     @Override
-    public String getStringifyItem(String key) {
+    public String selectStringify(String key) {
         return content.get(key).toString();
     }
 
     @Override
-    public void setItem(String key, Object value) {
+    public void insert(String key, Object value) {
         content.put(key, value.toString());
     }
 
     @Override
-    public void removeItem(String key) {
+    public void remove(String key) {
         content.remove(key);
     }
 
     @Override
-    public boolean containsItem(String key) {
+    public boolean contains(String key) {
         return content.containsKey(key);
     }
 
@@ -65,7 +72,7 @@ public class SimpleColumn implements Column {
             return value.equals("null");
         }
 
-        final String given = getStringifyItem(key);
+        final String given = selectStringify(key);
 
         switch (filter) {
             case EQUALS: {
@@ -153,18 +160,16 @@ public class SimpleColumn implements Column {
         this.content = content;
     }
 
+    @JsonGetter(value = "creation")
+    @JSONPropertyName("creation")
     @Override
     public long getCreatedAt() {
         return createdAt;
     }
 
+    @Override
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
-    }
-
-    @Deprecated
-    public long getCreation() {
-        return createdAt;
     }
 
 }

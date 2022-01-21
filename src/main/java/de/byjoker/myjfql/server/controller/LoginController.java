@@ -60,7 +60,7 @@ public class LoginController implements Handler {
                 if (config.showConnections())
                     MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " joined the session '" + session.getToken() + "'.");
 
-                sender.sendResult(Collections.singletonList(token), new String[]{"Token"});
+                sender.sendResult(Collections.singletonList(token), new String[]{"token"});
                 return;
             }
 
@@ -87,7 +87,7 @@ public class LoginController implements Handler {
             if (config.showConnections())
                 MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " opened a session as '" + user.getName() + "'.");
 
-            sender.sendResult(Collections.singletonList(token), new String[]{"Token"});
+            sender.sendResult(Collections.singletonList(token), new String[]{"token"});
         } catch (Exception ex) {
             sender.sendError(ex);
         }
