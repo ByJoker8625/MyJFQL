@@ -4,7 +4,7 @@ import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Database;
 import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.user.session.Session;
+import de.byjoker.myjfql.server.session.Session;
 
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +42,7 @@ public class DeleteCommand extends Command {
             }
 
             if (!database.existsTable(name)) {
-                sender.sendError("Table doesn't exists!");
+                sender.sendError("Table doesn't exist!");
                 return;
             }
 
@@ -67,7 +67,7 @@ public class DeleteCommand extends Command {
             }
 
             if (!databaseService.existsDatabaseByIdentifier(identifier)) {
-                sender.sendError("Database doesn't exists!");
+                sender.sendError("Database doesn't exist!");
                 return;
             }
 

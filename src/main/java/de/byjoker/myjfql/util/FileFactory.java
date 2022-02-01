@@ -1,6 +1,5 @@
 package de.byjoker.myjfql.util;
 
-import com.github.underscore.lodash.U;
 import de.byjoker.myjfql.exception.FileException;
 import org.json.JSONObject;
 
@@ -35,16 +34,6 @@ public class FileFactory {
 
         Arrays.stream(files).map(file -> load(file).toMap()).forEach(map -> map.keySet().forEach(key -> jsonObject.put(key, map.get(key))));
         return jsonObject;
-    }
-
-    public void saveJSONFormatted(File file, JSONObject jsonObject) {
-        try {
-            FileWriter writer = new FileWriter(file);
-            writer.write(U.formatJson(jsonObject.toString()));
-            writer.close();
-        } catch (Exception ex) {
-            throw new FileException("Can't save file '" + file.getName() + "'.");
-        }
     }
 
     public void save(File file, JSONObject jsonObject) {

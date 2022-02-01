@@ -78,17 +78,17 @@ public class ConfigServiceImpl implements ConfigService {
         File file = new File("database");
 
         if (!file.exists())
-            file.mkdir();
+            file.mkdirs();
 
         file = new File("user");
 
         if (!file.exists())
-            file.mkdir();
+            file.mkdirs();
 
         file = new File("backup");
 
         if (!file.exists())
-            file.mkdir();
+            file.mkdirs();
 
         file = new File("sessions.json");
 
@@ -98,7 +98,7 @@ public class ConfigServiceImpl implements ConfigService {
         file = new File("config.json");
 
         if (!file.exists())
-            factory.saveJSONFormatted(file, new ConfigDefaults().asJson());
+            factory.save(file, new ConfigDefaults().asJson());
     }
 
     @Override

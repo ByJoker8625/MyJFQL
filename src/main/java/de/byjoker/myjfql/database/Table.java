@@ -1,121 +1,35 @@
 package de.byjoker.myjfql.database;
 
-import de.byjoker.myjfql.util.Sorter;
+import de.byjoker.myjfql.lang.ColumnComparator;
+import de.byjoker.myjfql.lang.SortingOrder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.Collection;
 
-public class Table implements ColumnHandler {
+public interface Table {
 
-    private String name;
-    private List<Column> columns;
-    private List<String> structure;
-    private String primary;
+    void addColumn(Column column);
 
-    public Table(String name, List<String> structure, String primary) {
-        this.name = name;
-        this.structure = structure;
-        this.primary = primary;
-        this.columns = new ArrayList<>();
-    }
+    void removeColumn(String identifier);
 
-    @Override
-    public void addColumn(Column column) {
-        if (column.getContent(primary) == null) {
-            return;
-        }
+    Column getColumn(String identifier);
 
-        for (int i = 0; i < columns.size(); i++) {
-            final Column col = columns.get(i);
+    Collection<Column> getColumns();
 
-            if (col.getContent(primary).equals(column.getContent(primary))) {
-                column.setCreation(col.getCreation());
-                columns.set(i, column);
-                return;
-            }
-        }
+    Collection<Column> getColumns(ColumnComparator comparator, SortingOrder order);
 
-        columns.add(column);
-    }
+    Collection<String> getStructure();
 
-    @Override
-    public void removeColumn(String key) {
-        columns.removeIf(col -> col.getContent(primary).toString().equals(key));
-    }
+    void setStructure(Collection<String> structure);
 
-    @Override
-    public Column getColumn(String key) {
-        return columns.stream().filter(col -> col.getContent(primary).toString().equals(key)).findFirst().orElse(null);
-    }
+    String getPrimary();
 
-    @Override
-    public List<Column> getColumns() {
-        return getColumns(Sorter.Type.CREATION, Sorter.Order.ASC);
-    }
+    void setPrimary(String primary);
 
-    public void setColumns(List<Column> columns) {
-        this.columns = columns;
-    }
+    void reformat(TableType type, String[] parameters);
 
-    @Override
-    public List<Column> getColumns(Sorter.Type type, Sorter.Order order, String... strings) {
-        switch (type) {
-            case CREATION:
-                return Sorter.sortColumns(columns);
-            case CUSTOM:
-                return Sorter.sortColumns(strings[0], columns, order);
-        }
+    TableType getType();
 
-        return columns;
-    }
+    String getName();
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<String> getStructure() {
-        return structure;
-    }
-
-    public void setStructure(final List<String> structure) {
-        this.structure = structure;
-    }
-
-    public String getPrimary() {
-        return primary;
-    }
-
-    public void setPrimary(final String primary) {
-        this.primary = primary;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Table table = (Table) o;
-        return Objects.equals(name, table.name) &&
-                Objects.equals(structure, table.structure) &&
-                Objects.equals(primary, table.primary);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, structure, primary);
-    }
-
-    @Override
-    public String toString() {
-        return "Table{" +
-                "name='" + name + '\'' +
-                ", structure=" + structure +
-                ", primary='" + primary + '\'' +
-                ", columns=" + columns +
-                '}';
-    }
+    void clear();
 }

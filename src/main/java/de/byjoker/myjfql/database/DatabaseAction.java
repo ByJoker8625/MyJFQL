@@ -6,7 +6,7 @@ public enum DatabaseAction {
     READ(1),
     READ_WRITE(2);
 
-    public int level;
+    public final int level;
 
     DatabaseAction(int level) {
         this.level = level;
@@ -16,4 +16,7 @@ public enum DatabaseAction {
         return level >= action.level;
     }
 
+    public int getLevel() {
+        return level;
+    }
 }

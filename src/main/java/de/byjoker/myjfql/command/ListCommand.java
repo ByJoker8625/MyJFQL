@@ -5,7 +5,8 @@ import de.byjoker.myjfql.database.Database;
 import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.database.Table;
-import de.byjoker.myjfql.util.Sorter;
+import de.byjoker.myjfql.lang.SortingOrder;
+import de.byjoker.myjfql.lang.StringComparator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,21 +53,22 @@ public class ListCommand extends Command {
             }
 
             if (args.containsKey("ORDER")) {
-                Sorter.Order order;
+                SortingOrder order;
 
                 try {
-                    order = Sorter.Order.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
+                    order = SortingOrder.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
                 } catch (Exception ex) {
                     sender.sendError("Unknown or undefined sort order!");
                     return;
                 }
 
-                sender.sendResult(Sorter.sortList(databases, order), new String[]{"Database"});
-                return;
+                databases.sort(new StringComparator());
+
+                if (order == SortingOrder.DESC)
+                    Collections.reverse(databases);
             }
 
-
-            sender.sendResult(databases, new String[]{"Database"});
+            sender.sendResult(databases, new String[]{"databases"});
             return;
         }
 
@@ -75,9 +77,8 @@ public class ListCommand extends Command {
 
             if (!args.containsKey("FROM")) {
                 List<String> finalTables = tables;
-                databaseService.getDatabases().stream().filter(database -> sender.allowed(database.getId(), DatabaseAction.READ)).forEach(database -> {
-                    finalTables.addAll(database.getTables().stream().map(Table::getName).collect(Collectors.toList()));
-                });
+                databaseService.getDatabases().stream().filter(database -> sender.allowed(database.getId(), DatabaseAction.READ)).forEach(database ->
+                        finalTables.addAll(database.getTables().stream().map(Table::getName).collect(Collectors.toList())));
             } else {
                 final String identifier = formatString(args.get("FROM"));
 
@@ -117,20 +118,22 @@ public class ListCommand extends Command {
             }
 
             if (args.containsKey("ORDER")) {
-                Sorter.Order order;
+                SortingOrder order;
 
                 try {
-                    order = Sorter.Order.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
+                    order = SortingOrder.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
                 } catch (Exception ex) {
                     sender.sendError("Unknown or undefined sort order!");
                     return;
                 }
 
-                sender.sendResult(Sorter.sortList(tables, order), new String[]{"Table"});
-                return;
+                tables.sort(new StringComparator());
+
+                if (order == SortingOrder.DESC)
+                    Collections.reverse(tables);
             }
 
-            sender.sendResult(tables, new String[]{"Table"});
+            sender.sendResult(tables, new String[]{"tables"});
             return;
         }
 

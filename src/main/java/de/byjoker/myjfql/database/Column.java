@@ -1,79 +1,46 @@
 package de.byjoker.myjfql.database;
 
-import java.util.HashMap;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.byjoker.myjfql.lang.Requirement;
+import org.json.JSONPropertyIgnore;
+import org.json.JSONPropertyName;
+
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-public class Column {
+public interface Column {
 
-    private long creation;
-    private Map<String, Object> content;
+    Object select(String key);
 
-    public Column() {
-        this.content = new HashMap<>();
-        this.creation = System.currentTimeMillis();
-    }
+    String selectStringify(String key);
 
-    public Column(Map<String, Object> content) {
-        this.content = content;
-        this.creation = System.currentTimeMillis();
-    }
+    void insert(String key, Object value);
 
-    public long getCreation() {
-        return creation;
-    }
+    void remove(String key);
 
-    public void setCreation(final long creation) {
-        this.creation = creation;
-    }
+    void compile();
 
-    public Object getContent(final String key) {
-        return content.get(key);
-    }
+    boolean contains(String key);
 
-    public void putContent(final String key, final Object o) {
-        content.put(key, o);
-    }
+    boolean containsOrNotNullItem(String key);
 
-    public void removeContent(final String key) {
-        content.remove(key);
-    }
+    boolean matches(List<List<Requirement>> conditions);
 
-    public boolean containsContentKey(final String key) {
-        return content.containsKey(key);
-    }
+    @JsonIgnore
+    @JSONPropertyIgnore
+    String json();
 
-    public boolean containsContentValue(final String value) {
-        return content.containsValue(value);
-    }
+    Map<String, Object> getContent();
 
-    public Map<String, Object> getContent() {
-        return content;
-    }
+    void setContent(Map<String, Object> content);
 
-    public void setContent(final Map<String, Object> content) {
-        this.content = content;
-    }
+    void applyContent(Map<String, Object> content);
 
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Column column = (Column) o;
-        return creation == column.creation &&
-                Objects.equals(content, column.content);
-    }
+    @JsonGetter(value = "creation")
+    @JSONPropertyName("creation")
+    long getCreatedAt();
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(creation, content);
-    }
+    void setCreatedAt(long createdAt);
 
-    @Override
-    public String toString() {
-        return "Column{" +
-                "creation=" + creation +
-                ", content=" + content +
-                '}';
-    }
 }

@@ -1,13 +1,14 @@
 package de.byjoker.myjfql.command;
 
-import de.byjoker.jfql.util.ID;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Column;
 import de.byjoker.myjfql.database.DatabaseService;
+import de.byjoker.myjfql.database.LegacyColumn;
+import de.byjoker.myjfql.server.session.Session;
+import de.byjoker.myjfql.server.session.SessionService;
 import de.byjoker.myjfql.user.User;
 import de.byjoker.myjfql.user.UserService;
-import de.byjoker.myjfql.user.session.Session;
-import de.byjoker.myjfql.user.session.SessionService;
+import de.byjoker.myjfql.util.IDGenerator;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -44,7 +45,9 @@ public class SessionsCommand extends ConsoleCommand {
                 final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 long expire = -1;
 
-                if (args.containsKey("EXPIRE") && args.get("EXPIRE").size() != 0 && !Objects.requireNonNull(formatString(args.get("EXPIRE"))).equalsIgnoreCase("NEVER")) {
+                if (args.containsKey("EXPIRE") && args.get("EXPIRE").size() != 0
+                        && !Objects.requireNonNull(formatString(args.get("EXPIRE"))).equalsIgnoreCase("never")) {
+
                     try {
                         expire = dateFormat.parse(formatString(args.get("EXPIRE"))).getTime();
                     } catch (Exception ex) {
@@ -59,11 +62,17 @@ public class SessionsCommand extends ConsoleCommand {
                 }
 
                 String token = null;
-                String database = null;
-                String address = "127.0.0.1";
+                String database = user.getPreferredDatabase();
+                String address = "*";
 
-                if (args.containsKey("TOKEN") && args.get("TOKEN").size() != 0)
+                if (args.containsKey("TOKEN") && args.get("TOKEN").size() != 0) {
                     token = formatString(args.get("TOKEN"));
+                }
+
+                if (token != null && token.length() < 16) {
+                    sender.sendError("Token is to short! Minimum 16 characters!");
+                    return;
+                }
 
                 if (args.containsKey("DATABASE") && args.get("DATABASE").size() != 0) {
                     database = formatString(args.get("DATABASE"));
@@ -76,23 +85,25 @@ public class SessionsCommand extends ConsoleCommand {
                     database = databaseService.getDatabaseByIdentifier(database).getId();
                 }
 
-                if (args.containsKey("ADDRESS") && args.get("ADDRESS").size() != 0)
+                if (args.containsKey("ADDRESS") && args.get("ADDRESS").size() != 0) {
                     address = formatString(args.get("ADDRESS"));
+                }
 
-                if (token == null)
-                    token = ID.generateMixed().toString();
+                if (token == null) {
+                    token = IDGenerator.generateMixed(25);
+                }
 
                 final Session session = new Session(token, user.getId(), database, address, expire);
                 sessionService.openSession(session);
 
-                final Column column = new Column();
-                column.putContent("Token", session.getToken());
-                column.putContent("Address", session.getAddress());
-                column.putContent("Database", String.valueOf(session.getDatabaseId()));
-                column.putContent("Start", dateFormat.format(new Date(session.getOpen())));
-                column.putContent("Expire", session.getExpire() == -1 ? "NEVER" : dateFormat.format(new Date(session.getExpire())));
+                final Column column = new LegacyColumn();
+                column.insert("token", session.getToken());
+                column.insert("address", session.getAddress());
+                column.insert("database_id", String.valueOf(session.getDatabaseId()));
+                column.insert("start", dateFormat.format(new Date(session.getOpen())));
+                column.insert("expire", session.getExpire() == -1 ? "never" : dateFormat.format(new Date(session.getExpire())));
 
-                sender.sendResult(Collections.singletonList(column), new String[]{"Token", "Address", "Database", "Start", "Expire"});
+                sender.sendResult(Collections.singletonList(column), new String[]{"token", "address", "database_id", "start", "expire"});
                 return;
             }
 
@@ -178,7 +189,7 @@ public class SessionsCommand extends ConsoleCommand {
                         return;
                     }
 
-                    if (expire.equalsIgnoreCase("NEVER")) {
+                    if (expire.equalsIgnoreCase("never")) {
                         final Session session = sessionService.getSession(token);
                         session.setExpire(-1);
                         sessionService.saveSession(session);
@@ -215,16 +226,17 @@ public class SessionsCommand extends ConsoleCommand {
             final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
             sessionService.getSessionsByUserId(user.getId()).forEach(session -> {
-                final Column column = new Column();
-                column.putContent("Token", session.getToken());
-                column.putContent("Address", session.getAddress());
-                column.putContent("Database", String.valueOf(session.getDatabaseId()));
-                column.putContent("Start", dateFormat.format(new Date(session.getOpen())));
-                column.putContent("Expire", session.getExpire() == -1 ? "NEVER" : dateFormat.format(new Date(session.getExpire())));
+                final Column column = new LegacyColumn();
+                column.insert("token", session.getToken());
+                column.insert("address", session.getAddress());
+                column.insert("database_id", String.valueOf(session.getDatabaseId()));
+                column.insert("start", dateFormat.format(new Date(session.getOpen())));
+                column.insert("expire", session.getExpire() == -1 ? "never" : dateFormat.format(new Date(session.getExpire())));
+
                 sessions.add(column);
             });
 
-            sender.sendResult(sessions, new String[]{"Token", "Address", "Database", "Start", "Expire"});
+            sender.sendResult(sessions, new String[]{"token", "address", "database_id", "start", "expire"});
             return;
         }
 

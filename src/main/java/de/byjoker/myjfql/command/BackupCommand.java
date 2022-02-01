@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class BackupCommand extends ConsoleCommand {
 
     public BackupCommand() {
-        super("backup", Arrays.asList("COMMAND", "CREATE", "DELETE", "LOAD", "FETCH", "LIST", "RE-BACKUP", "DISPLAY"));
+        super("backup", Arrays.asList("COMMAND", "CREATE", "DELETE", "LOAD", "LIST", "RE-BACKUP", "DISPLAY"));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class BackupCommand extends ConsoleCommand {
             }
 
             if (!backupService.existsBackup(name)) {
-                sender.sendError("Backup doesn't exists!");
+                sender.sendError("Backup doesn't exist!");
                 return;
             }
 
@@ -78,7 +78,7 @@ public class BackupCommand extends ConsoleCommand {
             }
 
             if (!backupService.existsBackup(name)) {
-                sender.sendError("Backup doesn't exists!");
+                sender.sendError("Backup doesn't exist!");
                 return;
             }
 
@@ -100,48 +100,6 @@ public class BackupCommand extends ConsoleCommand {
             return;
         }
 
-        if (args.containsKey("FETCH")) {
-            final String information = formatString(args.get("FETCH"));
-
-            if (information == null) {
-                sender.sendError("Undefined user, password and host!");
-                return;
-            }
-
-            String user;
-            String password;
-            String host;
-
-            try {
-                final String[] connectionInformation = information.split("@");
-                final String[] userInformation = connectionInformation[0].split(":");
-
-                user = userInformation[0];
-                password = userInformation[1];
-                host = connectionInformation[1];
-            } catch (Exception ex) {
-                sender.sendError("Unknown fetch information format!");
-                return;
-            }
-
-            if (args.containsKey("RE-BACKUP")) {
-                final String preBackupName = "TMP-B-" + user + "-" + System.currentTimeMillis();
-
-                if (!backupService.existsBackup(preBackupName))
-                    backupService.createBackup(preBackupName);
-            }
-
-            try {
-                backupService.fetchBackup(user, password, host);
-            } catch (Exception ex) {
-                sender.sendError("Failed to fetch backup!");
-                return;
-            }
-
-            sender.sendSuccess();
-            return;
-        }
-
         if (args.containsKey("DISPLAY")) {
             final String name = formatString(args.get("DISPLAY"));
 
@@ -151,7 +109,7 @@ public class BackupCommand extends ConsoleCommand {
             }
 
             if (!backupService.existsBackup(name)) {
-                sender.sendError("Backup doesn't exists!");
+                sender.sendError("Backup doesn't exist!");
                 return;
             }
 
@@ -168,7 +126,7 @@ public class BackupCommand extends ConsoleCommand {
         }
 
         if (args.containsKey("LIST")) {
-            sender.sendResult(backupService.getBackups(), new String[]{"Backup"});
+            sender.sendResult(backupService.getBackups(), new String[]{"backup"});
             return;
         }
 
