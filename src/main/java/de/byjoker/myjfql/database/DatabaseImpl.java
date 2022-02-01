@@ -2,28 +2,34 @@ package de.byjoker.myjfql.database;
 
 import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.util.IDGenerator;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class MapManagedDatabase implements Database {
+public class DatabaseImpl implements Database {
 
     private final String name;
+    private final DatabaseType type;
     private String id;
-    private Map<String, Table> tables;
+    private final Map<String, Table> tables;
 
-    public MapManagedDatabase(String name) {
+    public DatabaseImpl(String name) {
         this.id = IDGenerator.generateMixed(16);
         this.name = name;
         this.tables = new HashMap<>();
+        this.type = DatabaseType.FOLDER;
     }
 
-    public MapManagedDatabase(String id, String name) {
+    public DatabaseImpl(String id, String name, DatabaseType type) {
         this.id = id;
         this.name = name;
         this.tables = new HashMap<>();
+        this.type = type;
     }
 
     @Override
@@ -51,6 +57,14 @@ public class MapManagedDatabase implements Database {
 
     @Override
     public void deleteTable(String name) {
+        if (type == DatabaseType.FOLDER) {
+            try {
+                FileUtils.deleteDirectory(new File("database/" + id + "/" + name));
+            } catch (IOException ex) {
+                throw new FileException(ex);
+            }
+        }
+
         tables.remove(name);
     }
 
@@ -64,8 +78,9 @@ public class MapManagedDatabase implements Database {
         return tables.values();
     }
 
-    public void setTables(Map<String, Table> tables) {
-        this.tables = tables;
+    @Override
+    public DatabaseType getType() {
+        return type;
     }
 
     @Override
@@ -82,7 +97,7 @@ public class MapManagedDatabase implements Database {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MapManagedDatabase database = (MapManagedDatabase) o;
+        DatabaseImpl database = (DatabaseImpl) o;
         return Objects.equals(id, database.id);
     }
 

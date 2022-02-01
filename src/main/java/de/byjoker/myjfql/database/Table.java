@@ -25,6 +25,10 @@ public interface Table {
 
     void setPrimary(String primary);
 
+    void reformat(TableType type, String[] parameters);
+
+    TableType getType();
+
     String getName();
 
     void clear();

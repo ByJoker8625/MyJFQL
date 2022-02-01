@@ -35,6 +35,8 @@ public interface Column {
 
     void setContent(Map<String, Object> content);
 
+    void applyContent(Map<String, Object> content);
+
     @JsonGetter(value = "creation")
     @JSONPropertyName("creation")
     long getCreatedAt();

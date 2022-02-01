@@ -19,7 +19,6 @@ public class JsonColumnParser {
         }
     }
 
-    @Deprecated
     public static String stringifyLegacyColumns(Collection<Column> columns, Object structure) {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", RestCommandSender.ResponseType.RESULT);

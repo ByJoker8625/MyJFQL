@@ -18,6 +18,8 @@ public interface Database {
 
     Collection<Table> getTables();
 
+    DatabaseType getType();
+
     String getName();
 
     String getId();

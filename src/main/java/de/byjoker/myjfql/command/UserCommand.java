@@ -62,7 +62,7 @@ public class UserCommand extends ConsoleCommand {
                     return;
                 }
 
-                final Database database = new MapManagedDatabase(databaseName);
+                final Database database = new DatabaseImpl(databaseName);
                 databaseService.createDatabase(database);
 
                 user.grantAccess(database.getId(), DatabaseAction.READ_WRITE);

@@ -14,7 +14,7 @@ import de.byjoker.myjfql.console.SystemConsole;
 import de.byjoker.myjfql.database.BackupService;
 import de.byjoker.myjfql.database.BackupServiceImpl;
 import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.database.MapManagedDatabaseService;
+import de.byjoker.myjfql.database.DatabaseServiceImpl;
 import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.exception.NetworkException;
 import de.byjoker.myjfql.lang.CommandFormatter;
@@ -63,7 +63,7 @@ public final class MyJFQL {
         this.commandService = new CommandServiceImpl(formatter);
         this.userService = new UserServiceImpl();
         this.downloader = updater.getDownloader();
-        this.databaseService = new MapManagedDatabaseService();
+        this.databaseService = new DatabaseServiceImpl();
         this.databaseBackupService = new BackupServiceImpl(databaseService);
         this.server = new Server();
     }

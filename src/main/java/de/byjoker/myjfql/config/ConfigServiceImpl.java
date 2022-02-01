@@ -98,7 +98,7 @@ public class ConfigServiceImpl implements ConfigService {
         file = new File("config.json");
 
         if (!file.exists())
-            factory.saveJSONFormatted(file, new ConfigDefaults().asJson());
+            factory.save(file, new ConfigDefaults().asJson());
     }
 
     @Override

@@ -54,7 +54,7 @@ public class BackupCommand extends ConsoleCommand {
             }
 
             if (!backupService.existsBackup(name)) {
-                sender.sendError("Backup doesn't exists!");
+                sender.sendError("Backup doesn't exist!");
                 return;
             }
 
@@ -78,7 +78,7 @@ public class BackupCommand extends ConsoleCommand {
             }
 
             if (!backupService.existsBackup(name)) {
-                sender.sendError("Backup doesn't exists!");
+                sender.sendError("Backup doesn't exist!");
                 return;
             }
 
@@ -109,7 +109,7 @@ public class BackupCommand extends ConsoleCommand {
             }
 
             if (!backupService.existsBackup(name)) {
-                sender.sendError("Backup doesn't exists!");
+                sender.sendError("Backup doesn't exist!");
                 return;
             }
 

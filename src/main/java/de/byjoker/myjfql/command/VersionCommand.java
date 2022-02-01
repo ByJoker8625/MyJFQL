@@ -22,7 +22,7 @@ public class VersionCommand extends ConsoleCommand {
         final Downloader downloader = MyJFQL.getInstance().getDownloader();
 
         if (args.containsKey("DISPLAY")) {
-            sender.sendResult(Collections.singletonList(MyJFQL.getInstance().getVersion()), new String[]{"Version"});
+            sender.sendResult(Collections.singletonList(MyJFQL.getInstance().getVersion()), new String[]{"version"});
             return;
         }
 

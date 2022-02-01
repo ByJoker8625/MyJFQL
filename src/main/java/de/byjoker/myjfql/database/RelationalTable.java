@@ -5,14 +5,14 @@ import de.byjoker.myjfql.lang.SortingOrder;
 
 import java.util.*;
 
-public class MapManagedTable implements Table {
+public class RelationalTable implements Table {
 
     private final String name;
     private Map<String, Column> columns;
     private Collection<String> structure;
     private String primary;
 
-    public MapManagedTable(String name, List<String> structure, String primary) {
+    public RelationalTable(String name, List<String> structure, String primary) {
         this.name = name;
         this.structure = structure;
         this.primary = primary;
@@ -91,6 +91,16 @@ public class MapManagedTable implements Table {
         reindexColumns();
     }
 
+    @Override
+    public void reformat(TableType type, String[] parameters) {
+        //TODO
+    }
+
+    @Override
+    public TableType getType() {
+        return TableType.RELATIONAL;
+    }
+
     public void reindexColumns() {
         final Collection<Column> columns = new ArrayList<>(this.columns.values());
         this.columns.clear();
@@ -101,7 +111,7 @@ public class MapManagedTable implements Table {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MapManagedTable table = (MapManagedTable) o;
+        RelationalTable table = (RelationalTable) o;
         return Objects.equals(name, table.name);
     }
 

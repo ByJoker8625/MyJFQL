@@ -1,23 +1,28 @@
-import de.byjoker.myjfql.database.*;
+import de.byjoker.myjfql.database.Column;
+import de.byjoker.myjfql.database.LegacyColumn;
+import de.byjoker.myjfql.database.RelationalTable;
+import de.byjoker.myjfql.database.Table;
 import de.byjoker.myjfql.lang.ColumnComparator;
 import de.byjoker.myjfql.lang.ColumnFilter;
+import de.byjoker.myjfql.lang.Requirement;
 import de.byjoker.myjfql.lang.SortingOrder;
 import de.byjoker.myjfql.util.JsonColumnParser;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 public class Speedtest {
 
     public static void main(String[] args) {
-        Table table = new MapManagedTable("users", Arrays.asList("id", "name", "password"), "id");
+        Table table = new RelationalTable("users", Arrays.asList("id", "name", "password"), "id");
 
         long l1 = System.currentTimeMillis();
         double d0;
 
         for (int i = 0; i < 10000; i++) {
-            SimpleColumn column = new CompiledColumn();
+            Column column = new LegacyColumn();
             column.insert("id", i);
             column.insert("name", "__" + i);
             column.insert("password", Objects.hash("pw", i));
@@ -34,7 +39,7 @@ public class Speedtest {
         {
             long l = System.currentTimeMillis();
 
-            columns = ColumnFilter.filter(table, Arrays.asList("id !== 1"), new ColumnComparator(
+            columns = ColumnFilter.filter(table, Collections.singletonList(Collections.singletonList(new Requirement("id", Requirement.State.IS, Requirement.Method.EQUALS, "1"))), new ColumnComparator(
                     "id"
             ), SortingOrder.ASC);
 
@@ -46,7 +51,7 @@ public class Speedtest {
         {
             long l = System.currentTimeMillis();
 
-            String jsonObject = JsonColumnParser.stringifyCompiledColumns(columns, table.getStructure());
+            String jsonObject = JsonColumnParser.stringifyLegacyColumns(columns, table.getStructure());
 
             d2 = (double) System.currentTimeMillis() - l;
 

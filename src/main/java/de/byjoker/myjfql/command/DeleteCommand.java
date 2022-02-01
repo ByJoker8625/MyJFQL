@@ -42,7 +42,7 @@ public class DeleteCommand extends Command {
             }
 
             if (!database.existsTable(name)) {
-                sender.sendError("Table doesn't exists!");
+                sender.sendError("Table doesn't exist!");
                 return;
             }
 
@@ -67,7 +67,7 @@ public class DeleteCommand extends Command {
             }
 
             if (!databaseService.existsDatabaseByIdentifier(identifier)) {
-                sender.sendError("Database doesn't exists!");
+                sender.sendError("Database doesn't exist!");
                 return;
             }
 

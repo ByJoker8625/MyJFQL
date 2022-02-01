@@ -70,7 +70,7 @@ public class RemoveCommand extends Command {
                 List<Column> columns;
 
                 try {
-                    columns = ColumnFilter.filter(table, args.get("WHERE"));
+                    columns = ColumnFilter.filterByCommandLineArguments(table, args.get("WHERE"));
                 } catch (Exception ex) {
                     sender.sendError(ex);
                     return;
