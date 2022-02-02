@@ -22,6 +22,10 @@ public class RelationalColumn extends SimpleColumn {
         this.json = "{}";
     }
 
+    public RelationalColumn(Column column) {
+        super(column.getContent(), column.getCreatedAt());
+    }
+
     /**
      * I don't know why case this is already in SimpleColumn but kotlin wants that
      */

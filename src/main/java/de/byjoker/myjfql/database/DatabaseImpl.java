@@ -14,15 +14,15 @@ import java.util.Objects;
 public class DatabaseImpl implements Database {
 
     private final String name;
-    private final DatabaseType type;
-    private String id;
     private final Map<String, Table> tables;
+    private DatabaseType type;
+    private String id;
 
     public DatabaseImpl(String name) {
         this.id = IDGenerator.generateMixed(16);
         this.name = name;
         this.tables = new HashMap<>();
-        this.type = DatabaseType.FOLDER;
+        this.type = DatabaseType.SPLIT_STORAGE_TARGET;
     }
 
     public DatabaseImpl(String id, String name, DatabaseType type) {
@@ -57,7 +57,7 @@ public class DatabaseImpl implements Database {
 
     @Override
     public void deleteTable(String name) {
-        if (type == DatabaseType.FOLDER) {
+        if (type == DatabaseType.SPLIT_STORAGE_TARGET) {
             try {
                 FileUtils.deleteDirectory(new File("database/" + id + "/" + name));
             } catch (IOException ex) {
@@ -66,6 +66,13 @@ public class DatabaseImpl implements Database {
         }
 
         tables.remove(name);
+    }
+
+    @Override
+    public void reformat(DatabaseType type, DatabaseService service) {
+        service.deleteDatabase(id);
+        this.type = type;
+        service.createDatabase(this);
     }
 
     @Override
@@ -108,10 +115,11 @@ public class DatabaseImpl implements Database {
 
     @Override
     public String toString() {
-        return "Database{" +
-                "id='" + id + '\'' +
-                ", tables=" + tables.values() +
-                ", name='" + name + '\'' +
+        return "DatabaseImpl{" +
+                "name='" + name + '\'' +
+                ", tables=" + tables +
+                ", type=" + type +
+                ", id='" + id + '\'' +
                 '}';
     }
 }

@@ -25,7 +25,7 @@ public interface Table {
 
     void setPrimary(String primary);
 
-    void reformat(TableType type, String[] parameters);
+    Table reformat(TableType type, String... parameters);
 
     TableType getType();
 

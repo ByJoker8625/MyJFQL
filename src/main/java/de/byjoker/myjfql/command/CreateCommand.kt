@@ -136,7 +136,13 @@ class CreateCommand :
                         return
                     }
 
-                    database.createTable(RelationalTable(table, structure, primary))
+                    database.createTable(
+                        RelationalTable(
+                            table,
+                            structure,
+                            primary
+                        )
+                    )
                 }
             }
 

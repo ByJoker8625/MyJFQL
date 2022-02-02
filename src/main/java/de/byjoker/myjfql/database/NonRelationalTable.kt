@@ -70,8 +70,12 @@ class NonRelationalTable : Table {
         throw IllegalArgumentException()
     }
 
-    override fun reformat(type: TableType, parameters: Array<String>) {
-        TODO("Not yet implemented")
+    override fun reformat(type: TableType, parameters: Array<String>): Table {
+        if (type == TableType.NON_RELATIONAL) {
+            return this
+        }
+
+        throw ClassCastException("A non-relational table cannot be formatted into a rational table, since it is not possible to relationalize all values!")
     }
 
     override fun getType(): TableType {

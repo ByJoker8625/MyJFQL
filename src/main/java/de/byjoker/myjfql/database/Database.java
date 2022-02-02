@@ -14,6 +14,8 @@ public interface Database {
 
     void deleteTable(String name);
 
+    void reformat(DatabaseType type, DatabaseService service);
+
     Table getTable(String name);
 
     Collection<Table> getTables();

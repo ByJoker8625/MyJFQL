@@ -30,8 +30,6 @@ class InsertCommand :
             return
         }
 
-        println(args)
-
         if (!args.containsKey("INTO")) {
             sender.sendSyntax()
             return
@@ -49,11 +47,7 @@ class InsertCommand :
             return
         }
 
-        val table: Table = database.getTable(into)
-
-        println(table)
-        println(table.type)
-
+        val table = database.getTable(into)
         val content: Map<String, Any>?
 
         when (table.type) {
@@ -116,8 +110,6 @@ class InsertCommand :
                 }
             }
         }
-
-        println(content)
 
         if (content == null) {
             sender.sendError("Undefined content!")

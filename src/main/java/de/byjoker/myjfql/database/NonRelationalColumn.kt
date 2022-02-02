@@ -29,9 +29,9 @@ class NonRelationalColumn : ColumnMatcher {
         this.json = "{}"
     }
 
-    constructor(column: Column, primary: String) {
+    constructor(column: Column) {
         if (!column.contains("_id")) {
-            column.insert("_id", column.select(primary))
+            column.insert("_id", IDGenerator.generateMixed(32))
         }
 
         this.content = column.content

@@ -11,10 +11,7 @@ import de.byjoker.myjfql.console.Console;
 import de.byjoker.myjfql.console.JLineConsole;
 import de.byjoker.myjfql.console.ScannerConsole;
 import de.byjoker.myjfql.console.SystemConsole;
-import de.byjoker.myjfql.database.BackupService;
-import de.byjoker.myjfql.database.BackupServiceImpl;
-import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.database.DatabaseServiceImpl;
+import de.byjoker.myjfql.database.*;
 import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.exception.NetworkException;
 import de.byjoker.myjfql.lang.CommandFormatter;
@@ -101,9 +98,6 @@ public final class MyJFQL {
                 console = new ScannerConsole();
 
             switch (config.encryption().toUpperCase()) {
-                case "BASE64":
-                    encryptor = new Base64Encryptor();
-                    break;
                 case "ARGON2":
                     encryptor = new Argon2Encryptor();
                     break;
@@ -165,38 +159,41 @@ public final class MyJFQL {
 
         {
             console.logInfo("Loading databases and users (This can take a while)...");
-            databaseService.loadAll();
-            userService.loadAll();
-            sessionService.loadAll();
+
+            try {
+                databaseService.loadAll();
+                userService.loadAll();
+                sessionService.loadAll();
+            } catch (Exception ex) {
+                throw new FileException(ex);
+            }
+
             console.logInfo("Loading finished!");
+            console.clean();
         }
 
-        if (encryptor.name().equals("NONE")) {
-            console.clean();
-            console.logWarning("You are using no encryption! This state of password storing is very insecure!");
-        }
 
         {
-            if (databaseService.getDatabases().size() == 0
-                    && userService.getUsers().size() != 0) {
-                console.clean();
+            if (encryptor.name().equals("NONE")) {
+                console.logWarning("You are using no encryption! This state of password storing is very insecure!");
+            }
+
+            if (databaseService.getDatabases().stream().anyMatch(database -> database.getType() == DatabaseType.SINGLE_STORAGE_TARGET)) {
+                console.logWarning("Some of your databases are single file databases! This can affect you scalability!");
+            }
+
+            if (databaseService.getDatabases().size() == 0) {
                 console.logWarning("No databases exists!");
             }
 
-            if (databaseService.getDatabases().size() != 0
-                    && userService.getUsers().size() == 0) {
-                console.clean();
-                console.logWarning("No users exists!");
-            }
-
-            if (databaseService.getDatabases().size() == 0 && userService.getUsers().size() == 0) {
-                console.clean();
-                console.logWarning("No databases exists!");
+            if (userService.getUsers().size() == 0) {
                 console.logWarning("No users exists!");
             }
         }
 
-        sessionService.openSession(new Session(consoleCommandSender.getName(), consoleCommandSender.getName(), null, "localhost", System.currentTimeMillis(), -1));
+        sessionService.openSession(
+                new Session(consoleCommandSender.getName(), consoleCommandSender.getName(), null, "localhost", System.currentTimeMillis(), -1)
+        );
 
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override

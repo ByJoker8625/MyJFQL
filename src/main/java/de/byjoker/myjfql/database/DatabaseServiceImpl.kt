@@ -89,11 +89,11 @@ class DatabaseServiceImpl() : DatabaseService {
 
         for (file in files) {
             if (file.isDirectory) {
-                loadDatabase(DatabaseType.FOLDER, file)
+                loadDatabase(DatabaseType.SPLIT_STORAGE_TARGET, file)
                 continue
             }
 
-            loadDatabase(DatabaseType.FILE, file)
+            loadDatabase(DatabaseType.SINGLE_STORAGE_TARGET, file)
         }
     }
 
@@ -177,7 +177,7 @@ class DatabaseServiceImpl() : DatabaseService {
         }
 
         when (type) {
-            DatabaseType.FOLDER -> {
+            DatabaseType.SPLIT_STORAGE_TARGET -> {
                 val json = factory.load(File("${file.path}/%database%.json"))
                 val database = DatabaseImpl(
                     if (json.has("id")) json.getString("id") else file.name.replace(
@@ -185,7 +185,7 @@ class DatabaseServiceImpl() : DatabaseService {
                         ""
                     ),
                     json.getString("name"),
-                    DatabaseType.FOLDER
+                    DatabaseType.SPLIT_STORAGE_TARGET
                 )
 
                 for (table in json.getJSONArray("tables").toList().map { any -> any.toString() }) {
@@ -211,7 +211,7 @@ class DatabaseServiceImpl() : DatabaseService {
                         ""
                     ),
                     json.getString("name"),
-                    DatabaseType.FILE
+                    DatabaseType.SINGLE_STORAGE_TARGET
                 )
 
                 for (i in 0 until tables.length()) {
@@ -237,7 +237,7 @@ class DatabaseServiceImpl() : DatabaseService {
     override fun updateAll(space: File) {
         for (database in databases.values) {
             when (database.type) {
-                DatabaseType.FOLDER -> {
+                DatabaseType.SPLIT_STORAGE_TARGET -> {
                     val folder = File("${space.path}/${database.id}")
                     folder.mkdirs()
 
