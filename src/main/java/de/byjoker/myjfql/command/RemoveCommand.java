@@ -81,8 +81,7 @@ public class RemoveCommand extends Command {
                     return;
                 }
 
-                final String primary = table.getPrimary();
-                columns.stream().map(col -> col.selectStringify(primary)).forEach(table::removeColumn);
+                columns.stream().map(col -> col.selectStringify(table.getPrimary())).forEach(table::removeColumn);
 
                 sender.sendSuccess();
 

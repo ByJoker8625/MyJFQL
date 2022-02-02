@@ -16,9 +16,14 @@ open class RelationalTable(private val name: String, structure: List<String>, pr
     }
 
     override fun addColumn(column: Column) {
+        if (column !is SimpleColumn) {
+            return
+        }
+
         if (!column.containsOrNotNullItem(primary)) {
             return
         }
+
         column.compile()
         columns[column.selectStringify(primary)] = column
     }
@@ -89,11 +94,11 @@ open class RelationalTable(private val name: String, structure: List<String>, pr
 
                 table
             }
-            TableType.NON_RELATIONAL -> {
-                val table: Table = NonRelationalTable(name, ArrayList(structure))
+            TableType.DOCUMENT -> {
+                val table: Table = DocumentTable(name, ArrayList(structure))
 
                 columns.values.forEach { column ->
-                    table.addColumn(NonRelationalColumn(column))
+                    table.addColumn(DocumentColumn(column))
                 }
 
                 table

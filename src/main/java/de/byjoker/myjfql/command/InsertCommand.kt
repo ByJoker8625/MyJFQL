@@ -51,7 +51,7 @@ class InsertCommand :
         val content: Map<String, Any>?
 
         when (table.type) {
-            TableType.NON_RELATIONAL -> {
+            TableType.DOCUMENT -> {
                 if (!args.containsKey("CONTENT")) {
                     sender.sendSyntax()
                     return
@@ -130,7 +130,7 @@ class InsertCommand :
                     return
                 }
 
-                if (content.containsKey(table.primary) && table is NonRelationalTable) {
+                if (content.containsKey(table.primary) && table is DocumentTable) {
                     sender.sendError("Can't modify unique id of column!")
                     return
                 }
@@ -177,12 +177,12 @@ class InsertCommand :
                 }
 
                 val column: Column = table.getColumn(primary) ?: when (table.type) {
-                    TableType.NON_RELATIONAL -> NonRelationalColumn()
+                    TableType.DOCUMENT -> DocumentColumn()
                     TableType.KEY_VALUE -> KeyValueColumn()
                     else -> RelationalColumn()
                 }
 
-                if (content.containsKey(table.primary) && table is NonRelationalTable) {
+                if (content.containsKey(table.primary) && table is DocumentTable) {
                     sender.sendError("Can't modify unique id of column!")
                     return
                 }

@@ -96,7 +96,7 @@ class FormatCommand : ConsoleCommand("format", mutableListOf("COMMAND", "DATABAS
                 return
             }
 
-            if (table.type == TableType.NON_RELATIONAL) {
+            if (table.type == TableType.DOCUMENT) {
                 sender.sendError("A non-relational table cannot be formatted into a rational table, since it is not possible to relationalize all values!")
                 return
             }

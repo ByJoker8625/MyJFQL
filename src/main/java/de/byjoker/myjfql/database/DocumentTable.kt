@@ -4,7 +4,7 @@ import de.byjoker.myjfql.lang.ColumnComparator
 import de.byjoker.myjfql.lang.SortingOrder
 import java.util.Collections.reverse
 
-class NonRelationalTable : Table {
+class DocumentTable : Table {
 
     private var name: String
     private var columns: MutableMap<String, Column>
@@ -23,7 +23,7 @@ class NonRelationalTable : Table {
     }
 
     override fun addColumn(column: Column) {
-        if (column !is NonRelationalColumn) {
+        if (column !is DocumentColumn) {
             throw ClassCastException("Can't cast " + column.javaClass.name + " to de.byjoker.myjfql.database.NonRelationalColumn!")
         }
 
@@ -71,7 +71,7 @@ class NonRelationalTable : Table {
     }
 
     override fun reformat(type: TableType, parameters: Array<String>): Table {
-        if (type == TableType.NON_RELATIONAL) {
+        if (type == TableType.DOCUMENT) {
             return this
         }
 
@@ -79,7 +79,7 @@ class NonRelationalTable : Table {
     }
 
     override fun getType(): TableType {
-        return TableType.NON_RELATIONAL
+        return TableType.DOCUMENT
     }
 
     override fun getName(): String {
@@ -88,10 +88,6 @@ class NonRelationalTable : Table {
 
     override fun clear() {
         this.columns = HashMap()
-    }
-
-    override fun toString(): String {
-        return "NonRelationalTable(name='$name', columns=$columns, prototypeStructure=$prototypeStructure)"
     }
 
 }

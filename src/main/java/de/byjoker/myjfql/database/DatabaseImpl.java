@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class DatabaseImpl implements Database {
 
@@ -100,27 +99,5 @@ public class DatabaseImpl implements Database {
         return name;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DatabaseImpl database = (DatabaseImpl) o;
-        return Objects.equals(id, database.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
-
-    @Override
-    public String toString() {
-        return "DatabaseImpl{" +
-                "name='" + name + '\'' +
-                ", tables=" + tables +
-                ", type=" + type +
-                ", id='" + id + '\'' +
-                '}';
-    }
 }
 

@@ -7,7 +7,7 @@ public enum TableType {
 
     RELATIONAL("RELATIONAL", "REL", "SQL", "THE_THING_I_EVER_USED_BEFORE"),
     KEY_VALUE("KEY_VALUE", "KV"),
-    NON_RELATIONAL("NON_RELATIONAL", "NON_REL", "DOCUMENT", "JSON", "MONGODB");
+    DOCUMENT("NON_RELATIONAL", "NON_REL", "DOCUMENT", "JSON", "MONGODB");
 
     private final List<String> aliases;
 

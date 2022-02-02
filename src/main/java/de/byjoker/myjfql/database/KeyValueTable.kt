@@ -12,9 +12,9 @@ class KeyValueTable(name: String) : RelationalTable(name, mutableListOf("key", "
 
     override fun reformat(type: TableType, parameters: Array<String>): Table {
         when (type) {
-            TableType.NON_RELATIONAL -> {
-                val table = NonRelationalTable(name, ArrayList(mutableListOf("key", "value")))
-                columns.forEach { column -> table.addColumn(NonRelationalColumn(column)) }
+            TableType.DOCUMENT -> {
+                val table = DocumentTable(name, ArrayList(mutableListOf("key", "value")))
+                columns.forEach { column -> table.addColumn(DocumentColumn(column)) }
 
                 return table
             }

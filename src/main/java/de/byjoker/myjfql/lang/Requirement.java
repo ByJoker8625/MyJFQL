@@ -24,16 +24,6 @@ public class Requirement {
         this.value = value;
     }
 
-    @Override
-    public String toString() {
-        return "Requirement{" +
-                "method=" + method +
-                ", state=" + state +
-                ", key='" + key + '\'' +
-                ", value='" + value + '\'' +
-                '}';
-    }
-
     public String getValue() {
         return value;
     }

@@ -96,7 +96,7 @@ class CreateCommand :
             }
 
             when (type) {
-                TableType.NON_RELATIONAL -> {
+                TableType.DOCUMENT -> {
                     val structure: MutableList<String>? =
                         if (!args.containsKey("STRUCTURE")) mutableListOf("_id") else formatList(args["STRUCTURE"])
 
@@ -105,7 +105,7 @@ class CreateCommand :
                         return
                     }
 
-                    database.createTable(NonRelationalTable(table, structure))
+                    database.createTable(DocumentTable(table, structure))
                 }
                 TableType.KEY_VALUE -> {
                     database.createTable(KeyValueTable(table))

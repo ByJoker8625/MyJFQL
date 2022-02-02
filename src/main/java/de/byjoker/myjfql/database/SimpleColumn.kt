@@ -52,7 +52,4 @@ abstract class SimpleColumn(private var content: MutableMap<String, Any>, privat
         this.createdAt = createdAt
     }
 
-    override fun toString(): String {
-        return "SimpleColumn(content=$content, createdAt=$createdAt)"
-    }
 }

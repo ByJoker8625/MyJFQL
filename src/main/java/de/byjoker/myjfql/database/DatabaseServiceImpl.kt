@@ -88,16 +88,23 @@ class DatabaseServiceImpl() : DatabaseService {
         val files: Array<File> = space.listFiles() ?: return
 
         for (file in files) {
-            if (file.isDirectory) {
+            val database: Database? = if (file.isDirectory) {
+                loadDatabase(DatabaseType.SINGLE_STORAGE_TARGET, file)
+            } else {
                 loadDatabase(DatabaseType.SPLIT_STORAGE_TARGET, file)
-                continue
             }
 
-            loadDatabase(DatabaseType.SINGLE_STORAGE_TARGET, file)
+            if (database != null) {
+                databases[database.id] = database
+            }
         }
     }
 
-    private fun loadDatabase(type: DatabaseType, file: File) {
+    override fun loadDatabase(type: DatabaseType, file: File): Database? {
+        if (!file.exists()) {
+            return null;
+        }
+
         fun loadTable(json: JSONObject): Table? {
             val name = json.getString("name")
             val columns = json.getJSONArray("columns")
@@ -135,7 +142,7 @@ class DatabaseServiceImpl() : DatabaseService {
                     return table
                 }
                 "NON_RELATIONAL" -> {
-                    val table = NonRelationalTable(
+                    val table = DocumentTable(
                         name,
                         ArrayList(json.getJSONArray("structure").toMutableList().map { o -> o.toString() })
                     )
@@ -144,7 +151,7 @@ class DatabaseServiceImpl() : DatabaseService {
                         val column: JSONObject = columns.getJSONObject(i)
 
                         table.addColumn(
-                            NonRelationalColumn(
+                            DocumentColumn(
                                 column.getJSONObject("content").toMap(),
                                 column.getLong("creation")
                             )
@@ -196,10 +203,10 @@ class DatabaseServiceImpl() : DatabaseService {
                     || database.id.contains("%") || database.id.contains("#") || database.id.contains("'")
                 ) {
                     MyJFQL.getInstance().console.logWarning("Database used unauthorized characters in the identifier!")
-                    return
+                    return null
                 }
 
-                databases[database.id] = database
+                return database
             }
             else -> {
                 val json = factory.load(file)
@@ -222,10 +229,10 @@ class DatabaseServiceImpl() : DatabaseService {
                     || database.id.contains("%") || database.id.contains("#") || database.id.contains("'")
                 ) {
                     MyJFQL.getInstance().console.logWarning("Database used unauthorized characters in the identifier!")
-                    return
+                    return null
                 }
 
-                databases[database.id] = database
+                return database
             }
         }
     }

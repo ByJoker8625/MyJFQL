@@ -7,7 +7,7 @@ import de.byjoker.myjfql.util.JsonColumnParser
 import org.json.JSONPropertyIgnore
 import org.json.JSONPropertyName
 
-class NonRelationalColumn : ColumnMatcher {
+class DocumentColumn : ColumnMatcher {
 
     private var content: MutableMap<String, Any>
     private var createdAt: Long
@@ -104,25 +104,5 @@ class NonRelationalColumn : ColumnMatcher {
     override fun setCreatedAt(createdAt: Long) {
         this.createdAt = createdAt
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as NonRelationalColumn
-
-        if (content.get("_id") != other.content.get("_id")) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return content.hashCode()
-    }
-
-    override fun toString(): String {
-        return "NonRelationalColumn(content=$content, createdAt=$createdAt)"
-    }
-
 
 }
