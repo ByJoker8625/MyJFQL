@@ -107,9 +107,6 @@ class CreateCommand :
 
                     database.createTable(DocumentTable(table, structure))
                 }
-                TableType.KEY_VALUE -> {
-                    database.createTable(KeyValueTable(table))
-                }
                 else -> {
                     if (!args.containsKey("STRUCTURE")) {
                         sender.sendSyntax()

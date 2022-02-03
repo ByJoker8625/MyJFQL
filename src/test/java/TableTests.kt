@@ -1,4 +1,7 @@
-import de.byjoker.myjfql.database.*
+import de.byjoker.myjfql.database.Column
+import de.byjoker.myjfql.database.DocumentColumn
+import de.byjoker.myjfql.database.RelationalColumn
+import de.byjoker.myjfql.database.RelationalTable
 import de.byjoker.myjfql.lang.ColumnFilter
 import de.byjoker.myjfql.lang.Requirement
 import org.junit.Test
@@ -24,10 +27,6 @@ class TableTests {
 
         assertEquals(table.columns.size, 0)
 
-        table.addColumn(KeyValueColumn())
-
-        assertEquals(table.columns.size, 0)
-
         table.addColumn(
             RelationalColumn(
                 mutableMapOf("id" to "primary key value") as Map<String, Any>,
@@ -50,14 +49,6 @@ class TableTests {
             DocumentColumn(
                 mutableMapOf("_id" to "unique id of document column", "id" to "primary key value"),
                 System.currentTimeMillis()
-            )
-        )
-
-        assertEquals(table.columns.size, 0)
-
-        table.addColumn(
-            KeyValueColumn(
-                "first field value", "second field value"
             )
         )
 

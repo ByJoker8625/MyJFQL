@@ -82,7 +82,7 @@ class DocumentColumn : ColumnMatcher {
     }
 
     override fun setContent(content: MutableMap<String, Any>) {
-        content.remove("_id")
+        content["_id"] = this.content["_id"].toString()
         this.content = content
     }
 

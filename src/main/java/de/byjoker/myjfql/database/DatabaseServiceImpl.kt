@@ -89,9 +89,9 @@ class DatabaseServiceImpl() : DatabaseService {
 
         for (file in files) {
             val database: Database? = if (file.isDirectory) {
-                loadDatabase(DatabaseType.SINGLE_STORAGE_TARGET, file)
-            } else {
                 loadDatabase(DatabaseType.SPLIT_STORAGE_TARGET, file)
+            } else {
+                loadDatabase(DatabaseType.SINGLE_STORAGE_TARGET, file)
             }
 
             if (database != null) {
@@ -124,24 +124,7 @@ class DatabaseServiceImpl() : DatabaseService {
             }
 
             when (json.getString("type")) {
-                "KEY_VALUE" -> {
-                    val table = KeyValueTable(name)
-
-                    for (i in 0 until columns.length()) {
-                        val column: JSONObject = columns.getJSONObject(i)
-
-                        table.addColumn(
-                            KeyValueColumn(
-                                column.getJSONObject("content").getString("key"),
-                                column.getJSONObject("content").getString("value"),
-                                column.getLong("creation")
-                            )
-                        )
-                    }
-
-                    return table
-                }
-                "NON_RELATIONAL" -> {
+                TableType.DOCUMENT.name -> {
                     val table = DocumentTable(
                         name,
                         ArrayList(json.getJSONArray("structure").toMutableList().map { o -> o.toString() })

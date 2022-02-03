@@ -178,7 +178,6 @@ class InsertCommand :
 
                 val column: Column = table.getColumn(primary) ?: when (table.type) {
                     TableType.DOCUMENT -> DocumentColumn()
-                    TableType.KEY_VALUE -> KeyValueColumn()
                     else -> RelationalColumn()
                 }
 
@@ -188,12 +187,12 @@ class InsertCommand :
                 }
 
                 /**
-                 * To prevent duplication of an entry when the primary key is changed, the previous entry is removed
+                 * To prevent duplication of an entry when the primary key is changed,
+                 * the previous entry is removed
                  */
 
-                if (content.contains(table.primary)) {
+                if (content.contains(table.primary) && column.select(table.primary) != content[table.primary]) {
                     table.removeColumn(column.selectStringify(table.primary))
-                    return
                 }
 
                 if (args.containsKey("FULLY")) {

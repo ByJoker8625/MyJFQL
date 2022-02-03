@@ -101,43 +101,14 @@ class FormatCommand : ConsoleCommand("format", mutableListOf("COMMAND", "DATABAS
                 return
             }
 
-            if (type == TableType.KEY_VALUE) {
-                if (!args.containsKey("KEEP")) {
-                    sender.sendError("Undefined which field to keep as second value pare!")
-                    return
-                }
+            database.deleteTable(table.name)
 
-                val keep: String? = formatString(args["KEEP"])
-
-                if (keep == null) {
-                    sender.sendError("Undefined which field to keep as second value pare!")
-                    return
-                }
-
-                if (!table.structure.contains(keep)) {
-                    sender.sendError("Specified field to keep doesn't match table structure!")
-                    return
-                }
-
-                database.deleteTable(table.name)
-
-                try {
-                    database.createTable(table.reformat(type, keep))
-                } catch (ex: Exception) {
-                    sender.sendError("Failed to format table: ${ex.message}!")
-                    database.createTable(table)
-                    return
-                }
-            } else {
-                database.deleteTable(table.name)
-
-                try {
-                    database.createTable(table.reformat(type))
-                } catch (ex: Exception) {
-                    sender.sendError("Failed to format table: ${ex.message}!")
-                    database.createTable(table)
-                    return
-                }
+            try {
+                database.createTable(table.reformat(type))
+            } catch (ex: Exception) {
+                sender.sendError("Failed to format table: ${ex.message}!")
+                database.createTable(table)
+                return
             }
 
             sender.sendSuccess()

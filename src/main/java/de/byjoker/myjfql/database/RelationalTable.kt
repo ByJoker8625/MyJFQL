@@ -32,8 +32,8 @@ open class RelationalTable(private val name: String, structure: List<String>, pr
         columns.remove(primary)
     }
 
-    override fun getColumn(key: String): Column {
-        return columns[key]!!
+    override fun getColumn(key: String): Column? {
+        return columns[key]
     }
 
     override fun getColumns(): Collection<Column> {
@@ -79,21 +79,6 @@ open class RelationalTable(private val name: String, structure: List<String>, pr
 
     override fun reformat(type: TableType, parameters: Array<String>): Table {
         return when (type) {
-            TableType.KEY_VALUE -> {
-                if (parameters.size != 1) {
-                    throw NullPointerException()
-                }
-
-                val table: Table = KeyValueTable(name)
-
-                columns.values.stream().map { column: Column ->
-                    KeyValueColumn(
-                        column, primary, parameters[0]
-                    )
-                }.forEach { column: KeyValueColumn? -> table.addColumn(column) }
-
-                table
-            }
             TableType.DOCUMENT -> {
                 val table: Table = DocumentTable(name, ArrayList(structure))
 
