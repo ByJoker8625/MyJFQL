@@ -17,7 +17,7 @@ public class VersionCommand extends ConsoleCommand {
     }
 
     @Override
-    public void handleConsoleCommand(ConsoleCommandSender sender, Map<String, List<String>> args) {
+    public void executeAsConsole(ConsoleCommandSender sender, Map<String, List<String>> args) {
         final Updater updater = MyJFQL.getInstance().getUpdater();
         final Downloader downloader = MyJFQL.getInstance().getDownloader();
 

@@ -8,7 +8,7 @@ import de.byjoker.myjfql.database.TableType
 @CommandHandler
 class FormatCommand : ConsoleCommand("format", mutableListOf("COMMAND", "DATABASE", "TABLE", "INTO", "KEEP")) {
 
-    override fun handleConsoleCommand(sender: ConsoleCommandSender, args: MutableMap<String, MutableList<String>>) {
+    override fun executeAsConsole(sender: ConsoleCommandSender, args: MutableMap<String, MutableList<String>>) {
         val databaseService = MyJFQL.getInstance().databaseService
 
         if (!args.containsKey("INTO")) {

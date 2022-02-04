@@ -1,7 +1,6 @@
 package de.byjoker.myjfql.lang;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.exception.LanguageException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -60,13 +59,13 @@ public class JFQLCommandFormatter implements CommandFormatter {
         final Map<String, List<String>> arguments = new HashMap<>();
         String section = null;
 
-        for (final String current : strings) {
+        for (String current : strings) {
             if (syntax.contains(current.toUpperCase())) {
                 section = current.toUpperCase();
                 arguments.put(section, new ArrayList<>());
             } else {
                 if (section == null) {
-                    throw new LanguageException();
+                    break;
                 }
 
                 if (!arguments.containsKey(section)) {

@@ -5,10 +5,15 @@ import de.byjoker.myjfql.database.Database;
 import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.server.session.Session;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jline.reader.ParsedLine;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @CommandHandler
 public class UseCommand extends Command {
@@ -18,7 +23,7 @@ public class UseCommand extends Command {
     }
 
     @Override
-    public void handleCommand(CommandSender sender, Map<String, List<String>> args) {
+    public void execute(CommandSender sender, Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
         final Session session = sender.getSession();
 
@@ -55,5 +60,25 @@ public class UseCommand extends Command {
         }
 
         sender.sendSyntax();
+    }
+
+    @Nullable
+    @Override
+    public List<String> complete(@NotNull CommandSender sender, @NotNull ParsedLine line) {
+        if (sender.getSession() == null) return null;
+
+        final String args = line.line().toUpperCase();
+        final String before = line.words().get(line.wordIndex() - 1).toUpperCase();
+
+        if (!args.contains(" DATABASE")) {
+            return Collections.singletonList("database");
+        }
+
+        if (before.equals("DATABASE")) {
+            return MyJFQL.getInstance().getDatabaseService().getDatabases().stream().map(Database::getName)
+                    .collect(Collectors.toList());
+        }
+
+        return null;
     }
 }

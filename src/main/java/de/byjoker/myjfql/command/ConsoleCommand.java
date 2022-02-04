@@ -1,5 +1,7 @@
 package de.byjoker.myjfql.command;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 import java.util.Map;
 
@@ -9,10 +11,10 @@ public abstract class ConsoleCommand extends Command {
         super(name, syntax);
     }
 
-    public abstract void handleConsoleCommand(ConsoleCommandSender sender, final Map<String, List<String>> args);
+    public abstract void executeAsConsole(ConsoleCommandSender sender, final Map<String, List<String>> args);
 
     @Override
-    public final void handleCommand(CommandSender sender, Map<String, List<String>> args) {
+    public final void execute(@NotNull CommandSender sender, @NotNull Map<String, List<String>> args) {
         if (!(sender instanceof ConsoleCommandSender)) {
             sender.sendForbidden();
             return;
@@ -23,6 +25,6 @@ public abstract class ConsoleCommand extends Command {
             return;
         }
 
-        handleConsoleCommand((ConsoleCommandSender) sender, args);
+        executeAsConsole((ConsoleCommandSender) sender, args);
     }
 }

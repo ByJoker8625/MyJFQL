@@ -4,7 +4,7 @@ import de.byjoker.myjfql.database.Column;
 import de.byjoker.myjfql.database.RelationalTable;
 import de.byjoker.myjfql.database.Table;
 import de.byjoker.myjfql.exception.LanguageException;
-import de.byjoker.myjfql.util.SortingOrder;
+import de.byjoker.myjfql.util.Order;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +22,7 @@ public class ColumnFilter {
         return filter(table, conditions, null, null);
     }
 
-    public static List<Column> filterByCommandLineArguments(Table table, List<String> argument, ColumnComparator comparator, SortingOrder order) {
+    public static List<Column> filterByCommandLineArguments(Table table, List<String> argument, ColumnComparator comparator, Order order) {
         if (argument.size() == 0) {
             throw new LanguageException("No arguments given!");
         }
@@ -99,14 +99,14 @@ public class ColumnFilter {
         }
     }
 
-    public static List<Column> filter(Table table, List<List<Requirement>> conditions, ColumnComparator comparator, SortingOrder order) {
+    public static List<Column> filter(Table table, List<List<Requirement>> conditions, ColumnComparator comparator, Order order) {
         try {
             final List<Column> columns = table.getColumns().stream().filter(column -> column.matches(conditions)).collect(Collectors.toList());
 
             if (comparator != null) {
                 columns.sort(comparator);
 
-                if (order == SortingOrder.DESC)
+                if (order == Order.DESC)
                     Collections.reverse(columns);
             }
 

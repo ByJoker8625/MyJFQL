@@ -5,6 +5,7 @@ import de.byjoker.myjfql.database.Database;
 import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.server.session.Session;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +19,7 @@ public class DeleteCommand extends Command {
     }
 
     @Override
-    public void handleCommand(CommandSender sender, Map<String, List<String>> args) {
+    public void execute(@NotNull CommandSender sender, @NotNull Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
         final Session session = sender.getSession();
 

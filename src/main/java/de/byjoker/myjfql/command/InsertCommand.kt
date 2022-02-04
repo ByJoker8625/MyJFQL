@@ -3,13 +3,14 @@ package de.byjoker.myjfql.command
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.*
 import de.byjoker.myjfql.lang.ColumnFilter
+import org.jline.reader.ParsedLine
 import org.json.JSONObject
 
 @CommandHandler
 class InsertCommand :
     Command("insert", mutableListOf("COMMAND", "INTO", "CONTENT", "KEY", "VALUE", "PRIMARY-KEY", "WHERE", "FULLY")) {
 
-    override fun handleCommand(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
+    override fun execute(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
         val databaseService = MyJFQL.getInstance().databaseService
         val session = sender.session
 
@@ -217,6 +218,33 @@ class InsertCommand :
                 databaseService.saveDatabase(database)
                 return
             }
+        }
+    }
+
+    override fun complete(sender: CommandSender, line: ParsedLine)
+            : MutableList<String>? {
+        sender.session ?: return null
+        val database: Database = sender.session.getDatabase(MyJFQL.getInstance().databaseService) ?: return null
+
+        if (!sender.allowed(database.id, DatabaseAction.READ_WRITE)) {
+            return null
+        }
+
+        val args = line.line().uppercase()
+        val before = line.words()[line.wordIndex() - 1].uppercase()
+
+        return when {
+            !args.contains(" INTO") -> mutableListOf("into")
+            before == "INTO" -> database.tables.map { table -> table.name }.toMutableList()
+            !args.contains(" CONTENT") && !args.contains(" KEY") -> mutableListOf("content", "key")
+            before == "CONTENT" -> null
+            before == "KEY" -> null
+            args.contains(" KEY") && !args.contains(" VALUE") -> mutableListOf("value")
+            before == "VALUE" -> null
+            !args.contains(" WHERE") && !args.contains(" PRIMARY-KEY") -> mutableListOf("where", "primary-key")
+            before == "WHERE" || before == "PRIMARY-KEY" -> null
+            !args.contains(" FULLY") -> mutableListOf("fully")
+            else -> null
         }
     }
 

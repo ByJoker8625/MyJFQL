@@ -79,7 +79,7 @@ public class CommandServiceImpl implements CommandService {
                 return;
             }
 
-            command.handleCommand(sender, arguments);
+            command.execute(sender, arguments);
         } catch (Exception ex) {
             new LanguageException(ex).printStackTrace();
         }

@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.database
 
 import de.byjoker.myjfql.lang.ColumnComparator
-import de.byjoker.myjfql.util.SortingOrder
+import de.byjoker.myjfql.util.Order
 import java.util.Collections.reverse
 
 class DocumentTable : Table {
@@ -43,13 +43,13 @@ class DocumentTable : Table {
         return columns.values
     }
 
-    override fun getColumns(comparator: ColumnComparator, order: SortingOrder): List<Column> {
+    override fun getColumns(comparator: ColumnComparator, order: Order): List<Column> {
         val columns: List<Column> = ArrayList(
             this.columns.values
         )
         columns.sortedWith(comparator)
 
-        if (order == SortingOrder.DESC) reverse(columns)
+        if (order == Order.DESC) reverse(columns)
 
         return columns
     }

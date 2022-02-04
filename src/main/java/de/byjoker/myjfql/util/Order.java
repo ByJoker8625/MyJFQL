@@ -1,6 +1,6 @@
 package de.byjoker.myjfql.util;
 
-public enum SortingOrder {
+public enum Order {
 
     ASC,
     DESC

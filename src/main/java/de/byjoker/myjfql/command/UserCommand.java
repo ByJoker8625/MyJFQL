@@ -19,7 +19,7 @@ public class UserCommand extends ConsoleCommand {
     }
 
     @Override
-    public void handleConsoleCommand(ConsoleCommandSender sender, Map<String, List<String>> args) {
+    public void executeAsConsole(ConsoleCommandSender sender, Map<String, List<String>> args) {
         final UserService userService = MyJFQL.getInstance().getUserService();
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
 

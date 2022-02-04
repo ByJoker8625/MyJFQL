@@ -8,9 +8,9 @@ import de.byjoker.myjfql.config.ConfigDefaults;
 import de.byjoker.myjfql.config.ConfigService;
 import de.byjoker.myjfql.config.ConfigServiceImpl;
 import de.byjoker.myjfql.console.Console;
-import de.byjoker.myjfql.console.JLineConsole;
-import de.byjoker.myjfql.console.ScannerConsole;
-import de.byjoker.myjfql.console.SystemConsole;
+import de.byjoker.myjfql.console.ConsoleCommandCompleter;
+import de.byjoker.myjfql.console.ConsoleImpl;
+import de.byjoker.myjfql.console.SimpleConsole;
 import de.byjoker.myjfql.database.*;
 import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.exception.NetworkException;
@@ -50,7 +50,7 @@ public final class MyJFQL {
     public MyJFQL() {
         instance = this;
         this.configService = new ConfigServiceImpl();
-        this.console = new SystemConsole();
+        this.console = new ConsoleImpl();
         this.config = new ConfigDefaults();
         this.encryptor = new NoneEncryptor();
         this.formatter = new JFQLCommandFormatter();
@@ -92,10 +92,9 @@ public final class MyJFQL {
                 config = configService.getConfig();
             }
 
-            if (config.jline())
-                console = new JLineConsole();
-            else
-                console = new ScannerConsole();
+            if (config.jline()) {
+                console = new SimpleConsole();
+            }
 
             switch (config.encryption().toUpperCase()) {
                 case "ARGON2":
@@ -205,7 +204,7 @@ public final class MyJFQL {
             }
         }, 1000 * 60, 1000 * 60);
 
-        console.complete();
+        console.bind(new ConsoleCommandCompleter(commandService, consoleCommandSender));
 
         while (true)
             commandService.execute(consoleCommandSender, console.readPrompt());

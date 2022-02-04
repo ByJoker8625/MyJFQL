@@ -6,7 +6,7 @@ import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.database.Table;
 import de.byjoker.myjfql.lang.StringComparator;
-import de.byjoker.myjfql.util.SortingOrder;
+import de.byjoker.myjfql.util.Order;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,7 +19,7 @@ public class ListCommand extends Command {
     }
 
     @Override
-    public void handleCommand(CommandSender sender, Map<String, List<String>> args) {
+    public void execute(CommandSender sender, Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
 
         if (sender.getSession() == null) {
@@ -53,10 +53,10 @@ public class ListCommand extends Command {
             }
 
             if (args.containsKey("ORDER")) {
-                SortingOrder order;
+                Order order;
 
                 try {
-                    order = SortingOrder.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
+                    order = Order.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
                 } catch (Exception ex) {
                     sender.sendError("Unknown or undefined sort order!");
                     return;
@@ -64,7 +64,7 @@ public class ListCommand extends Command {
 
                 databases.sort(new StringComparator());
 
-                if (order == SortingOrder.DESC)
+                if (order == Order.DESC)
                     Collections.reverse(databases);
             }
 
@@ -118,10 +118,10 @@ public class ListCommand extends Command {
             }
 
             if (args.containsKey("ORDER")) {
-                SortingOrder order;
+                Order order;
 
                 try {
-                    order = SortingOrder.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
+                    order = Order.valueOf(Objects.requireNonNull(formatString(args.get("ORDER"))).toUpperCase());
                 } catch (Exception ex) {
                     sender.sendError("Unknown or undefined sort order!");
                     return;
@@ -129,7 +129,7 @@ public class ListCommand extends Command {
 
                 tables.sort(new StringComparator());
 
-                if (order == SortingOrder.DESC)
+                if (order == Order.DESC)
                     Collections.reverse(tables);
             }
 

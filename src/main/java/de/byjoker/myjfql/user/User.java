@@ -96,14 +96,4 @@ public class User {
         this.id = id;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "name='" + name + '\'' +
-                ", password='" + password + '\'' +
-                ", accesses=" + accesses +
-                ", preferredDatabase=" + preferredDatabase +
-                '}';
-    }
-
 }

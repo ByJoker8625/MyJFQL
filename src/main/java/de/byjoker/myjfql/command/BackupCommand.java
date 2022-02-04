@@ -17,7 +17,7 @@ public class BackupCommand extends ConsoleCommand {
     }
 
     @Override
-    public void handleConsoleCommand(ConsoleCommandSender sender, Map<String, List<String>> args) {
+    public void executeAsConsole(ConsoleCommandSender sender, Map<String, List<String>> args) {
         final BackupService backupService = MyJFQL.getInstance().getDatabaseBackupService();
 
         if (args.containsKey("CREATE")) {

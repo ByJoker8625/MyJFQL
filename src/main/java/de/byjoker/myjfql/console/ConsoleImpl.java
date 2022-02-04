@@ -1,9 +1,14 @@
 package de.byjoker.myjfql.console;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Scanner;
 
-public class SystemConsole implements Console {
+public class ConsoleImpl implements Console {
+
+    private Scanner scanner = null;
 
     @Override
     public void clean() {
@@ -37,7 +42,7 @@ public class SystemConsole implements Console {
             return;
         }
 
-        System.out.println("[" + getTime() + "] " + s);
+        System.out.println("[" + time() + "] " + s);
     }
 
     @Override
@@ -47,42 +52,30 @@ public class SystemConsole implements Console {
             return;
         }
 
-        System.out.println("[" + getTime() + "] " + s);
+        System.out.println("[" + time() + "] " + s);
     }
 
-    @Override
-    public void printWarning(String s) {
-        print("WARNING: " + s);
-    }
-
-    @Override
-    public void printInfo(String s) {
-        print("INFO: " + s);
-    }
-
-    @Override
-    public void printError(String s) {
-        print("ERROR: " + s);
-    }
-
-
-    @Deprecated
     @Override
     public String readPrompt() {
-        return null;
+        try {
+            return scanner.nextLine();
+        } catch (Exception ignore) {
+        }
+
+        return "";
     }
 
-    @Deprecated
+    @Override
+    public void bind(@NotNull Object... parameters) {
+        scanner = new Scanner(System.in);
+    }
+
     @Override
     public void clear() {
+        throw new UnsupportedOperationException();
     }
 
-    @Deprecated
-    @Override
-    public void complete() {
-    }
-
-    private String getTime() {
+    private String time() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     }
 

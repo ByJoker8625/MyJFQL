@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.database
 
 import de.byjoker.myjfql.lang.ColumnComparator
-import de.byjoker.myjfql.util.SortingOrder
+import de.byjoker.myjfql.util.Order
 import java.util.function.Consumer
 
 open class RelationalTable(private val name: String, structure: List<String>, primary: String) : Table {
@@ -44,10 +44,10 @@ open class RelationalTable(private val name: String, structure: List<String>, pr
         this.columns = columns
     }
 
-    override fun getColumns(comparator: ColumnComparator, order: SortingOrder): Collection<Column> {
+    override fun getColumns(comparator: ColumnComparator, order: Order): Collection<Column> {
         val columns: MutableList<Column> = ArrayList(columns.values)
         columns.sortWith(comparator)
-        if (order == SortingOrder.DESC) columns.reverse()
+        if (order == Order.DESC) columns.reverse()
         return columns
     }
 

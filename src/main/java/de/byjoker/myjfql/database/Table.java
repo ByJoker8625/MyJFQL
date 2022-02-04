@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.database;
 
 import de.byjoker.myjfql.lang.ColumnComparator;
-import de.byjoker.myjfql.util.SortingOrder;
+import de.byjoker.myjfql.util.Order;
 
 import java.util.Collection;
 
@@ -15,7 +15,7 @@ public interface Table {
 
     Collection<Column> getColumns();
 
-    Collection<Column> getColumns(ColumnComparator comparator, SortingOrder order);
+    Collection<Column> getColumns(ColumnComparator comparator, Order order);
 
     Collection<String> getStructure();
 

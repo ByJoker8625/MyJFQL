@@ -8,13 +8,14 @@ import de.byjoker.myjfql.database.RelationalTable
 import de.byjoker.myjfql.lang.ColumnComparator
 import de.byjoker.myjfql.lang.ColumnFilter
 import de.byjoker.myjfql.server.session.Session
-import de.byjoker.myjfql.util.SortingOrder
+import de.byjoker.myjfql.util.Order
+import org.jline.reader.ParsedLine
 import java.util.stream.Collectors
 
 @CommandHandler
 class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM", "WHERE", "SORT", "ORDER", "LIMIT")) {
 
-    override fun handleCommand(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
+    override fun execute(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
         val databaseService = MyJFQL.getInstance().databaseService
         val session: Session? = sender.session
 
@@ -52,7 +53,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
 
             val structure: Collection<String> = when {
                 formatString(args["VALUE"]) == "*" -> table.structure
-                else -> formatList(args["VALUE"])
+                else -> formatList(args["VALUE"]) ?: return
             }
 
             if (table is RelationalTable && structure.stream().anyMatch { entry -> !table.structure.contains(entry) }) {
@@ -60,7 +61,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                 return
             }
 
-            var order: SortingOrder? = null
+            var order: Order? = null
             var sortedBy: String? = null
             var limit = -1
 
@@ -96,7 +97,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
 
             if (args.containsKey("ORDER")) {
                 order = try {
-                    SortingOrder.valueOf(formatString(args["ORDER"]))
+                    Order.valueOf(formatString(args["ORDER"])!!)
                 } catch (ex: Exception) {
                     sender.sendError("Unknown sort order!")
                     return
@@ -164,6 +165,36 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
         }
 
         sender.sendSyntax()
+    }
+
+    override fun complete(sender: CommandSender, line: ParsedLine): MutableList<String>? {
+        sender.session ?: return null
+        val database: Database = sender.session.getDatabase(MyJFQL.getInstance().databaseService) ?: return null
+
+        if (!sender.allowed(database.id, DatabaseAction.READ)) {
+            return null
+        }
+
+        val args = line.line().uppercase()
+        val before = line.words()[line.wordIndex() - 1].uppercase()
+
+        return when {
+            !args.contains(" VALUE") -> mutableListOf("value")
+            before == "VALUE" -> mutableListOf("*")
+            !args.contains(" FROM") -> mutableListOf("from")
+            before == "FROM" -> database.tables.map { table -> table.name }.toMutableList()
+            !args.contains(" WHERE") && !args.contains(" PRIMARY-KEY") -> mutableListOf("where", "primary-key")
+            before == "WHERE" || before == "PRIMARY-KEY" -> null
+            !args.contains(" SORT") && !args.contains(" ORDER") && !args.contains(" LIMIT") -> mutableListOf(
+                "sort",
+                "order",
+                "limit"
+            )
+            before == "SORT" -> null
+            before == "ORDER" -> mutableListOf("asc", "desc")
+            before == "LIMIT" -> null
+            else -> null
+        }
     }
 
 }

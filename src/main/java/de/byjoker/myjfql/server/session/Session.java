@@ -6,7 +6,6 @@ import de.byjoker.myjfql.user.User;
 import de.byjoker.myjfql.user.UserService;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 public class Session {
 
@@ -129,29 +128,5 @@ public class Session {
         this.databaseId = databaseId;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Session session = (Session) o;
-        return Objects.equals(token, session.token);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(token);
-    }
-
-    @Override
-    public String toString() {
-        return "Session{" +
-                "token='" + token + '\'' +
-                ", userId='" + userId + '\'' +
-                ", databaseId='" + databaseId + '\'' +
-                ", address='" + address + '\'' +
-                ", open=" + open +
-                ", expire=" + expire +
-                '}';
-    }
 }
 

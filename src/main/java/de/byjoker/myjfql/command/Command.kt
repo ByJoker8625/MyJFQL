@@ -1,71 +1,37 @@
-package de.byjoker.myjfql.command;
+package de.byjoker.myjfql.command
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import org.jline.reader.ParsedLine
+import java.util.stream.Collectors
+import java.util.stream.IntStream
 
-public abstract class Command {
+abstract class Command(val name: String, val syntax: MutableList<String>) {
 
-    private final String name;
-    private final List<String> syntax;
+    abstract fun execute(sender: CommandSender, args: MutableMap<String, MutableList<String>>)
 
-    public Command(String name, List<String> syntax) {
-        this.name = name;
-        this.syntax = syntax;
+    open fun complete(sender: CommandSender, line: ParsedLine): MutableList<String>? = null
+
+    fun formatString(strings: MutableList<String>?): String? {
+        if (strings == null) {
+            return null
+        }
+
+        return if (strings.isEmpty()) null else IntStream.range(1, strings.size).mapToObj { i: Int -> " " + strings[i] }
+            .collect(Collectors.joining("", strings[0], "")).replace("'", "")
     }
 
-    public abstract void handleCommand(CommandSender sender, Map<String, List<String>> args);
+    fun formatList(strings: MutableList<String>?): MutableList<String>? {
+        if (strings == null) {
+            return null
+        }
 
-    public final String formatString(List<String> strings) {
-        if (strings.size() == 0)
-            return null;
-
-        return IntStream.range(1, strings.size()).mapToObj(i -> " " + strings.get(i)).collect(Collectors.joining("", strings.get(0), "")).replace("'", "");
+        return if (strings.isEmpty()) ArrayList() else strings.stream().map { s: String -> s.replace("'", "") }
+            .collect(Collectors.toList())
     }
 
-    public final List<String> formatList(List<String> strings) {
-        if (strings.size() == 0)
-            return new ArrayList<>();
+    fun formatInteger(strings: MutableList<String>?): Int {
+        if (strings == null) return -1
 
-        return strings.stream().map(s -> s.replace("'", "")).collect(Collectors.toList());
-    }
-
-    public final int formatInteger(List<String> strings) {
-        if (strings.size() == 0)
-            return -1;
-
-        return Integer.parseInt(IntStream.range(1, strings.size()).mapToObj(i -> " " + strings.get(i)).collect(Collectors.joining("", strings.get(0), "")).replace("'", ""));
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Command command = (Command) o;
-        return Objects.equals(name, command.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
-
-    @Override
-    public String toString() {
-        return "Command{" +
-                "name='" + name + '\'' +
-                ", syntax=" + syntax +
-                '}';
-    }
-
-    public List<String> getSyntax() {
-        return syntax;
-    }
-
-    public String getName() {
-        return name;
+        return if (strings.isEmpty()) -1 else IntStream.range(1, strings.size).mapToObj { i: Int -> " " + strings[i] }
+            .collect(Collectors.joining("", strings[0], "")).replace("'", "").toInt()
     }
 }

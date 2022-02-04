@@ -3,12 +3,13 @@ package de.byjoker.myjfql.command
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.*
 import de.byjoker.myjfql.server.session.Session
+import org.jline.reader.ParsedLine
 
 @CommandHandler
 class CreateCommand :
     Command("create", mutableListOf("COMMAND", "DATABASE", "TABLE", "STRUCTURE", "LIKE", "PRIMARY-KEY")) {
 
-    override fun handleCommand(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
+    override fun execute(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
         val databaseService: DatabaseService = MyJFQL.getInstance().databaseService
         val session: Session? = sender.session
 
@@ -84,11 +85,8 @@ class CreateCommand :
              * the default value of the table type is set to 'RELATIONAL'.
              */
 
-            if (!args.containsKey("LIKE")) {
-                args["LIKE"] = mutableListOf("THE_THING_I_EVER_USED_BEFORE")
-            }
-
-            val type: TableType? = TableType.likeTableType(formatString(args["LIKE"]))
+            val type: TableType? =
+                if (!args.containsKey("LIKE")) TableType.RELATIONAL else TableType.likeTableType(formatString(args["LIKE"]))
 
             if (type == null) {
                 sender.sendError("Unknown table type!")
@@ -150,6 +148,21 @@ class CreateCommand :
         }
 
         sender.sendSyntax()
+    }
+
+    override fun complete(sender: CommandSender, line: ParsedLine): MutableList<String>? {
+        sender.session ?: return null
+
+        val args = line.line().uppercase()
+
+        return when {
+            !args.contains(" TABLE") && !args.contains(" DATABASE") -> {
+                mutableListOf("table", "database")
+            }
+            else -> {
+                null
+            }
+        }
     }
 
 }
