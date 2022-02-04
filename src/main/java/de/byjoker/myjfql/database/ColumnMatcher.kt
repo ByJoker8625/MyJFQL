@@ -1,7 +1,6 @@
 package de.byjoker.myjfql.database
 
 import de.byjoker.myjfql.lang.Requirement
-import java.util.*
 
 abstract class ColumnMatcher : Column {
 
@@ -35,21 +34,20 @@ abstract class ColumnMatcher : Column {
                 return value.contains(given)
             }
             Requirement.Method.CONTAINS_EQUALS_IGNORE_CASE -> {
-                return value.lowercase(Locale.getDefault()).contains(given.lowercase(Locale.getDefault()))
+                return value.contains(given, ignoreCase = true)
             }
             else -> {
                 when {
-                    given.startsWith("$|") && given.endsWith("|$") -> {
-                        return value.lowercase(Locale.getDefault())
-                            .contains(given.substring(2, given.length - 2).lowercase(Locale.getDefault()))
+                    value.startsWith("$|") && value.endsWith("|$") -> {
+                        return given.contains(value.substring(2, value.length - 2), ignoreCase = true)
                     }
-                    given.startsWith("$") && given.endsWith("$") -> {
-                        return value.contains(given.substring(1, given.length - 1))
+                    value.startsWith("$") && value.endsWith("$") -> {
+                        return given.contains(value.substring(1, value.length - 1))
                     }
-                    given.startsWith("|") && given.endsWith("|") -> {
-                        return value.equals(given.substring(1, given.length - 1), ignoreCase = true)
+                    value.startsWith("|") && value.endsWith("|") -> {
+                        return given.equals(value.substring(1, value.length - 1), ignoreCase = true)
                     }
-                    else -> value == given
+                    else -> given == value
                 }
             }
         }
@@ -61,6 +59,7 @@ abstract class ColumnMatcher : Column {
             val state = requirement.state
             val key = requirement.key
             val value = requirement.value
+
             when (key) {
                 "*" -> {
                     if (!adjustState(state, content.keys.stream().anyMatch { given: String ->

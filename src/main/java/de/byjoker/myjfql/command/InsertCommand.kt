@@ -64,7 +64,7 @@ class InsertCommand :
                     return
                 }
 
-                val json: JSONObject = try {
+                val json = try {
                     JSONObject(raw)
                 } catch (ex: Exception) {
                     sender.sendError("Invalid json format: ${ex.message}")
@@ -176,12 +176,12 @@ class InsertCommand :
                     }
                 }
 
-                val column: Column = table.getColumn(primary) ?: when (table.type) {
+                val column = table.getColumn(primary) ?: when (table.type) {
                     TableType.DOCUMENT -> DocumentColumn()
                     else -> RelationalColumn()
                 }
 
-                if (content.containsKey(table.primary) && table is DocumentTable) {
+                if (table is DocumentTable && content.containsKey(table.primary)) {
                     sender.sendError("Can't modify unique id of column!")
                     return
                 }

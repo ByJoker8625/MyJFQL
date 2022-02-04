@@ -5,8 +5,8 @@ import de.byjoker.myjfql.database.Database;
 import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.database.Table;
-import de.byjoker.myjfql.lang.SortingOrder;
 import de.byjoker.myjfql.lang.StringComparator;
+import de.byjoker.myjfql.util.SortingOrder;
 
 import java.util.*;
 import java.util.stream.Collectors;

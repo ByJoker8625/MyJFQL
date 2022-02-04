@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.lang;
+package de.byjoker.myjfql.util;
 
 public enum SortingOrder {
 

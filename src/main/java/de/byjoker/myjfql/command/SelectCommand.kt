@@ -1,18 +1,21 @@
 package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
-import de.byjoker.myjfql.database.*
+import de.byjoker.myjfql.database.Column
+import de.byjoker.myjfql.database.Database
+import de.byjoker.myjfql.database.DatabaseAction
+import de.byjoker.myjfql.database.RelationalTable
 import de.byjoker.myjfql.lang.ColumnComparator
 import de.byjoker.myjfql.lang.ColumnFilter
-import de.byjoker.myjfql.lang.SortingOrder
 import de.byjoker.myjfql.server.session.Session
+import de.byjoker.myjfql.util.SortingOrder
 import java.util.stream.Collectors
 
 @CommandHandler
 class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM", "WHERE", "SORT", "ORDER", "LIMIT")) {
 
     override fun handleCommand(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
-        val databaseService: DatabaseService = MyJFQL.getInstance().databaseService
+        val databaseService = MyJFQL.getInstance().databaseService
         val session: Session? = sender.session
 
         if (session == null) {
@@ -40,7 +43,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                 return
             }
 
-            val table: Table = database.getTable(from)
+            val table = database.getTable(from)
 
             if (!sender.allowed(database.id, DatabaseAction.READ)) {
                 sender.sendForbidden()
@@ -59,7 +62,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
 
             var order: SortingOrder? = null
             var sortedBy: String? = null
-            var limit: Int = -1
+            var limit = -1
 
             if (args.containsKey("LIMIT")) {
                 limit = try {

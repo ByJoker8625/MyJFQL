@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.database
 
 import de.byjoker.myjfql.lang.ColumnComparator
-import de.byjoker.myjfql.lang.SortingOrder
+import de.byjoker.myjfql.util.SortingOrder
 import java.util.function.Consumer
 
 open class RelationalTable(private val name: String, structure: List<String>, primary: String) : Table {

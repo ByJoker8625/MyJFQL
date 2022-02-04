@@ -4,6 +4,7 @@ import de.byjoker.myjfql.database.Column;
 import de.byjoker.myjfql.database.RelationalTable;
 import de.byjoker.myjfql.database.Table;
 import de.byjoker.myjfql.exception.LanguageException;
+import de.byjoker.myjfql.util.SortingOrder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,8 +83,7 @@ public class ColumnFilter {
 
                     final String key = attributes[0];
 
-                    if (table instanceof RelationalTable && !table.getStructure().contains(key)
-                            && !key.equals("?")) {
+                    if (table instanceof RelationalTable && !table.getStructure().contains(key)) {
                         throw new LanguageException("Specified fields don't match table structure!");
                     }
 
