@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.user;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.DatabaseAction;
+import de.byjoker.myjfql.database.DatabaseActionPerformType;
 import de.byjoker.myjfql.util.IDGenerator;
 
 import java.util.HashMap;
@@ -13,7 +13,7 @@ public class User {
     private String name;
     private String password;
 
-    private Map<String, DatabaseAction> accesses;
+    private Map<String, DatabaseActionPerformType> accesses;
     private String preferredDatabase;
 
     public User(String name, String password) {
@@ -32,11 +32,11 @@ public class User {
         this.preferredDatabase = null;
     }
 
-    public boolean allowed(String database, DatabaseAction action) {
+    public boolean allowed(String database, DatabaseActionPerformType action) {
         return (accesses.containsKey("*") && accesses.get("*").can(action)) || (accesses.containsKey(database) && accesses.get(database).can(action));
     }
 
-    public void grantAccess(String database, DatabaseAction action) {
+    public void grantAccess(String database, DatabaseActionPerformType action) {
         accesses.put(database, action);
     }
 
@@ -44,11 +44,11 @@ public class User {
         accesses.remove(database);
     }
 
-    public Map<String, DatabaseAction> getAccesses() {
+    public Map<String, DatabaseActionPerformType> getAccesses() {
         return accesses;
     }
 
-    public void setAccesses(Map<String, DatabaseAction> accesses) {
+    public void setAccesses(Map<String, DatabaseActionPerformType> accesses) {
         this.accesses = accesses;
     }
 

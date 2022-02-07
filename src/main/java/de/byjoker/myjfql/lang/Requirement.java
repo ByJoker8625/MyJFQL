@@ -54,7 +54,7 @@ public class Requirement {
         }
 
         public static Method getFilterByMethod(String method) {
-            return Arrays.stream(Method.values()).filter(filter -> method.startsWith(filter.getMethod()))
+            return Arrays.stream(Method.values()).filter(filter -> method.startsWith(filter.method))
                     .findFirst()
                     .orElse(ARGUMENT_BASED);
         }

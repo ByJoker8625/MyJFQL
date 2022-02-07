@@ -3,11 +3,11 @@ package de.byjoker.myjfql.database
 import com.fasterxml.jackson.annotation.JsonGetter
 import com.fasterxml.jackson.annotation.JsonIgnore
 import de.byjoker.myjfql.util.IDGenerator
-import de.byjoker.myjfql.util.JsonColumnParser
+import de.byjoker.myjfql.util.TableEntryParser
 import org.json.JSONPropertyIgnore
 import org.json.JSONPropertyName
 
-class Document : ColumnMatcher {
+class Document : TableEntryMatcher {
 
     private var content: MutableMap<String, Any>
     private var createdAt: Long
@@ -21,7 +21,7 @@ class Document : ColumnMatcher {
 
     constructor(content: MutableMap<String, Any>, createdAt: Long) {
         if (!content.containsKey("_id")) {
-            throw NullPointerException("No unique id in column content present!")
+            throw NullPointerException("No unique id in entry present!")
         }
 
         this.content = content
@@ -29,13 +29,13 @@ class Document : ColumnMatcher {
         this.json = "{}"
     }
 
-    constructor(column: Column) {
-        if (!column.contains("_id")) {
-            column.insert("_id", IDGenerator.generateMixed(32))
+    constructor(tableEntry: TableEntry) {
+        if (!tableEntry.contains("_id")) {
+            tableEntry.insert("_id", IDGenerator.generateMixed(32))
         }
 
-        this.content = column.content
-        this.createdAt = column.createdAt
+        this.content = tableEntry.content
+        this.createdAt = tableEntry.createdAt
         this.json = "{}"
     }
 
@@ -49,7 +49,7 @@ class Document : ColumnMatcher {
 
     override fun insert(key: String, value: Any?) {
         if (key == "_id") {
-            throw IllegalArgumentException("Can't modify unique id of column!")
+            throw IllegalArgumentException("Can't modify unique id of entry!")
         }
 
         content[key] = value ?: "null"
@@ -60,7 +60,7 @@ class Document : ColumnMatcher {
     }
 
     override fun compile() {
-        json = JsonColumnParser.stringify(this)
+        json = TableEntryParser.stringify(this)
     }
 
     override fun contains(key: String): Boolean {

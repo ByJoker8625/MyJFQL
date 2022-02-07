@@ -2,7 +2,7 @@ package de.byjoker.myjfql.database
 
 import de.byjoker.myjfql.lang.Requirement
 
-abstract class ColumnMatcher : Column {
+abstract class TableEntryMatcher : TableEntry {
 
     override fun matches(conditions: MutableList<MutableList<Requirement>>): Boolean {
         return conditions.stream().anyMatch { requirements: List<Requirement> ->

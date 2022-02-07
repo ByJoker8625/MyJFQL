@@ -1,6 +1,6 @@
 import de.byjoker.myjfql.database.Document
-import de.byjoker.myjfql.database.RelationalColumn
 import de.byjoker.myjfql.database.RelationalTable
+import de.byjoker.myjfql.database.RelationalTableEntry
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -14,52 +14,52 @@ class TableTests {
 
 
     @Test
-    fun `column primary key pass relational table test`() {
+    fun `table entry primary key pass relational table test`() {
         table.clear()
 
         /**
-         * Only columns with primary key containing should pass
+         * Only entries with primary key containing should pass
          */
 
-        table.addColumn(RelationalColumn())
+        table.addEntry(RelationalTableEntry())
 
-        assertEquals(table.columns.size, 0)
+        assertEquals(table.entries.size, 0)
 
-        table.addColumn(
-            RelationalColumn(
+        table.addEntry(
+            RelationalTableEntry(
                 mutableMapOf("id" to "primary key value") as Map<String, Any>,
                 System.currentTimeMillis()
             )
         )
 
-        assertEquals(table.columns.size, 1)
+        assertEquals(table.entries.size, 1)
     }
 
     @Test
-    fun `column type pass relational table test`() {
+    fun `entry type pass relational table test`() {
         table.clear()
 
         /**
-         * Only columns of type RelationalColumn should pass
+         * Only entries of type RelationalTableEntry should pass
          */
 
-        table.addColumn(
+        table.addEntry(
             Document(
-                mutableMapOf("_id" to "unique id of document column", "id" to "primary key value"),
+                mutableMapOf("_id" to "unique id of document", "id" to "primary key value"),
                 System.currentTimeMillis()
             )
         )
 
-        assertEquals(table.columns.size, 0)
+        assertEquals(table.entries.size, 0)
 
-        table.addColumn(
-            RelationalColumn(
+        table.addEntry(
+            RelationalTableEntry(
                 mutableMapOf("id" to "primary key value") as Map<String, Any>,
                 System.currentTimeMillis()
             )
         )
 
-        assertEquals(table.columns.size, 1)
+        assertEquals(table.entries.size, 1)
     }
 
 

@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.OnelinerLegacyColumn;
+import de.byjoker.myjfql.database.OneFieldTableEntry;
 import de.byjoker.myjfql.util.Downloader;
 import de.byjoker.myjfql.util.ResultType;
 import de.byjoker.myjfql.util.Updater;
@@ -25,7 +25,7 @@ public class VersionCommand extends ConsoleCommand {
 
         if (args.containsKey("DISPLAY")) {
             sender.sendResult(
-                    Collections.singletonList(new OnelinerLegacyColumn("version", MyJFQL.getInstance().getVersion())),
+                    Collections.singletonList(new OneFieldTableEntry("version", MyJFQL.getInstance().getVersion())),
                     Collections.singletonList("version"), ResultType.LEGACY
             );
             return;

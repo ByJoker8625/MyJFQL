@@ -1,6 +1,6 @@
 package de.byjoker.myjfql.lang;
 
-import de.byjoker.myjfql.database.Column;
+import de.byjoker.myjfql.database.TableEntry;
 import de.byjoker.myjfql.database.RelationalTable;
 import de.byjoker.myjfql.database.Table;
 import de.byjoker.myjfql.exception.LanguageException;
@@ -12,17 +12,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ColumnFilter {
+public class TableEntryFilter {
 
-    public static List<Column> filterByCommandLineArguments(Table table, List<String> argument) {
-        return ColumnFilter.filterByCommandLineArguments(table, argument, null, null);
+    public static List<TableEntry> filterByCommandLineArguments(Table table, List<String> argument) {
+        return TableEntryFilter.filterByCommandLineArguments(table, argument, null, null);
     }
 
-    public static List<Column> filter(Table table, List<List<Requirement>> conditions) {
+    public static List<TableEntry> filter(Table table, List<List<Requirement>> conditions) {
         return filter(table, conditions, null, null);
     }
 
-    public static List<Column> filterByCommandLineArguments(Table table, List<String> argument, ColumnComparator comparator, Order order) {
+    public static List<TableEntry> filterByCommandLineArguments(Table table, List<String> argument, TableEntryComparator comparator, Order order) {
         if (argument.size() == 0) {
             throw new LanguageException("No arguments given!");
         }
@@ -99,18 +99,18 @@ public class ColumnFilter {
         }
     }
 
-    public static List<Column> filter(Table table, List<List<Requirement>> conditions, ColumnComparator comparator, Order order) {
+    public static List<TableEntry> filter(Table table, List<List<Requirement>> conditions, TableEntryComparator comparator, Order order) {
         try {
-            final List<Column> columns = table.getColumns().stream().filter(column -> column.matches(conditions)).collect(Collectors.toList());
+            final List<TableEntry> entries = table.getEntries().stream().filter(entry -> entry.matches(conditions)).collect(Collectors.toList());
 
             if (comparator != null) {
-                columns.sort(comparator);
+                entries.sort(comparator);
 
                 if (order == Order.DESC)
-                    Collections.reverse(columns);
+                    Collections.reverse(entries);
             }
 
-            return columns;
+            return entries;
         } catch (Exception ex) {
             throw new LanguageException(ex);
         }

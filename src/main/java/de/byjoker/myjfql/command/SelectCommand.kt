@@ -1,12 +1,12 @@
 package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
-import de.byjoker.myjfql.database.Column
+import de.byjoker.myjfql.database.TableEntry
 import de.byjoker.myjfql.database.Database
-import de.byjoker.myjfql.database.DatabaseAction
+import de.byjoker.myjfql.database.DatabaseActionPerformType
 import de.byjoker.myjfql.database.RelationalTable
-import de.byjoker.myjfql.lang.ColumnComparator
-import de.byjoker.myjfql.lang.ColumnFilter
+import de.byjoker.myjfql.lang.TableEntryComparator
+import de.byjoker.myjfql.lang.TableEntryFilter
 import de.byjoker.myjfql.server.session.Session
 import de.byjoker.myjfql.util.Order
 import de.byjoker.myjfql.util.ResultType
@@ -47,7 +47,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
 
             val table = database.getTable(from)
 
-            if (!sender.allowed(database.id, DatabaseAction.READ)) {
+            if (!sender.allowed(database.id, DatabaseActionPerformType.READ)) {
                 sender.sendForbidden()
                 return
             }
@@ -104,7 +104,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                     return
                 }
 
-                if (sortedBy == null) sortedBy = table.primary
+                if (sortedBy == null) sortedBy = table.primaryField
             }
 
             val resultType = if (table is RelationalTable) ResultType.RELATIONAL else ResultType.DOCUMENT
@@ -117,59 +117,61 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                     return
                 }
 
-                val column = table.getColumn(primaryKey)
+                val entry = table.getEntry(primaryKey)
 
-                if (column == null) {
-                    sender.sendError("Column was not found!")
+                if (entry == null) {
+                    sender.sendError("Entry was not found!")
                     return
                 }
 
-                sender.sendResult(listOf(column), structure, resultType)
+                sender.sendResult(listOf(entry), structure, resultType)
             } else if (args.containsKey("WHERE")) {
-                val columns: List<Column>? = try {
-                    ColumnFilter.filterByCommandLineArguments(
-                        table, args["WHERE"], if (sortedBy == null) null else ColumnComparator(sortedBy), order
+                val entries: List<TableEntry>? = try {
+                    TableEntryFilter.filterByCommandLineArguments(
+                        table, args["WHERE"], if (sortedBy == null) null else TableEntryComparator(
+                            sortedBy
+                        ), order
                     )
                 } catch (ex: Exception) {
                     sender.sendError(ex)
                     return
                 }
 
-                if (columns == null) {
+                if (entries == null) {
                     sender.sendError("Unknown statement error!")
                     return
                 }
 
                 if (limit != -1) {
                     sender.sendResult(
-                        columns.stream().limit(limit.toLong()).collect(Collectors.toList()),
+                        entries.stream().limit(limit.toLong()).collect(Collectors.toList()),
                         structure,
                         resultType
                     )
                     return
                 }
 
-                sender.sendResult(columns, structure, resultType)
+                sender.sendResult(entries, structure, resultType)
             } else {
-                val columns = if (sortedBy == null) table.columns else table.getColumns(
-                    ColumnComparator(sortedBy), order
+                val entries = if (sortedBy == null) table.entries else table.getEntries(
+                    TableEntryComparator(sortedBy), order
                 )
 
-                if (columns.isEmpty()) {
-                    sender.sendResult(ArrayList<Column>(), structure, resultType)
+                if (entries.isEmpty()) {
+                    sender.sendResult(ArrayList<TableEntry>(), structure, resultType)
                     return
                 }
 
                 if (limit != -1) {
                     sender.sendResult(
-                        columns.stream().limit(limit.toLong()).collect(Collectors.toList()),
+                        entries.stream().limit(limit.toLong()).collect(Collectors.toList()),
                         structure,
                         resultType
                     )
                     return
                 }
 
-                sender.sendResult(columns, structure, resultType)
+                sender.sendResult(entries, structure, resultType)
             }
 
             return
@@ -182,7 +184,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
         sender.session ?: return null
         val database: Database = sender.session.getDatabase(MyJFQL.getInstance().databaseService) ?: return null
 
-        if (!sender.allowed(database.id, DatabaseAction.READ)) {
+        if (!sender.allowed(database.id, DatabaseActionPerformType.READ)) {
             return null
         }
 

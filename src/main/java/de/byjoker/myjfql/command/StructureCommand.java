@@ -46,26 +46,26 @@ public class StructureCommand extends Command {
             }
 
 
-            if (!sender.allowed(database.getId(), DatabaseAction.READ)) {
+            if (!sender.allowed(database.getId(), DatabaseActionPerformType.READ)) {
                 sender.sendForbidden();
                 return;
             }
 
             final Table table = database.getTable(name);
             final Collection<String> structure = table.getStructure();
-            final String primary = table.getPrimary();
+            final String primary = table.getPrimaryField();
 
             if (!args.containsKey("ADD") && !args.containsKey("REMOVE") && !args.containsKey("SET") && !args.containsKey("MARK-PRIMARY")) {
                 if (args.containsKey("PRIMARY-KEY")) {
-                    sender.sendResult(Collections.singletonList(new OnelinerLegacyColumn("primary_field_name", primary)), Collections.singletonList("primary_key_name"), ResultType.RELATIONAL);
+                    sender.sendResult(Collections.singletonList(new OneFieldTableEntry("primary_field_name", primary)), Collections.singletonList("primary_key_name"), ResultType.RELATIONAL);
                     return;
                 }
 
-                sender.sendResult(structure.stream().map(s -> new OnelinerLegacyColumn("field_name", s)).collect(Collectors.toList()), Collections.singletonList("field_name"), ResultType.RELATIONAL);
+                sender.sendResult(structure.stream().map(s -> new OneFieldTableEntry("field_name", s)).collect(Collectors.toList()), Collections.singletonList("field_name"), ResultType.RELATIONAL);
                 return;
             }
 
-            if (!sender.allowed(database.getId(), DatabaseAction.READ_WRITE)) {
+            if (!sender.allowed(database.getId(), DatabaseActionPerformType.READ_WRITE)) {
                 sender.sendForbidden();
                 return;
             }
@@ -123,7 +123,7 @@ public class StructureCommand extends Command {
                     return;
                 }
 
-                table.setPrimary(argument);
+                table.setPrimaryField(argument);
 
                 sender.sendSuccess();
 
@@ -165,9 +165,9 @@ public class StructureCommand extends Command {
                         return;
                     }
 
-                    table.setPrimary(key);
+                    table.setPrimaryField(key);
                 } else {
-                    table.setPrimary(newStructure.get(0));
+                    table.setPrimaryField(newStructure.get(0));
                 }
 
 

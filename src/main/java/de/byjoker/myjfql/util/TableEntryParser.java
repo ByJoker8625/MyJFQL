@@ -2,12 +2,12 @@ package de.byjoker.myjfql.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.byjoker.myjfql.command.RestCommandSender;
-import de.byjoker.myjfql.database.Column;
+import de.byjoker.myjfql.database.TableEntry;
 import org.json.JSONObject;
 
 import java.util.Collection;
 
-public class JsonColumnParser {
+public class TableEntryParser {
 
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -19,16 +19,18 @@ public class JsonColumnParser {
         }
     }
 
-    public static String stringifyLegacyColumns(Collection<Column> columns, Object structure) {
+    @Deprecated
+    public static String stringifyLegacyTableEntries(Collection<TableEntry> entries, Object structure) {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", RestCommandSender.ResponseType.RESULT);
         jsonObject.put("structure", structure);
-        jsonObject.put("result", columns);
+        jsonObject.put("result", entries);
 
         return jsonObject.toString();
     }
 
-    public static String stringifySingletonColumn(Collection<String> strings, Object structure, ResultType resultType) {
+    @Deprecated
+    public static String stringifySingletonTableEntries(Collection<String> strings, Object structure, ResultType resultType) {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", "RESULT");
         jsonObject.put("structure", structure);
@@ -38,13 +40,13 @@ public class JsonColumnParser {
         return jsonObject.toString();
     }
 
-    public static String stringifyCompiledColumns(Collection<Column> columns, Object structure, ResultType resultType) {
+    public static String stringifyTableEntries(Collection<TableEntry> entries, Object structure, ResultType resultType) {
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.append("{\"type\":\"RESULT\",\"resultType\":\"").append(resultType).append("\"\"structure\":").append(stringify(structure)).append(",");
 
-        if (columns.size() != 0) {
+        if (entries.size() != 0) {
             jsonBuilder.append("\"result\":[");
-            columns.forEach(column -> jsonBuilder.append(column.json()).append(","));
+            entries.forEach(column -> jsonBuilder.append(column.json()).append(","));
             jsonBuilder.deleteCharAt(jsonBuilder.length() - 1).append("]");
         } else {
             jsonBuilder.append("\"result\":[]");

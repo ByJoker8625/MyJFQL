@@ -2,7 +2,7 @@ package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.*
-import de.byjoker.myjfql.lang.ColumnFilter
+import de.byjoker.myjfql.lang.TableEntryFilter
 import org.jline.reader.ParsedLine
 import org.json.JSONObject
 
@@ -26,7 +26,7 @@ class InsertCommand :
             return
         }
 
-        if (!sender.allowed(database.id, DatabaseAction.READ_WRITE)) {
+        if (!sender.allowed(database.id, DatabaseActionPerformType.READ_WRITE)) {
             sender.sendForbidden()
             return
         }
@@ -119,36 +119,36 @@ class InsertCommand :
 
         when {
             args.containsKey("WHERE") -> {
-                val columns: MutableList<Column>? = try {
-                    ColumnFilter.filterByCommandLineArguments(table, args["WHERE"])
+                val entries: MutableList<TableEntry>? = try {
+                    TableEntryFilter.filterByCommandLineArguments(table, args["WHERE"])
                 } catch (ex: Exception) {
                     sender.sendError(ex)
                     return
                 }
 
-                if (columns == null) {
+                if (entries == null) {
                     sender.sendError("Unknown statement error!")
                     return
                 }
 
-                if (content.containsKey(table.primary) && table is DocumentCollection) {
-                    sender.sendError("Can't modify unique id of column!")
+                if (content.containsKey(table.primaryField) && table is DocumentCollection) {
+                    sender.sendError("Can't modify unique id of document entry!")
                     return
                 }
 
-                for (column in columns) {
+                for (entry in entries) {
                     /**
                      * To prevent duplication of an entry when the primary key is changed, the previous entry is removed
                      */
 
-                    if (content.containsKey(table.primary)) {
-                        table.removeColumn(column.selectStringify(table.primary))
+                    if (content.containsKey(table.primaryField)) {
+                        table.removeEntry(entry.selectStringify(table.primaryField))
                     }
 
                     if (args.containsKey("FULLY")) {
-                        column.content = content
+                        entry.content = content
                     } else {
-                        column.applyContent(content)
+                        entry.applyContent(content)
                     }
                 }
 
@@ -169,7 +169,7 @@ class InsertCommand :
                         return
                     }
                 } else {
-                    primary = content[table.primary]?.toString()
+                    primary = content[table.primaryField]?.toString()
 
                     if (table is RelationalTable && primary == null) {
                         sender.sendError("No primary key in form of unique identifier specified!")
@@ -177,13 +177,13 @@ class InsertCommand :
                     }
                 }
 
-                val column = table.getColumn(primary) ?: when (table.type) {
+                val entry = table.getEntry(primary) ?: when (table.type) {
                     TableType.DOCUMENT -> Document()
-                    else -> RelationalColumn()
+                    else -> RelationalTableEntry()
                 }
 
-                if (table is DocumentCollection && content.containsKey(table.primary)) {
-                    sender.sendError("Can't modify unique id of column!")
+                if (table is DocumentCollection && content.containsKey(table.primaryField)) {
+                    sender.sendError("Can't modify unique id of document entry!")
                     return
                 }
 
@@ -192,14 +192,14 @@ class InsertCommand :
                  * the previous entry is removed
                  */
 
-                if (content.contains(table.primary) && column.select(table.primary) != content[table.primary]) {
-                    table.removeColumn(column.selectStringify(table.primary))
+                if (content.contains(table.primaryField) && entry.select(table.primaryField) != content[table.primaryField]) {
+                    table.removeEntry(entry.selectStringify(table.primaryField))
                 }
 
                 if (args.containsKey("FULLY")) {
-                    column.content = content
+                    entry.content = content
                 } else {
-                    column.applyContent(content)
+                    entry.applyContent(content)
                 }
 
                 /**
@@ -207,13 +207,13 @@ class InsertCommand :
                  * argument and the entry does not yet exist, it will be added later
                  */
 
-                if (!column.contains(table.primary)) {
-                    column.insert(table.primary, primary)
+                if (!entry.contains(table.primaryField)) {
+                    entry.insert(table.primaryField, primary)
                 }
 
                 sender.sendSuccess()
 
-                table.addColumn(column)
+                table.addEntry(entry)
                 database.saveTable(table)
                 databaseService.saveDatabase(database)
                 return
@@ -226,7 +226,7 @@ class InsertCommand :
         sender.session ?: return null
         val database: Database = sender.session.getDatabase(MyJFQL.getInstance().databaseService) ?: return null
 
-        if (!sender.allowed(database.id, DatabaseAction.READ_WRITE)) {
+        if (!sender.allowed(database.id, DatabaseActionPerformType.READ_WRITE)) {
             return null
         }
 

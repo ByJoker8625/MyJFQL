@@ -2,7 +2,7 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Database;
-import de.byjoker.myjfql.database.DatabaseAction;
+import de.byjoker.myjfql.database.DatabaseActionPerformType;
 import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.server.session.Session;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,7 @@ public class DeleteCommand extends Command {
                 return;
             }
 
-            if (!sender.allowed(database.getId(), DatabaseAction.READ_WRITE)) {
+            if (!sender.allowed(database.getId(), DatabaseActionPerformType.READ_WRITE)) {
                 sender.sendForbidden();
                 return;
             }

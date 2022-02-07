@@ -3,8 +3,8 @@ package de.byjoker.myjfql.database
 import com.fasterxml.jackson.annotation.JsonGetter
 import org.json.JSONPropertyName
 
-abstract class SimpleColumn(private var content: MutableMap<String, Any>, private var createdAt: Long) :
-    ColumnMatcher() {
+abstract class SimpleTableEntry(private var content: MutableMap<String, Any>, private var createdAt: Long) :
+    TableEntryMatcher() {
 
     override fun select(key: String): Any? {
         return content[key]

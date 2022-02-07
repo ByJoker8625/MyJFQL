@@ -35,7 +35,7 @@ class CreateCommand :
              * todo come up with a good permission handling for this case
              */
 
-            if (!sender.allowed("%", DatabaseAction.READ_WRITE)) {
+            if (!sender.allowed("%", DatabaseActionPerformType.READ_WRITE)) {
                 sender.sendForbidden()
                 return
             }
@@ -58,7 +58,7 @@ class CreateCommand :
                 return
             }
 
-            if (!sender.allowed(database.id, DatabaseAction.READ_WRITE)) {
+            if (!sender.allowed(database.id, DatabaseActionPerformType.READ_WRITE)) {
                 sender.sendForbidden()
                 return
             }

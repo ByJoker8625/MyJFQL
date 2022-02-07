@@ -1,31 +1,31 @@
 package de.byjoker.myjfql.database;
 
-import de.byjoker.myjfql.lang.ColumnComparator;
+import de.byjoker.myjfql.lang.TableEntryComparator;
 import de.byjoker.myjfql.util.Order;
 
 import java.util.Collection;
 
 public interface Table {
 
-    void addColumn(Column column);
+    void addEntry(TableEntry tableEntry);
 
-    void removeColumn(String identifier);
+    void removeEntry(String identifier);
 
-    Column getColumn(String identifier);
+    TableEntry getEntry(String identifier);
 
-    Collection<Column> getColumns();
+    Collection<TableEntry> getEntries();
 
-    Collection<Column> getColumns(ColumnComparator comparator, Order order);
+    Collection<TableEntry> getEntries(TableEntryComparator comparator, Order order);
 
     Collection<String> getStructure();
 
     void setStructure(Collection<String> structure);
 
-    String getPrimary();
+    String getPrimaryField();
 
-    void setPrimary(String primary);
+    void setPrimaryField(String primary);
 
-    Table reformat(TableType type, String... parameters);
+    Table reformat(TableType type);
 
     TableType getType();
 

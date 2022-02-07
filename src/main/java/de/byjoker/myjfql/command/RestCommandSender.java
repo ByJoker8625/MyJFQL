@@ -1,12 +1,12 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.Column;
-import de.byjoker.myjfql.database.DatabaseAction;
+import de.byjoker.myjfql.database.TableEntry;
+import de.byjoker.myjfql.database.DatabaseActionPerformType;
 import de.byjoker.myjfql.exception.LanguageException;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.user.User;
-import de.byjoker.myjfql.util.JsonColumnParser;
+import de.byjoker.myjfql.util.TableEntryParser;
 import de.byjoker.myjfql.util.ResultType;
 import io.javalin.http.Context;
 import org.json.JSONObject;
@@ -26,7 +26,7 @@ public class RestCommandSender extends CommandSender {
     }
 
     @Override
-    public boolean allowed(String database, DatabaseAction action) {
+    public boolean allowed(String database, DatabaseActionPerformType action) {
         return user.allowed(database, action);
     }
 
@@ -66,8 +66,8 @@ public class RestCommandSender extends CommandSender {
     }
 
     @Override
-    public void sendResult(Collection<Column> columns, Collection<String> structure, ResultType resultType) {
-        send(JsonColumnParser.stringifyCompiledColumns(columns, structure, resultType));
+    public void sendResult(Collection<TableEntry> entries, Collection<String> structure, ResultType resultType) {
+        send(TableEntryParser.stringifyTableEntries(entries, structure, resultType));
     }
 
     @Override

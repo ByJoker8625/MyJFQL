@@ -9,7 +9,7 @@ import org.json.JSONPropertyName;
 import java.util.List;
 import java.util.Map;
 
-public interface Column {
+public interface TableEntry {
 
     Object select(String key);
 

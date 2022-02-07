@@ -133,7 +133,7 @@ class DatabaseServiceImpl() : DatabaseService {
                     for (i in 0 until columns.length()) {
                         val column: JSONObject = columns.getJSONObject(i)
 
-                        table.addColumn(
+                        table.addEntry(
                             Document(
                                 column.getJSONObject("content").toMap(),
                                 column.getLong("creation")
@@ -153,8 +153,8 @@ class DatabaseServiceImpl() : DatabaseService {
                     for (i in 0 until columns.length()) {
                         val column: JSONObject = columns.getJSONObject(i)
 
-                        table.addColumn(
-                            RelationalColumn(
+                        table.addEntry(
+                            RelationalTableEntry(
                                 column.getJSONObject("content").toMap(),
                                 column.getLong("creation")
                             )

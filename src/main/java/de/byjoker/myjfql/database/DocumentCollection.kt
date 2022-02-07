@@ -1,57 +1,57 @@
 package de.byjoker.myjfql.database
 
-import de.byjoker.myjfql.lang.ColumnComparator
+import de.byjoker.myjfql.lang.TableEntryComparator
 import de.byjoker.myjfql.util.Order
 import java.util.Collections.reverse
 
 class DocumentCollection : Table {
 
     private var name: String
-    private var columns: MutableMap<String, Column>
+    private var entries: MutableMap<String, TableEntry>
     private var prototypeStructure: MutableCollection<String>
 
-    constructor(name: String, columns: MutableMap<String, Column>, structure: MutableCollection<String>) {
+    constructor(name: String, entries: MutableMap<String, TableEntry>, structure: MutableCollection<String>) {
         this.name = name
-        this.columns = columns
+        this.entries = entries
         this.prototypeStructure = structure
     }
 
     constructor(name: String, structure: MutableCollection<String>) {
         this.name = name
-        this.columns = mutableMapOf()
+        this.entries = mutableMapOf()
         this.prototypeStructure = structure
     }
 
-    override fun addColumn(column: Column) {
-        if (column !is Document) {
+    override fun addEntry(tableEntry: TableEntry) {
+        if (tableEntry !is Document) {
             throw ClassCastException()
         }
 
-        column.compile()
-        columns[column.selectStringify("_id")] = column
+        tableEntry.compile()
+        entries[tableEntry.selectStringify("_id")] = tableEntry
     }
 
-    override fun removeColumn(identifier: String) {
-        columns.remove(identifier)
+    override fun removeEntry(identifier: String) {
+        entries.remove(identifier)
     }
 
-    override fun getColumn(identifier: String?): Column? {
-        return columns[identifier]
+    override fun getEntry(identifier: String?): TableEntry? {
+        return entries[identifier]
     }
 
-    override fun getColumns(): MutableCollection<Column> {
-        return columns.values
+    override fun getEntries(): MutableCollection<TableEntry> {
+        return entries.values
     }
 
-    override fun getColumns(comparator: ColumnComparator, order: Order): List<Column> {
-        val columns: List<Column> = ArrayList(
-            this.columns.values
+    override fun getEntries(comparator: TableEntryComparator, order: Order): List<TableEntry> {
+        val entries: List<TableEntry> = ArrayList(
+            this.entries.values
         )
-        columns.sortedWith(comparator)
+        entries.sortedWith(comparator)
 
-        if (order == Order.DESC) reverse(columns)
+        if (order == Order.DESC) reverse(entries)
 
-        return columns
+        return entries
     }
 
     override fun getStructure(): MutableCollection<String> {
@@ -62,15 +62,15 @@ class DocumentCollection : Table {
         this.prototypeStructure = structure
     }
 
-    override fun getPrimary(): String {
+    override fun getPrimaryField(): String {
         return "_id"
     }
 
-    override fun setPrimary(primary: String) {
+    override fun setPrimaryField(primary: String) {
         throw IllegalArgumentException()
     }
 
-    override fun reformat(type: TableType, parameters: Array<String>): Table {
+    override fun reformat(type: TableType): Table {
         if (type == TableType.DOCUMENT) {
             return this
         }
@@ -87,7 +87,7 @@ class DocumentCollection : Table {
     }
 
     override fun clear() {
-        this.columns = HashMap()
+        this.entries = HashMap()
     }
 
 }

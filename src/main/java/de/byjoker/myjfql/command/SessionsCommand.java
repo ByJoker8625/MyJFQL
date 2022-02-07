@@ -1,9 +1,9 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.Column;
+import de.byjoker.myjfql.database.LegacyTableEntry;
+import de.byjoker.myjfql.database.TableEntry;
 import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.database.LegacyColumn;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.server.session.SessionService;
 import de.byjoker.myjfql.user.User;
@@ -97,14 +97,14 @@ public class SessionsCommand extends ConsoleCommand {
                 final Session session = new Session(token, user.getId(), database, address, expire);
                 sessionService.openSession(session);
 
-                final Column column = new LegacyColumn();
-                column.insert("token", session.getToken());
-                column.insert("address", session.getAddress());
-                column.insert("database_id", String.valueOf(session.getDatabaseId()));
-                column.insert("start", dateFormat.format(new Date(session.getOpen())));
-                column.insert("expire", session.getExpire() == -1 ? "never" : dateFormat.format(new Date(session.getExpire())));
+                final TableEntry tableEntry = new LegacyTableEntry();
+                tableEntry.insert("token", session.getToken());
+                tableEntry.insert("address", session.getAddress());
+                tableEntry.insert("database_id", String.valueOf(session.getDatabaseId()));
+                tableEntry.insert("start", dateFormat.format(new Date(session.getOpen())));
+                tableEntry.insert("expire", session.getExpire() == -1 ? "never" : dateFormat.format(new Date(session.getExpire())));
 
-                sender.sendResult(Collections.singletonList(column), Arrays.asList("token", "address", "database_id", "start", "expire"), ResultType.LEGACY);
+                sender.sendResult(Collections.singletonList(tableEntry), Arrays.asList("token", "address", "database_id", "start", "expire"), ResultType.LEGACY);
                 return;
             }
 
@@ -223,18 +223,18 @@ public class SessionsCommand extends ConsoleCommand {
                 return;
             }
 
-            final List<Column> sessions = new ArrayList<>();
+            final List<TableEntry> sessions = new ArrayList<>();
             final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
             sessionService.getSessionsByUserId(user.getId()).forEach(session -> {
-                final Column column = new LegacyColumn();
-                column.insert("token", session.getToken());
-                column.insert("address", session.getAddress());
-                column.insert("database_id", String.valueOf(session.getDatabaseId()));
-                column.insert("start", dateFormat.format(new Date(session.getOpen())));
-                column.insert("expire", session.getExpire() == -1 ? "never" : dateFormat.format(new Date(session.getExpire())));
+                final TableEntry tableEntry = new LegacyTableEntry();
+                tableEntry.insert("token", session.getToken());
+                tableEntry.insert("address", session.getAddress());
+                tableEntry.insert("database_id", String.valueOf(session.getDatabaseId()));
+                tableEntry.insert("start", dateFormat.format(new Date(session.getOpen())));
+                tableEntry.insert("expire", session.getExpire() == -1 ? "never" : dateFormat.format(new Date(session.getExpire())));
 
-                sessions.add(column);
+                sessions.add(tableEntry);
             });
 
             sender.sendResult(sessions, Arrays.asList("token", "address", "database_id", "start", "expire"), ResultType.LEGACY);

@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.command;
 
-import de.byjoker.myjfql.database.Column;
-import de.byjoker.myjfql.database.DatabaseAction;
+import de.byjoker.myjfql.database.TableEntry;
+import de.byjoker.myjfql.database.DatabaseActionPerformType;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.util.ResultType;
 
@@ -17,7 +17,7 @@ public abstract class CommandSender {
         this.session = session;
     }
 
-    public abstract boolean allowed(String database, DatabaseAction action);
+    public abstract boolean allowed(String database, DatabaseActionPerformType action);
 
     public abstract void sendError(Object obj);
 
@@ -27,7 +27,7 @@ public abstract class CommandSender {
 
     public abstract void sendSuccess();
 
-    public abstract void sendResult(Collection<Column> columns, Collection<String> structure, ResultType resultType);
+    public abstract void sendResult(Collection<TableEntry> entries, Collection<String> structure, ResultType resultType);
 
     public abstract void send(Object obj);
 

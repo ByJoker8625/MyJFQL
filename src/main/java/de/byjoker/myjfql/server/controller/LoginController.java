@@ -3,7 +3,7 @@ package de.byjoker.myjfql.server.controller;
 import de.byjoker.myjfql.command.RestCommandSender;
 import de.byjoker.myjfql.config.Config;
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.OnelinerLegacyColumn;
+import de.byjoker.myjfql.database.OneFieldTableEntry;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.server.session.SessionService;
 import de.byjoker.myjfql.user.User;
@@ -62,7 +62,7 @@ public class LoginController implements Handler {
                 if (config.showConnections())
                     MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " joined the session '" + session.getToken() + "'.");
 
-                sender.sendResult(Collections.singletonList(new OnelinerLegacyColumn("token", token)), Collections.singletonList("token"), ResultType.RELATIONAL);
+                sender.sendResult(Collections.singletonList(new OneFieldTableEntry("token", token)), Collections.singletonList("token"), ResultType.RELATIONAL);
                 return;
             }
 
@@ -89,7 +89,7 @@ public class LoginController implements Handler {
             if (config.showConnections())
                 MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " opened a session as '" + user.getName() + "'.");
 
-            sender.sendResult(Collections.singletonList(new OnelinerLegacyColumn("token", token)), Collections.singletonList("token"), ResultType.RELATIONAL);
+            sender.sendResult(Collections.singletonList(new OneFieldTableEntry("token", token)), Collections.singletonList("token"), ResultType.RELATIONAL);
         } catch (Exception ex) {
             sender.sendError(ex);
         }

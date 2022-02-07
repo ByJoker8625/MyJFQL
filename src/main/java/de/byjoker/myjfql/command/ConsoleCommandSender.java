@@ -3,8 +3,8 @@ package de.byjoker.myjfql.command;
 import de.byjoker.myjfql.console.Console;
 import de.byjoker.myjfql.console.TablePrinter;
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.Column;
-import de.byjoker.myjfql.database.DatabaseAction;
+import de.byjoker.myjfql.database.TableEntry;
+import de.byjoker.myjfql.database.DatabaseActionPerformType;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.util.ResultType;
 
@@ -18,7 +18,7 @@ public class ConsoleCommandSender extends CommandSender {
     }
 
     @Override
-    public boolean allowed(String database, DatabaseAction action) {
+    public boolean allowed(String database, DatabaseActionPerformType action) {
         return true;
     }
 
@@ -43,15 +43,15 @@ public class ConsoleCommandSender extends CommandSender {
     }
 
     @Override
-    public void sendResult(Collection<Column> columns, Collection<String> structure, ResultType resultType) {
+    public void sendResult(Collection<TableEntry> entries, Collection<String> structure, ResultType resultType) {
         final String[] fields = structure.toArray(new String[structure.size()]);
         final TablePrinter printer = new TablePrinter(fields);
 
-        for (Column column : columns) {
+        for (TableEntry tableEntry : entries) {
             final String[] row = new String[fields.length];
 
             for (int i = 0; i < fields.length; i++) {
-                final Object value = column.select(fields[i]);
+                final Object value = tableEntry.select(fields[i]);
 
                 if (value != null)
                     row[i] = value.toString();

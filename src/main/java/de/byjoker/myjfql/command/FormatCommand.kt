@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
-import de.byjoker.myjfql.database.DatabaseAction
+import de.byjoker.myjfql.database.DatabaseActionPerformType
 import de.byjoker.myjfql.database.DatabaseType
 import de.byjoker.myjfql.database.TableType
 
@@ -58,7 +58,7 @@ class FormatCommand : ConsoleCommand("format", mutableListOf("COMMAND", "DATABAS
                 return
             }
 
-            if (!sender.allowed(database.id, DatabaseAction.READ_WRITE)) {
+            if (!sender.allowed(database.id, DatabaseActionPerformType.READ_WRITE)) {
                 sender.sendForbidden()
                 return
             }

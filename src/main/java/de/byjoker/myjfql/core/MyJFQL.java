@@ -32,7 +32,7 @@ public final class MyJFQL {
     private static MyJFQL instance;
 
     private final String version = "1.5.5";
-    private final Interpreter formatter;
+    private final Interpreter interpreter;
     private final CommandService commandService;
     private final DatabaseService databaseService;
     private final ConfigService configService;
@@ -53,11 +53,11 @@ public final class MyJFQL {
         this.console = new ConsoleImpl();
         this.config = new ConfigDefaults();
         this.encryptor = new NoneEncryptor();
-        this.formatter = new JFQLInterpreter();
+        this.interpreter = new JFQLInterpreter();
         this.sessionService = new SessionServiceImpl();
         this.consoleCommandSender = new ConsoleCommandSender();
         this.updater = new Updater(version);
-        this.commandService = new CommandServiceImpl(formatter);
+        this.commandService = new CommandServiceImpl(interpreter);
         this.userService = new UserServiceImpl();
         this.downloader = updater.getDownloader();
         this.databaseService = new DatabaseServiceImpl();
@@ -259,8 +259,8 @@ public final class MyJFQL {
         return encryptor;
     }
 
-    public Interpreter getFormatter() {
-        return formatter;
+    public Interpreter getInterpreter() {
+        return interpreter;
     }
 
     public DatabaseService getDatabaseService() {

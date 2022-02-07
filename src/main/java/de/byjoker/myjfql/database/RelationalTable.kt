@@ -1,54 +1,54 @@
 package de.byjoker.myjfql.database
 
-import de.byjoker.myjfql.lang.ColumnComparator
+import de.byjoker.myjfql.lang.TableEntryComparator
 import de.byjoker.myjfql.util.Order
 import java.util.function.Consumer
 
 open class RelationalTable(private val name: String, structure: List<String>, primary: String) : Table {
-    private var columns: MutableMap<String, Column>
+    private var entries: MutableMap<String, TableEntry>
     private var structure: Collection<String>
     private var primary: String
 
     init {
         this.structure = structure
         this.primary = primary
-        columns = HashMap()
+        entries = HashMap()
     }
 
-    override fun addColumn(column: Column) {
-        if (column !is SimpleColumn) {
+    override fun addEntry(tableEntry: TableEntry) {
+        if (tableEntry !is SimpleTableEntry) {
             return
         }
 
-        if (!column.containsOrNotNullItem(primary)) {
+        if (!tableEntry.containsOrNotNullItem(primary)) {
             return
         }
 
-        column.compile()
-        columns[column.selectStringify(primary)] = column
+        tableEntry.compile()
+        entries[tableEntry.selectStringify(primary)] = tableEntry
     }
 
-    override fun removeColumn(primary: String) {
-        columns.remove(primary)
+    override fun removeEntry(primary: String) {
+        entries.remove(primary)
     }
 
-    override fun getColumn(key: String): Column? {
-        return columns[key]
+    override fun getEntry(key: String): TableEntry? {
+        return entries[key]
     }
 
-    override fun getColumns(): Collection<Column> {
-        return columns.values
+    override fun getEntries(): Collection<TableEntry> {
+        return entries.values
     }
 
-    fun setColumns(columns: MutableMap<String, Column>) {
-        this.columns = columns
+    fun setEntries(entries: MutableMap<String, TableEntry>) {
+        this.entries = entries
     }
 
-    override fun getColumns(comparator: ColumnComparator, order: Order): Collection<Column> {
-        val columns: MutableList<Column> = ArrayList(columns.values)
-        columns.sortWith(comparator)
-        if (order == Order.DESC) columns.reverse()
-        return columns
+    override fun getEntries(comparator: TableEntryComparator, order: Order): Collection<TableEntry> {
+        val entries: MutableList<TableEntry> = ArrayList(entries.values)
+        entries.sortWith(comparator)
+        if (order == Order.DESC) entries.reverse()
+        return entries
     }
 
     override fun getName(): String {
@@ -56,7 +56,7 @@ open class RelationalTable(private val name: String, structure: List<String>, pr
     }
 
     override fun clear() {
-        columns = HashMap()
+        entries = HashMap()
     }
 
     override fun getStructure(): Collection<String> {
@@ -65,25 +65,25 @@ open class RelationalTable(private val name: String, structure: List<String>, pr
 
     override fun setStructure(structure: Collection<String>) {
         this.structure = structure
-        reindexColumns()
+        reindex()
     }
 
-    override fun getPrimary(): String {
+    override fun getPrimaryField(): String {
         return primary
     }
 
-    override fun setPrimary(primary: String) {
+    override fun setPrimaryField(primary: String) {
         this.primary = primary
-        reindexColumns()
+        reindex()
     }
 
-    override fun reformat(type: TableType, parameters: Array<String>): Table {
+    override fun reformat(type: TableType): Table {
         return when (type) {
             TableType.DOCUMENT -> {
                 val table: Table = DocumentCollection(name, ArrayList(structure))
 
-                columns.values.forEach { column ->
-                    table.addColumn(Document(column))
+                entries.values.forEach { entry ->
+                    table.addEntry(Document(entry))
                 }
 
                 table
@@ -98,10 +98,10 @@ open class RelationalTable(private val name: String, structure: List<String>, pr
         return TableType.RELATIONAL
     }
 
-    private fun reindexColumns() {
-        val columns: Collection<Column> = ArrayList(columns.values)
-        this.columns.clear()
-        columns.forEach(Consumer { column: Column -> addColumn(column) })
+    private fun reindex() {
+        val entries: Collection<TableEntry> = ArrayList(entries.values)
+        this.entries.clear()
+        entries.forEach(Consumer { tableEntry: TableEntry -> addEntry(tableEntry) })
     }
 
 }

@@ -66,7 +66,7 @@ public class UserCommand extends ConsoleCommand {
                 final Database database = new DatabaseImpl(databaseName);
                 databaseService.createDatabase(database);
 
-                user.grantAccess(database.getId(), DatabaseAction.READ_WRITE);
+                user.grantAccess(database.getId(), DatabaseActionPerformType.READ_WRITE);
                 user.setPreferredDatabase(database.getId());
             }
 
@@ -126,10 +126,10 @@ public class UserCommand extends ConsoleCommand {
                 return;
             }
 
-            DatabaseAction action;
+            DatabaseActionPerformType action;
 
             try {
-                action = DatabaseAction.valueOf(access.toUpperCase());
+                action = DatabaseActionPerformType.valueOf(access.toUpperCase());
             } catch (Exception ex) {
                 sender.sendError("Unknown access action!");
                 return;
@@ -189,19 +189,19 @@ public class UserCommand extends ConsoleCommand {
             }
 
             final User selectedUser = userService.getUserByIdentifier(userIdentifier);
-            final Column column = new LegacyColumn();
+            final TableEntry tableEntry = new LegacyTableEntry();
 
-            column.insert("id", selectedUser.getId());
-            column.insert("name", selectedUser.getName());
-            column.insert("accesses", selectedUser.getAccesses().toString());
-            column.insert("preferred_database_id", String.valueOf(selectedUser.getPreferredDatabase()));
+            tableEntry.insert("id", selectedUser.getId());
+            tableEntry.insert("name", selectedUser.getName());
+            tableEntry.insert("accesses", selectedUser.getAccesses().toString());
+            tableEntry.insert("preferred_database_id", String.valueOf(selectedUser.getPreferredDatabase()));
 
-            sender.sendResult(Collections.singletonList(column), Arrays.asList("id", "name", "accesses", "preferred_database_id"), ResultType.LEGACY);
+            sender.sendResult(Collections.singletonList(tableEntry), Arrays.asList("id", "name", "accesses", "preferred_database_id"), ResultType.LEGACY);
             return;
         }
 
         if (args.containsKey("LIST")) {
-            sender.sendResult(userService.getUsers().stream().map(user -> new OnelinerLegacyColumn("user_name", user.getName())).collect(Collectors.toList()), Collections.singletonList("user_name"), ResultType.LEGACY);
+            sender.sendResult(userService.getUsers().stream().map(user -> new OneFieldTableEntry("user_name", user.getName())).collect(Collectors.toList()), Collections.singletonList("user_name"), ResultType.LEGACY);
             return;
         }
 

@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.user;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.DatabaseAction;
+import de.byjoker.myjfql.database.DatabaseActionPerformType;
 import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.util.FileFactory;
 import de.byjoker.myjfql.util.IDGenerator;
@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
             } else {
                 final User user = new User(name, jsonUser.getString("name"), jsonUser.getString("password"));
                 user.setPreferredDatabase(jsonUser.getString("preferred"));
-                user.setAccesses(jsonAccesses.keySet().stream().collect(Collectors.toMap(key -> key, key -> DatabaseAction.valueOf(jsonAccesses.getString(key)), (a, b) -> b)));
+                user.setAccesses(jsonAccesses.keySet().stream().collect(Collectors.toMap(key -> key, key -> DatabaseActionPerformType.valueOf(jsonAccesses.getString(key)), (a, b) -> b)));
 
                 if (!user.getName().contains("%") && !user.getName().contains("#") && !user.getName().contains("'"))
                     users.add(user);

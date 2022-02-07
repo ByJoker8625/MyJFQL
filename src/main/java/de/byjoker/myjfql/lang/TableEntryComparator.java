@@ -1,21 +1,21 @@
 package de.byjoker.myjfql.lang;
 
-import de.byjoker.myjfql.database.Column;
+import de.byjoker.myjfql.database.TableEntry;
 
 import java.util.Comparator;
 
-public class ColumnComparator implements Comparator<Column> {
+public class TableEntryComparator implements Comparator<TableEntry> {
 
     private final StringComparator comparator = new StringComparator();
 
     private final String key;
 
-    public ColumnComparator(String key) {
+    public TableEntryComparator(String key) {
         this.key = key;
     }
 
     @Override
-    public int compare(Column o1, Column o2) {
+    public int compare(TableEntry o1, TableEntry o2) {
         if (key == null)
             return Long.compare(o1.getCreatedAt(), o2.getCreatedAt());
 

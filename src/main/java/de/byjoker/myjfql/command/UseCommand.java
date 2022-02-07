@@ -2,7 +2,7 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Database;
-import de.byjoker.myjfql.database.DatabaseAction;
+import de.byjoker.myjfql.database.DatabaseActionPerformType;
 import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.server.session.Session;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +47,7 @@ public class UseCommand extends Command {
 
             final Database database = databaseService.getDatabaseByIdentifier(databaseIdentifier);
 
-            if (!sender.allowed(database.getId(), DatabaseAction.READ)) {
+            if (!sender.allowed(database.getId(), DatabaseActionPerformType.READ)) {
                 sender.sendForbidden();
                 return;
             }
