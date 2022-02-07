@@ -66,16 +66,8 @@ public class RestCommandSender extends CommandSender {
     }
 
     @Override
-    public void sendResult(Object obj, Object structure, ResultType resultType) {
-        if (!(obj instanceof Collection<?>)) {
-            return;
-        }
-
-        try {
-            send(JsonColumnParser.stringifyCompiledColumns((Collection<Column>) obj, structure, resultType));
-        } catch (Exception ex) {
-            send(JsonColumnParser.stringifySingletonColumn((Collection<String>) obj, structure, resultType));
-        }
+    public void sendResult(Collection<Column> columns, Collection<String> structure, ResultType resultType) {
+        send(JsonColumnParser.stringifyCompiledColumns(columns, structure, resultType));
     }
 
     @Override
@@ -106,4 +98,5 @@ public class RestCommandSender extends CommandSender {
         SUCCESS,
         SYNTAX_ERROR
     }
+
 }

@@ -5,7 +5,6 @@ import de.byjoker.myjfql.console.TablePrinter;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Column;
 import de.byjoker.myjfql.database.DatabaseAction;
-import de.byjoker.myjfql.exception.LanguageException;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.util.ResultType;
 
@@ -44,47 +43,23 @@ public class ConsoleCommandSender extends CommandSender {
     }
 
     @Override
-    public void sendResult(Object obj, Object structure, ResultType resultType) {
-        if (!(structure instanceof String[]) && !(structure instanceof Collection))
-            throw new LanguageException("Input is not an array!");
+    public void sendResult(Collection<Column> columns, Collection<String> structure, ResultType resultType) {
+        final String[] fields = structure.toArray(new String[structure.size()]);
+        final TablePrinter printer = new TablePrinter(fields);
 
-        if (!(obj instanceof Collection))
-            throw new LanguageException("Input is not an collection!");
+        for (Column column : columns) {
+            final String[] row = new String[fields.length];
 
-        String[] array;
+            for (int i = 0; i < fields.length; i++) {
+                final Object value = column.select(fields[i]);
 
-        if (!(structure instanceof String[])) {
-            Collection<String> strings = (Collection<String>) structure;
-            array = new String[strings.size()];
-            array = strings.toArray(array);
-        } else {
-
-            array = (String[]) structure;
-        }
-
-        final TablePrinter printer = new TablePrinter(array);
-
-        try {
-            final Collection<Column> columns = (Collection<Column>) obj;
-
-            for (Column column : columns) {
-                final String[] row = new String[array.length];
-
-                for (int i = 0; i < array.length; i++) {
-                    final Object value = column.select(array[i]);
-
-                    if (value != null)
-                        row[i] = value.toString();
-                    else
-                        row[i] = "null";
-                }
-
-                printer.addRow(row);
+                if (value != null)
+                    row[i] = value.toString();
+                else
+                    row[i] = "null";
             }
 
-        } catch (Exception ex) {
-            final Collection<String> strings = (Collection<String>) obj;
-            strings.forEach(printer::addRow);
+            printer.addRow(row);
         }
 
         printer.print();

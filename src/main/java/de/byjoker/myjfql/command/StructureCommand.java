@@ -1,14 +1,12 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.Database;
-import de.byjoker.myjfql.database.DatabaseAction;
-import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.database.Table;
+import de.byjoker.myjfql.database.*;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.util.ResultType;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @CommandHandler
 public class StructureCommand extends Command {
@@ -59,11 +57,11 @@ public class StructureCommand extends Command {
 
             if (!args.containsKey("ADD") && !args.containsKey("REMOVE") && !args.containsKey("SET") && !args.containsKey("MARK-PRIMARY")) {
                 if (args.containsKey("PRIMARY-KEY")) {
-                    sender.sendResult(Collections.singletonList(primary), new String[]{"primary"}, ResultType.SINGLETON);
+                    sender.sendResult(Collections.singletonList(new OnelinerLegacyColumn("primary_field_name", primary)), Collections.singletonList("primary_key_name"), ResultType.RELATIONAL);
                     return;
                 }
 
-                sender.sendResult(structure, new String[]{"structure"}, ResultType.SINGLETON);
+                sender.sendResult(structure.stream().map(s -> new OnelinerLegacyColumn("field_name", s)).collect(Collectors.toList()), Collections.singletonList("field_name"), ResultType.RELATIONAL);
                 return;
             }
 
@@ -136,6 +134,11 @@ public class StructureCommand extends Command {
 
             if (args.containsKey("SET")) {
                 final List<String> newStructure = formatList(args.get("SET"));
+
+                if (newStructure == null) {
+                    sender.sendError("Undefined structure!");
+                    return;
+                }
 
                 if (newStructure.size() == 0) {
                     sender.sendError("Structures size cant be 0!");

@@ -196,12 +196,12 @@ public class UserCommand extends ConsoleCommand {
             column.insert("accesses", selectedUser.getAccesses().toString());
             column.insert("preferred_database_id", String.valueOf(selectedUser.getPreferredDatabase()));
 
-            sender.sendResult(Collections.singletonList(column), new String[]{"id", "name", "accesses", "preferred_database_id"}, ResultType.LEGACY);
+            sender.sendResult(Collections.singletonList(column), Arrays.asList("id", "name", "accesses", "preferred_database_id"), ResultType.LEGACY);
             return;
         }
 
         if (args.containsKey("LIST")) {
-            sender.sendResult(userService.getUsers().stream().map(User::getName).collect(Collectors.toList()), new String[]{"user_names"}, ResultType.LEGACY);
+            sender.sendResult(userService.getUsers().stream().map(user -> new OnelinerLegacyColumn("user_name", user.getName())).collect(Collectors.toList()), Collections.singletonList("user_name"), ResultType.LEGACY);
             return;
         }
 

@@ -104,7 +104,7 @@ public class SessionsCommand extends ConsoleCommand {
                 column.insert("start", dateFormat.format(new Date(session.getOpen())));
                 column.insert("expire", session.getExpire() == -1 ? "never" : dateFormat.format(new Date(session.getExpire())));
 
-                sender.sendResult(Collections.singletonList(column), new String[]{"token", "address", "database_id", "start", "expire"}, ResultType.LEGACY);
+                sender.sendResult(Collections.singletonList(column), Arrays.asList("token", "address", "database_id", "start", "expire"), ResultType.LEGACY);
                 return;
             }
 
@@ -237,7 +237,7 @@ public class SessionsCommand extends ConsoleCommand {
                 sessions.add(column);
             });
 
-            sender.sendResult(sessions, new String[]{"token", "address", "database_id", "start", "expire"}, ResultType.LEGACY);
+            sender.sendResult(sessions, Arrays.asList("token", "address", "database_id", "start", "expire"), ResultType.LEGACY);
             return;
         }
 
