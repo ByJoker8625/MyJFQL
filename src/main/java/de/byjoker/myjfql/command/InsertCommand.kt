@@ -131,7 +131,7 @@ class InsertCommand :
                     return
                 }
 
-                if (content.containsKey(table.primary) && table is DocumentTable) {
+                if (content.containsKey(table.primary) && table is DocumentCollection) {
                     sender.sendError("Can't modify unique id of column!")
                     return
                 }
@@ -178,11 +178,11 @@ class InsertCommand :
                 }
 
                 val column = table.getColumn(primary) ?: when (table.type) {
-                    TableType.DOCUMENT -> DocumentColumn()
+                    TableType.DOCUMENT -> Document()
                     else -> RelationalColumn()
                 }
 
-                if (table is DocumentTable && content.containsKey(table.primary)) {
+                if (table is DocumentCollection && content.containsKey(table.primary)) {
                     sender.sendError("Can't modify unique id of column!")
                     return
                 }

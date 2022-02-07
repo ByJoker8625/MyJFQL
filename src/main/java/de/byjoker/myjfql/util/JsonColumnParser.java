@@ -28,18 +28,19 @@ public class JsonColumnParser {
         return jsonObject.toString();
     }
 
-    public static String stringifySingletonColumn(Collection<String> strings, Object structure) {
+    public static String stringifySingletonColumn(Collection<String> strings, Object structure, ResultType resultType) {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", "RESULT");
         jsonObject.put("structure", structure);
         jsonObject.put("result", strings);
+        jsonObject.put("resultType", resultType);
 
         return jsonObject.toString();
     }
 
-    public static String stringifyCompiledColumns(Collection<Column> columns, Object structure) {
+    public static String stringifyCompiledColumns(Collection<Column> columns, Object structure, ResultType resultType) {
         StringBuilder jsonBuilder = new StringBuilder();
-        jsonBuilder.append("{\"type\":\"RESULT\",\"structure\":").append(stringify(structure)).append(",");
+        jsonBuilder.append("{\"type\":\"RESULT\",\"resultType\":\"").append(resultType).append("\"\"structure\":").append(stringify(structure)).append(",");
 
         if (columns.size() != 0) {
             jsonBuilder.append("\"result\":[");

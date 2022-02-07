@@ -80,10 +80,10 @@ open class RelationalTable(private val name: String, structure: List<String>, pr
     override fun reformat(type: TableType, parameters: Array<String>): Table {
         return when (type) {
             TableType.DOCUMENT -> {
-                val table: Table = DocumentTable(name, ArrayList(structure))
+                val table: Table = DocumentCollection(name, ArrayList(structure))
 
                 columns.values.forEach { column ->
-                    table.addColumn(DocumentColumn(column))
+                    table.addColumn(Document(column))
                 }
 
                 table

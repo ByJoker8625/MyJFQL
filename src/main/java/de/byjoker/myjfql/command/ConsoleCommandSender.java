@@ -7,6 +7,7 @@ import de.byjoker.myjfql.database.Column;
 import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.exception.LanguageException;
 import de.byjoker.myjfql.server.session.Session;
+import de.byjoker.myjfql.util.ResultType;
 
 import java.util.Collection;
 
@@ -43,7 +44,7 @@ public class ConsoleCommandSender extends CommandSender {
     }
 
     @Override
-    public void sendResult(Object obj, Object structure) {
+    public void sendResult(Object obj, Object structure, ResultType resultType) {
         if (!(structure instanceof String[]) && !(structure instanceof Collection))
             throw new LanguageException("Input is not an array!");
 

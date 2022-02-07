@@ -9,6 +9,7 @@ import de.byjoker.myjfql.server.session.SessionService;
 import de.byjoker.myjfql.user.User;
 import de.byjoker.myjfql.user.UserService;
 import de.byjoker.myjfql.util.IDGenerator;
+import de.byjoker.myjfql.util.ResultType;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -103,7 +104,7 @@ public class SessionsCommand extends ConsoleCommand {
                 column.insert("start", dateFormat.format(new Date(session.getOpen())));
                 column.insert("expire", session.getExpire() == -1 ? "never" : dateFormat.format(new Date(session.getExpire())));
 
-                sender.sendResult(Collections.singletonList(column), new String[]{"token", "address", "database_id", "start", "expire"});
+                sender.sendResult(Collections.singletonList(column), new String[]{"token", "address", "database_id", "start", "expire"}, ResultType.LEGACY);
                 return;
             }
 
@@ -236,7 +237,7 @@ public class SessionsCommand extends ConsoleCommand {
                 sessions.add(column);
             });
 
-            sender.sendResult(sessions, new String[]{"token", "address", "database_id", "start", "expire"});
+            sender.sendResult(sessions, new String[]{"token", "address", "database_id", "start", "expire"}, ResultType.LEGACY);
             return;
         }
 

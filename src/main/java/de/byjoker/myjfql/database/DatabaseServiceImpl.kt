@@ -125,7 +125,7 @@ class DatabaseServiceImpl() : DatabaseService {
 
             when (json.getString("type")) {
                 TableType.DOCUMENT.name -> {
-                    val table = DocumentTable(
+                    val table = DocumentCollection(
                         name,
                         ArrayList(json.getJSONArray("structure").toMutableList().map { o -> o.toString() })
                     )
@@ -134,7 +134,7 @@ class DatabaseServiceImpl() : DatabaseService {
                         val column: JSONObject = columns.getJSONObject(i)
 
                         table.addColumn(
-                            DocumentColumn(
+                            Document(
                                 column.getJSONObject("content").toMap(),
                                 column.getLong("creation")
                             )

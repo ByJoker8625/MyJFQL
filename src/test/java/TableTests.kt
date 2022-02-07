@@ -1,4 +1,4 @@
-import de.byjoker.myjfql.database.DocumentColumn
+import de.byjoker.myjfql.database.Document
 import de.byjoker.myjfql.database.RelationalColumn
 import de.byjoker.myjfql.database.RelationalTable
 import org.junit.Test
@@ -44,7 +44,7 @@ class TableTests {
          */
 
         table.addColumn(
-            DocumentColumn(
+            Document(
                 mutableMapOf("_id" to "unique id of document column", "id" to "primary key value"),
                 System.currentTimeMillis()
             )

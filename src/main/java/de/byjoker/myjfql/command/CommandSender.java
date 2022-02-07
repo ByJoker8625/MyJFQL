@@ -2,6 +2,7 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.server.session.Session;
+import de.byjoker.myjfql.util.ResultType;
 
 public abstract class CommandSender {
 
@@ -23,7 +24,7 @@ public abstract class CommandSender {
 
     public abstract void sendSuccess();
 
-    public abstract void sendResult(Object obj, Object structure);
+    public abstract void sendResult(Object obj, Object structure, ResultType resultType);
 
     public abstract void send(Object obj);
 

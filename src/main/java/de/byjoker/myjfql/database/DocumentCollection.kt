@@ -4,7 +4,7 @@ import de.byjoker.myjfql.lang.ColumnComparator
 import de.byjoker.myjfql.util.Order
 import java.util.Collections.reverse
 
-class DocumentTable : Table {
+class DocumentCollection : Table {
 
     private var name: String
     private var columns: MutableMap<String, Column>
@@ -23,8 +23,8 @@ class DocumentTable : Table {
     }
 
     override fun addColumn(column: Column) {
-        if (column !is DocumentColumn) {
-            throw ClassCastException("Can't cast " + column.javaClass.name + " to de.byjoker.myjfql.database.NonRelationalColumn!")
+        if (column !is Document) {
+            throw ClassCastException()
         }
 
         column.compile()

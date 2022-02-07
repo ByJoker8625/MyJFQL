@@ -28,7 +28,7 @@ public class ColumnFilter {
         }
 
         try {
-            final String[] conditionSets = Objects.requireNonNull(new JFQLCommandFormatter().formatString(argument))
+            final String[] conditionSets = Objects.requireNonNull(new JFQLInterpreter().parseString(argument))
                     .replace(" OR ", " or ")
                     .split(" or ");
             final List<List<Requirement>> conditions = new ArrayList<>();

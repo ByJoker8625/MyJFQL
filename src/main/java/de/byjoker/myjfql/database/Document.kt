@@ -7,7 +7,7 @@ import de.byjoker.myjfql.util.JsonColumnParser
 import org.json.JSONPropertyIgnore
 import org.json.JSONPropertyName
 
-class DocumentColumn : ColumnMatcher {
+class Document : ColumnMatcher {
 
     private var content: MutableMap<String, Any>
     private var createdAt: Long

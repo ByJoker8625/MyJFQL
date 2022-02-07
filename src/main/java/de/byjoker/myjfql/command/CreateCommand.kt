@@ -103,7 +103,7 @@ class CreateCommand :
                         return
                     }
 
-                    database.createTable(DocumentTable(table, structure))
+                    database.createTable(DocumentCollection(table, structure))
                 }
                 else -> {
                     if (!args.containsKey("STRUCTURE")) {

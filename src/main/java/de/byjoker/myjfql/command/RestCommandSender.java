@@ -7,6 +7,7 @@ import de.byjoker.myjfql.exception.LanguageException;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.user.User;
 import de.byjoker.myjfql.util.JsonColumnParser;
+import de.byjoker.myjfql.util.ResultType;
 import io.javalin.http.Context;
 import org.json.JSONObject;
 
@@ -65,15 +66,15 @@ public class RestCommandSender extends CommandSender {
     }
 
     @Override
-    public void sendResult(Object obj, Object structure) {
+    public void sendResult(Object obj, Object structure, ResultType resultType) {
         if (!(obj instanceof Collection<?>)) {
             return;
         }
 
         try {
-            send(JsonColumnParser.stringifyCompiledColumns((Collection<Column>) obj, structure));
+            send(JsonColumnParser.stringifyCompiledColumns((Collection<Column>) obj, structure, resultType));
         } catch (Exception ex) {
-            send(JsonColumnParser.stringifySingletonColumn((Collection<String>) obj, structure));
+            send(JsonColumnParser.stringifySingletonColumn((Collection<String>) obj, structure, resultType));
         }
     }
 

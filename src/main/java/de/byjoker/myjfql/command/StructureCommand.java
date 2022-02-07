@@ -6,6 +6,7 @@ import de.byjoker.myjfql.database.DatabaseAction;
 import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.database.Table;
 import de.byjoker.myjfql.server.session.Session;
+import de.byjoker.myjfql.util.ResultType;
 
 import java.util.*;
 
@@ -58,11 +59,11 @@ public class StructureCommand extends Command {
 
             if (!args.containsKey("ADD") && !args.containsKey("REMOVE") && !args.containsKey("SET") && !args.containsKey("MARK-PRIMARY")) {
                 if (args.containsKey("PRIMARY-KEY")) {
-                    sender.sendResult(Collections.singletonList(primary), new String[]{"primary"});
+                    sender.sendResult(Collections.singletonList(primary), new String[]{"primary"}, ResultType.SINGLETON);
                     return;
                 }
 
-                sender.sendResult(structure, new String[]{"structure"});
+                sender.sendResult(structure, new String[]{"structure"}, ResultType.SINGLETON);
                 return;
             }
 

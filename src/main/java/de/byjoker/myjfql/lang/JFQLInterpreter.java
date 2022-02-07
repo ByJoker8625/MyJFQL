@@ -6,10 +6,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class JFQLCommandFormatter implements CommandFormatter {
+public class JFQLInterpreter implements Interpreter {
 
     @Override
-    public Map<String, List<String>> formatCommand(String command) {
+    public Map<String, List<String>> interpretCommand(String command) {
         if (command == null)
             return null;
 
@@ -79,9 +79,8 @@ public class JFQLCommandFormatter implements CommandFormatter {
         return arguments;
     }
 
-
     @Override
-    public final String formatString(List<String> strings) {
+    public final String parseString(List<String> strings) {
         if (strings.size() == 0)
             return null;
 
@@ -89,8 +88,7 @@ public class JFQLCommandFormatter implements CommandFormatter {
     }
 
     @Override
-
-    public final List<String> formatList(List<String> strings) {
+    public final List<String> parseList(List<String> strings) {
         if (strings.size() == 0)
             return new ArrayList<>();
 
@@ -98,7 +96,7 @@ public class JFQLCommandFormatter implements CommandFormatter {
     }
 
     @Override
-    public final int formatInteger(List<String> strings) {
+    public final int parseInteger(List<String> strings) {
         if (strings.size() == 0)
             return -1;
 

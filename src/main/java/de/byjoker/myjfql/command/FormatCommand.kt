@@ -6,7 +6,7 @@ import de.byjoker.myjfql.database.DatabaseType
 import de.byjoker.myjfql.database.TableType
 
 @CommandHandler
-class FormatCommand : ConsoleCommand("format", mutableListOf("COMMAND", "DATABASE", "TABLE", "INTO", "KEEP")) {
+class FormatCommand : ConsoleCommand("format", mutableListOf("COMMAND", "DATABASE", "TABLE", "INTO")) {
 
     override fun executeAsConsole(sender: ConsoleCommandSender, args: MutableMap<String, MutableList<String>>) {
         val databaseService = MyJFQL.getInstance().databaseService

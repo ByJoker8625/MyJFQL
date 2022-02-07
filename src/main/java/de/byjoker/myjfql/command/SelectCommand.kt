@@ -9,6 +9,7 @@ import de.byjoker.myjfql.lang.ColumnComparator
 import de.byjoker.myjfql.lang.ColumnFilter
 import de.byjoker.myjfql.server.session.Session
 import de.byjoker.myjfql.util.Order
+import de.byjoker.myjfql.util.ResultType
 import org.jline.reader.ParsedLine
 import java.util.stream.Collectors
 
@@ -106,6 +107,8 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                 if (sortedBy == null) sortedBy = table.primary
             }
 
+            val resultType = if (table is RelationalTable) ResultType.RELATIONAL else ResultType.DOCUMENT
+
             if (args.containsKey("PRIMARY-KEY")) {
                 val primaryKey = formatString(args["PRIMARY-KEY"])
 
@@ -121,7 +124,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                     return
                 }
 
-                sender.sendResult(listOf(column), structure)
+                sender.sendResult(listOf(column), structure, resultType)
             } else if (args.containsKey("WHERE")) {
                 val columns: List<Column>? = try {
                     ColumnFilter.filterByCommandLineArguments(
@@ -138,27 +141,35 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                 }
 
                 if (limit != -1) {
-                    sender.sendResult(columns.stream().limit(limit.toLong()).collect(Collectors.toList()), structure)
+                    sender.sendResult(
+                        columns.stream().limit(limit.toLong()).collect(Collectors.toList()),
+                        structure,
+                        resultType
+                    )
                     return
                 }
 
-                sender.sendResult(columns, structure)
+                sender.sendResult(columns, structure, resultType)
             } else {
                 val columns = if (sortedBy == null) table.columns else table.getColumns(
                     ColumnComparator(sortedBy), order
                 )
 
                 if (columns.isEmpty()) {
-                    sender.sendResult(ArrayList<Column>(), structure)
+                    sender.sendResult(ArrayList<Column>(), structure, resultType)
                     return
                 }
 
                 if (limit != -1) {
-                    sender.sendResult(columns.stream().limit(limit.toLong()).collect(Collectors.toList()), structure)
+                    sender.sendResult(
+                        columns.stream().limit(limit.toLong()).collect(Collectors.toList()),
+                        structure,
+                        resultType
+                    )
                     return
                 }
 
-                sender.sendResult(columns, structure)
+                sender.sendResult(columns, structure, resultType)
             }
 
             return

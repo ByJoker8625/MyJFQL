@@ -14,8 +14,8 @@ import de.byjoker.myjfql.console.SimpleConsole;
 import de.byjoker.myjfql.database.*;
 import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.exception.NetworkException;
-import de.byjoker.myjfql.lang.CommandFormatter;
-import de.byjoker.myjfql.lang.JFQLCommandFormatter;
+import de.byjoker.myjfql.lang.Interpreter;
+import de.byjoker.myjfql.lang.JFQLInterpreter;
 import de.byjoker.myjfql.server.Server;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.server.session.SessionService;
@@ -32,7 +32,7 @@ public final class MyJFQL {
     private static MyJFQL instance;
 
     private final String version = "1.5.5";
-    private final CommandFormatter formatter;
+    private final Interpreter formatter;
     private final CommandService commandService;
     private final DatabaseService databaseService;
     private final ConfigService configService;
@@ -53,7 +53,7 @@ public final class MyJFQL {
         this.console = new ConsoleImpl();
         this.config = new ConfigDefaults();
         this.encryptor = new NoneEncryptor();
-        this.formatter = new JFQLCommandFormatter();
+        this.formatter = new JFQLInterpreter();
         this.sessionService = new SessionServiceImpl();
         this.consoleCommandSender = new ConsoleCommandSender();
         this.updater = new Updater(version);
@@ -259,7 +259,7 @@ public final class MyJFQL {
         return encryptor;
     }
 
-    public CommandFormatter getFormatter() {
+    public Interpreter getFormatter() {
         return formatter;
     }
 

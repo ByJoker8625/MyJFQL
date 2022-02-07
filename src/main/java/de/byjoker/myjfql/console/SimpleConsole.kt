@@ -4,10 +4,12 @@ import org.jline.reader.Completer
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
 import org.jline.reader.impl.LineReaderImpl
+import org.jline.widget.AutosuggestionWidgets
 import java.io.PrintStream
 import java.io.PrintWriter
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class SimpleConsole(
     private val reader: LineReaderImpl = LineReaderBuilder.builder().build() as LineReaderImpl,
@@ -98,6 +100,11 @@ class SimpleConsole(
 
     override fun bind(vararg parameters: Any) {
         reader.completer = parameters[0] as Completer
+
+        val autosuggestionWidgets = AutosuggestionWidgets(reader)
+        reader.putString("shutdown")
+        autosuggestionWidgets.enable()
+
         writeable = true
     }
 

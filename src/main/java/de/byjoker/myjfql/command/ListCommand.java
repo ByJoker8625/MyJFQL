@@ -7,6 +7,7 @@ import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.database.Table;
 import de.byjoker.myjfql.lang.StringComparator;
 import de.byjoker.myjfql.util.Order;
+import de.byjoker.myjfql.util.ResultType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -68,7 +69,7 @@ public class ListCommand extends Command {
                     Collections.reverse(databases);
             }
 
-            sender.sendResult(databases, new String[]{"databases"});
+            sender.sendResult(databases, new String[]{"databases"}, ResultType.SINGLETON);
             return;
         }
 
@@ -133,7 +134,7 @@ public class ListCommand extends Command {
                     Collections.reverse(tables);
             }
 
-            sender.sendResult(tables, new String[]{"tables"});
+            sender.sendResult(tables, new String[]{"tables"}, ResultType.SINGLETON);
             return;
         }
 

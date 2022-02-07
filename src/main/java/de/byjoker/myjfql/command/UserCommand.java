@@ -4,6 +4,7 @@ import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.*;
 import de.byjoker.myjfql.user.User;
 import de.byjoker.myjfql.user.UserService;
+import de.byjoker.myjfql.util.ResultType;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -195,12 +196,12 @@ public class UserCommand extends ConsoleCommand {
             column.insert("accesses", selectedUser.getAccesses().toString());
             column.insert("preferred_database_id", String.valueOf(selectedUser.getPreferredDatabase()));
 
-            sender.sendResult(Collections.singletonList(column), new String[]{"id", "name", "accesses", "preferred_database_id"});
+            sender.sendResult(Collections.singletonList(column), new String[]{"id", "name", "accesses", "preferred_database_id"}, ResultType.LEGACY);
             return;
         }
 
         if (args.containsKey("LIST")) {
-            sender.sendResult(userService.getUsers().stream().map(User::getName).collect(Collectors.toList()), new String[]{"user_names"});
+            sender.sendResult(userService.getUsers().stream().map(User::getName).collect(Collectors.toList()), new String[]{"user_names"}, ResultType.LEGACY);
             return;
         }
 

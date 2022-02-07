@@ -2,6 +2,7 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.BackupService;
+import de.byjoker.myjfql.util.ResultType;
 
 import java.io.File;
 import java.util.Arrays;
@@ -121,12 +122,12 @@ public class BackupCommand extends ConsoleCommand {
                 return;
             }
 
-            sender.sendResult(Arrays.stream(files).map(File::getName).collect(Collectors.toList()), new String[]{"Backup"});
+            sender.sendResult(Arrays.stream(files).map(File::getName).collect(Collectors.toList()), new String[]{"backups"}, ResultType.SINGLETON);
             return;
         }
 
         if (args.containsKey("LIST")) {
-            sender.sendResult(backupService.getBackups(), new String[]{"backup"});
+            sender.sendResult(backupService.getBackups(), new String[]{"backups"}, ResultType.SINGLETON);
             return;
         }
 

@@ -8,6 +8,7 @@ import de.byjoker.myjfql.server.session.SessionService;
 import de.byjoker.myjfql.user.User;
 import de.byjoker.myjfql.user.UserService;
 import de.byjoker.myjfql.util.IDGenerator;
+import de.byjoker.myjfql.util.ResultType;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +61,7 @@ public class LoginController implements Handler {
                 if (config.showConnections())
                     MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " joined the session '" + session.getToken() + "'.");
 
-                sender.sendResult(Collections.singletonList(token), new String[]{"token"});
+                sender.sendResult(Collections.singletonList(token), new String[]{"token"}, ResultType.SINGLETON);
                 return;
             }
 
@@ -87,7 +88,7 @@ public class LoginController implements Handler {
             if (config.showConnections())
                 MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " opened a session as '" + user.getName() + "'.");
 
-            sender.sendResult(Collections.singletonList(token), new String[]{"token"});
+            sender.sendResult(Collections.singletonList(token), new String[]{"token"}, ResultType.SINGLETON);
         } catch (Exception ex) {
             sender.sendError(ex);
         }
