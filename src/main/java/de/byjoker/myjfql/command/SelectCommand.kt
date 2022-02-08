@@ -1,10 +1,10 @@
 package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
-import de.byjoker.myjfql.database.TableEntry
 import de.byjoker.myjfql.database.Database
 import de.byjoker.myjfql.database.DatabaseActionPerformType
 import de.byjoker.myjfql.database.RelationalTable
+import de.byjoker.myjfql.database.TableEntry
 import de.byjoker.myjfql.lang.TableEntryComparator
 import de.byjoker.myjfql.lang.TableEntryFilter
 import de.byjoker.myjfql.server.session.Session
@@ -52,7 +52,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                 return
             }
 
-            val structure: Collection<String> = when {
+            val structure: MutableCollection<String> = when {
                 formatString(args["VALUE"]) == "*" -> table.structure
                 else -> formatList(args["VALUE"]) ?: return
             }
@@ -124,9 +124,9 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                     return
                 }
 
-                sender.sendResult(listOf(entry), structure, resultType)
+                sender.sendResult(mutableListOf(entry), structure, resultType)
             } else if (args.containsKey("WHERE")) {
-                val entries: List<TableEntry>? = try {
+                val entries: MutableList<TableEntry>? = try {
                     TableEntryFilter.filterByCommandLineArguments(
                         table, args["WHERE"], if (sortedBy == null) null else TableEntryComparator(
                             sortedBy
@@ -182,7 +182,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
 
     override fun complete(sender: CommandSender, line: ParsedLine): MutableList<String>? {
         sender.session ?: return null
-        val database: Database = sender.session.getDatabase(MyJFQL.getInstance().databaseService) ?: return null
+        val database: Database = sender.session!!.getDatabase(MyJFQL.getInstance().databaseService) ?: return null
 
         if (!sender.allowed(database.id, DatabaseActionPerformType.READ)) {
             return null

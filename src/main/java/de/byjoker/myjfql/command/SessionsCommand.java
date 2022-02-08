@@ -1,9 +1,9 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
+import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.database.LegacyTableEntry;
 import de.byjoker.myjfql.database.TableEntry;
-import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.server.session.SessionService;
 import de.byjoker.myjfql.user.User;
@@ -63,7 +63,7 @@ public class SessionsCommand extends ConsoleCommand {
                 }
 
                 String token = null;
-                String database = user.getPreferredDatabase();
+                String database = user.getPreferredDatabaseId();
                 String address = "*";
 
                 if (args.containsKey("TOKEN") && args.get("TOKEN").size() != 0) {

@@ -51,7 +51,7 @@ class FormatCommand : ConsoleCommand("format", mutableListOf("COMMAND", "DATABAS
         }
 
         if (args.containsKey("TABLE")) {
-            val database = sender.session.getDatabase(databaseService)
+            val database = sender.session!!.getDatabase(databaseService)
 
             if (database == null) {
                 sender.sendError("No database is in use for this user!")

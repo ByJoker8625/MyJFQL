@@ -1,6 +1,6 @@
 package de.byjoker.myjfql.server;
 
-import de.byjoker.myjfql.command.RestCommandSender;
+import de.byjoker.myjfql.command.ContextCommandSender;
 import de.byjoker.myjfql.server.controller.LoginController;
 import de.byjoker.myjfql.server.controller.LogoutController;
 import de.byjoker.myjfql.server.controller.QueryController;
@@ -18,7 +18,7 @@ public class Server {
 
         app._conf.showJavalinBanner = false;
 
-        app.error(404, context -> context.result(new JSONObject().put("type", RestCommandSender.ResponseType.SYNTAX_ERROR).toString()));
+        app.error(404, context -> context.result(new JSONObject().put("type", ContextCommandSender.ResponseType.SYNTAX_ERROR).toString()));
         app.post("api/v1/session/open", new LoginController());
         app.post("api/v1/login", new LoginController());
         app.post("api/v1/session/close", new LogoutController());

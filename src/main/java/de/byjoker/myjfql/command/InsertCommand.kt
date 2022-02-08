@@ -224,7 +224,7 @@ class InsertCommand :
     override fun complete(sender: CommandSender, line: ParsedLine)
             : MutableList<String>? {
         sender.session ?: return null
-        val database: Database = sender.session.getDatabase(MyJFQL.getInstance().databaseService) ?: return null
+        val database: Database = sender.session!!.getDatabase(MyJFQL.getInstance().databaseService) ?: return null
 
         if (!sender.allowed(database.id, DatabaseActionPerformType.READ_WRITE)) {
             return null

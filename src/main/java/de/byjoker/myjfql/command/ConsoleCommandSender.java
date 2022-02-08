@@ -3,8 +3,8 @@ package de.byjoker.myjfql.command;
 import de.byjoker.myjfql.console.Console;
 import de.byjoker.myjfql.console.TablePrinter;
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.TableEntry;
 import de.byjoker.myjfql.database.DatabaseActionPerformType;
+import de.byjoker.myjfql.database.TableEntry;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.util.ResultType;
 
@@ -44,7 +44,7 @@ public class ConsoleCommandSender extends CommandSender {
 
     @Override
     public void sendResult(Collection<TableEntry> entries, Collection<String> structure, ResultType resultType) {
-        final String[] fields = structure.toArray(new String[structure.size()]);
+        final String[] fields = structure.toArray(new String[0]);
         final TablePrinter printer = new TablePrinter(fields);
 
         for (TableEntry tableEntry : entries) {

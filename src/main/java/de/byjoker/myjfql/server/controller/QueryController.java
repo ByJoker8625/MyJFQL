@@ -1,6 +1,6 @@
 package de.byjoker.myjfql.server.controller;
 
-import de.byjoker.myjfql.command.RestCommandSender;
+import de.byjoker.myjfql.command.ContextCommandSender;
 import de.byjoker.myjfql.config.Config;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.server.session.Session;
@@ -17,7 +17,7 @@ public class QueryController implements Handler {
 
     @Override
     public void handle(@NotNull Context context) throws Exception {
-        RestCommandSender sender = new RestCommandSender(null, context);
+        ContextCommandSender sender = new ContextCommandSender(null, context);
 
         try {
             final JSONObject request = new JSONObject(context.body());

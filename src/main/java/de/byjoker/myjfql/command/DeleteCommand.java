@@ -55,7 +55,7 @@ public class DeleteCommand extends Command {
         }
 
         if (args.containsKey("DATABASE")) {
-            if (sender instanceof RestCommandSender) {
+            if (sender instanceof ContextCommandSender) {
                 sender.sendForbidden();
                 return;
             }

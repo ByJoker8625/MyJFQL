@@ -1,21 +1,19 @@
 package de.byjoker.myjfql.server.controller;
 
-import de.byjoker.myjfql.command.RestCommandSender;
+import de.byjoker.myjfql.command.ContextCommandSender;
 import de.byjoker.myjfql.config.Config;
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.OneFieldTableEntry;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.server.session.SessionService;
 import de.byjoker.myjfql.user.User;
 import de.byjoker.myjfql.user.UserService;
 import de.byjoker.myjfql.util.IDGenerator;
-import de.byjoker.myjfql.util.ResultType;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
-import java.util.Collections;
+import java.nio.charset.StandardCharsets;
 
 public class LoginController implements Handler {
 
@@ -25,7 +23,7 @@ public class LoginController implements Handler {
 
     @Override
     public void handle(@NotNull Context context) throws Exception {
-        RestCommandSender sender = new RestCommandSender(null, context);
+        ContextCommandSender sender = new ContextCommandSender(null, context);
 
         try {
             JSONObject request = new JSONObject(context.body());
@@ -62,7 +60,7 @@ public class LoginController implements Handler {
                 if (config.showConnections())
                     MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " joined the session '" + session.getToken() + "'.");
 
-                sender.sendResult(Collections.singletonList(new OneFieldTableEntry("token", token)), Collections.singletonList("token"), ResultType.RELATIONAL);
+                sender.sendBytes(new JSONObject().put("type", "RESULT").put("structure", new String[]{"token"}).put("result", new String[]{token}).toString().getBytes(StandardCharsets.UTF_8));
                 return;
             }
 
@@ -84,12 +82,12 @@ public class LoginController implements Handler {
             }
 
             final String token = IDGenerator.generateMixed(25);
-            sessionService.openSession(new Session(token, user.getId(), (user.hasPreferredDatabase()) ? user.getPreferredDatabase() : null, context.ip()));
+            sessionService.openSession(new Session(token, user.getId(), (user.hasPreferredDatabase()) ? user.getPreferredDatabaseId() : null, context.ip()));
 
             if (config.showConnections())
                 MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " opened a session as '" + user.getName() + "'.");
 
-            sender.sendResult(Collections.singletonList(new OneFieldTableEntry("token", token)), Collections.singletonList("token"), ResultType.RELATIONAL);
+            sender.sendBytes(new JSONObject().put("type", "RESULT").put("structure", new String[]{"token"}).put("result", new String[]{token}).toString().getBytes(StandardCharsets.UTF_8));
         } catch (Exception ex) {
             sender.sendError(ex);
         }

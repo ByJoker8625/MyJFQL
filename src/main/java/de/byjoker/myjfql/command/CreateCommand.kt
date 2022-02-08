@@ -3,6 +3,7 @@ package de.byjoker.myjfql.command
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.*
 import de.byjoker.myjfql.server.session.Session
+import de.byjoker.myjfql.user.User
 import org.jline.reader.ParsedLine
 
 @CommandHandler
@@ -31,11 +32,7 @@ class CreateCommand :
                 return
             }
 
-            /**
-             * todo come up with a good permission handling for this case
-             */
-
-            if (!sender.allowed("%", DatabaseActionPerformType.READ_WRITE)) {
+            if (!sender.allowed(User.ALLOW_CREATE_DATABASES, DatabaseActionPerformType.READ_WRITE)) {
                 sender.sendForbidden()
                 return
             }

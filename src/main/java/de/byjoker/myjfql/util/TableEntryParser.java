@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.byjoker.myjfql.command.RestCommandSender;
+import de.byjoker.myjfql.command.ContextCommandSender;
 import de.byjoker.myjfql.database.TableEntry;
 import org.json.JSONObject;
 
@@ -22,7 +22,7 @@ public class TableEntryParser {
     @Deprecated
     public static String stringifyLegacyTableEntries(Collection<TableEntry> entries, Object structure) {
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", RestCommandSender.ResponseType.RESULT);
+        jsonObject.put("type", ContextCommandSender.ResponseType.RESULT);
         jsonObject.put("structure", structure);
         jsonObject.put("result", entries);
 
@@ -30,7 +30,7 @@ public class TableEntryParser {
     }
 
     @Deprecated
-    public static String stringifySingletonTableEntries(Collection<String> strings, Object structure, ResultType resultType) {
+    public static String stringifySingletonTableEntries(Collection<String> strings, Collection<String> structure, ResultType resultType) {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", "RESULT");
         jsonObject.put("structure", structure);
@@ -40,13 +40,13 @@ public class TableEntryParser {
         return jsonObject.toString();
     }
 
-    public static String stringifyTableEntries(Collection<TableEntry> entries, Object structure, ResultType resultType) {
+    public static String stringifyTableEntries(Collection<TableEntry> entries, Collection<String> structure, ResultType resultType) {
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.append("{\"type\":\"RESULT\",\"resultType\":\"").append(resultType).append("\"\"structure\":").append(stringify(structure)).append(",");
 
         if (entries.size() != 0) {
             jsonBuilder.append("\"result\":[");
-            entries.forEach(column -> jsonBuilder.append(column.json()).append(","));
+            entries.forEach(entry -> jsonBuilder.append(entry.json()).append(","));
             jsonBuilder.deleteCharAt(jsonBuilder.length() - 1).append("]");
         } else {
             jsonBuilder.append("\"result\":[]");

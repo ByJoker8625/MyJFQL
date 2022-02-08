@@ -1,8 +1,8 @@
 package de.byjoker.myjfql.lang;
 
-import de.byjoker.myjfql.database.TableEntry;
 import de.byjoker.myjfql.database.RelationalTable;
 import de.byjoker.myjfql.database.Table;
+import de.byjoker.myjfql.database.TableEntry;
 import de.byjoker.myjfql.exception.LanguageException;
 import de.byjoker.myjfql.util.Order;
 

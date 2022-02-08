@@ -1,25 +1,25 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.TableEntry;
 import de.byjoker.myjfql.database.DatabaseActionPerformType;
+import de.byjoker.myjfql.database.TableEntry;
 import de.byjoker.myjfql.exception.LanguageException;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.user.User;
-import de.byjoker.myjfql.util.TableEntryParser;
 import de.byjoker.myjfql.util.ResultType;
+import de.byjoker.myjfql.util.TableEntryParser;
 import io.javalin.http.Context;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
-public class RestCommandSender extends CommandSender {
+public class ContextCommandSender extends CommandSender {
 
     private final Context context;
     private final User user;
 
-    public RestCommandSender(Session session, Context context) {
+    public ContextCommandSender(Session session, Context context) {
         super(null, session);
         this.user = (session == null) ? null : session.getUser(MyJFQL.getInstance().getUserService());
         this.context = context;
@@ -80,13 +80,13 @@ public class RestCommandSender extends CommandSender {
         context.result(bytes);
     }
 
-    public RestCommandSender bind(Session session) {
-        return new RestCommandSender(session, context);
+    public ContextCommandSender bind(Session session) {
+        return new ContextCommandSender(session, context);
     }
 
     public String getName() {
         if (user == null)
-            return null;
+            return "null";
 
         return user.getName();
     }
