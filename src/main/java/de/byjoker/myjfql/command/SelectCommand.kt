@@ -104,7 +104,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                     return
                 }
 
-                if (sortedBy == null) sortedBy = table.primaryField
+                if (sortedBy == null) sortedBy = table.primary
             }
 
             val resultType = if (table is RelationalTable) ResultType.RELATIONAL else ResultType.DOCUMENT

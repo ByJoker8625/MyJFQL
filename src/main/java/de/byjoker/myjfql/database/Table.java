@@ -21,9 +21,9 @@ public interface Table {
 
     void setStructure(Collection<String> structure);
 
-    String getPrimaryField();
+    String getPrimary();
 
-    void setPrimaryField(String primary);
+    void setPrimary(String primary);
 
     Table reformat(TableType type);
 

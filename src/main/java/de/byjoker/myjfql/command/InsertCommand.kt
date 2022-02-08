@@ -131,7 +131,7 @@ class InsertCommand :
                     return
                 }
 
-                if (content.containsKey(table.primaryField) && table is DocumentCollection) {
+                if (content.containsKey(table.primary) && table is DocumentCollection) {
                     sender.sendError("Can't modify unique id of document entry!")
                     return
                 }
@@ -141,8 +141,8 @@ class InsertCommand :
                      * To prevent duplication of an entry when the primary key is changed, the previous entry is removed
                      */
 
-                    if (content.containsKey(table.primaryField)) {
-                        table.removeEntry(entry.selectStringify(table.primaryField))
+                    if (content.containsKey(table.primary)) {
+                        table.removeEntry(entry.selectStringify(table.primary))
                     }
 
                     if (args.containsKey("FULLY")) {
@@ -169,7 +169,7 @@ class InsertCommand :
                         return
                     }
                 } else {
-                    primary = content[table.primaryField]?.toString()
+                    primary = content[table.primary]?.toString()
 
                     if (table is RelationalTable && primary == null) {
                         sender.sendError("No primary key in form of unique identifier specified!")
@@ -182,7 +182,7 @@ class InsertCommand :
                     else -> RelationalTableEntry()
                 }
 
-                if (table is DocumentCollection && content.containsKey(table.primaryField)) {
+                if (table is DocumentCollection && content.containsKey(table.primary)) {
                     sender.sendError("Can't modify unique id of document entry!")
                     return
                 }
@@ -192,8 +192,8 @@ class InsertCommand :
                  * the previous entry is removed
                  */
 
-                if (content.contains(table.primaryField) && entry.select(table.primaryField) != content[table.primaryField]) {
-                    table.removeEntry(entry.selectStringify(table.primaryField))
+                if (content.contains(table.primary) && entry.select(table.primary) != content[table.primary]) {
+                    table.removeEntry(entry.selectStringify(table.primary))
                 }
 
                 if (args.containsKey("FULLY")) {
@@ -207,8 +207,8 @@ class InsertCommand :
                  * argument and the entry does not yet exist, it will be added later
                  */
 
-                if (!entry.contains(table.primaryField)) {
-                    entry.insert(table.primaryField, primary)
+                if (!entry.contains(table.primary)) {
+                    entry.insert(table.primary, primary)
                 }
 
                 sender.sendSuccess()

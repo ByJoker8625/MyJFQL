@@ -83,7 +83,7 @@ class FilterTests {
                     "email" to "max@tests.byjoker.de",
                     "verified" to "true",
                     "locked" to "false"
-                ) as Map<String, Any>?, System.currentTimeMillis()
+                ) as Map<String, Any>, System.currentTimeMillis()
             )
         )
 
@@ -97,7 +97,7 @@ class FilterTests {
                     "email" to "byjoker@tests.byjoker.de",
                     "verified" to "false",
                     "locked" to "true"
-                ) as Map<String, Any>?, System.currentTimeMillis()
+                ) as Map<String, Any>, System.currentTimeMillis()
             )
         )
 
@@ -111,7 +111,7 @@ class FilterTests {
                     "email" to "admin@tests.byjoker.de",
                     "verified" to "true",
                     "locked" to "false"
-                ) as Map<String, Any>?, System.currentTimeMillis()
+                ) as Map<String, Any>, System.currentTimeMillis()
             )
         )
 
@@ -123,7 +123,7 @@ class FilterTests {
                     "name" to "system",
                     "verified" to "true",
                     "locked" to "true"
-                ) as Map<String, Any>?, System.currentTimeMillis()
+                ) as Map<String, Any>, System.currentTimeMillis()
             )
         )
 

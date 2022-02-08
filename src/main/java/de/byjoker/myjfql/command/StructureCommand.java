@@ -53,7 +53,7 @@ public class StructureCommand extends Command {
 
             final Table table = database.getTable(name);
             final Collection<String> structure = table.getStructure();
-            final String primary = table.getPrimaryField();
+            final String primary = table.getPrimary();
 
             if (!args.containsKey("ADD") && !args.containsKey("REMOVE") && !args.containsKey("SET") && !args.containsKey("MARK-PRIMARY")) {
                 if (args.containsKey("PRIMARY-KEY")) {
@@ -123,7 +123,7 @@ public class StructureCommand extends Command {
                     return;
                 }
 
-                table.setPrimaryField(argument);
+                table.setPrimary(argument);
 
                 sender.sendSuccess();
 
@@ -165,9 +165,9 @@ public class StructureCommand extends Command {
                         return;
                     }
 
-                    table.setPrimaryField(key);
+                    table.setPrimary(key);
                 } else {
-                    table.setPrimaryField(newStructure.get(0));
+                    table.setPrimary(newStructure.get(0));
                 }
 
 

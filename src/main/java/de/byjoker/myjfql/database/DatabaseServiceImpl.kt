@@ -107,7 +107,12 @@ class DatabaseServiceImpl() : DatabaseService {
 
         fun loadTable(json: JSONObject): Table? {
             val name = json.getString("name")
-            val columns = json.getJSONArray("columns")
+
+            /**
+             * Loading column's field if present to make sure older versions run too.
+             */
+
+            val entries = if (json.has("columns")) json.getJSONArray("columns") else json.getJSONArray("entries")
 
             if (name.contains("%") || name.contains("#") || name.contains("'")) {
                 MyJFQL.getInstance().console.logWarning("Database used unauthorized characters in the identifier!")
@@ -130,8 +135,8 @@ class DatabaseServiceImpl() : DatabaseService {
                         ArrayList(json.getJSONArray("structure").toMutableList().map { o -> o.toString() })
                     )
 
-                    for (i in 0 until columns.length()) {
-                        val column: JSONObject = columns.getJSONObject(i)
+                    for (i in 0 until entries.length()) {
+                        val column: JSONObject = entries.getJSONObject(i)
 
                         table.addEntry(
                             Document(
@@ -150,8 +155,8 @@ class DatabaseServiceImpl() : DatabaseService {
                         json.getString("primary")
                     )
 
-                    for (i in 0 until columns.length()) {
-                        val column: JSONObject = columns.getJSONObject(i)
+                    for (i in 0 until entries.length()) {
+                        val column: JSONObject = entries.getJSONObject(i)
 
                         table.addEntry(
                             RelationalTableEntry(

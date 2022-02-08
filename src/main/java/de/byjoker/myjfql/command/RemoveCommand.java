@@ -82,7 +82,7 @@ public class RemoveCommand extends Command {
                     return;
                 }
 
-                entries.stream().map(col -> col.selectStringify(table.getPrimaryField())).forEach(table::removeEntry);
+                entries.stream().map(col -> col.selectStringify(table.getPrimary())).forEach(table::removeEntry);
 
             } else {
                 if (!entry.equals("*")) {

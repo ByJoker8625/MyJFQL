@@ -62,11 +62,11 @@ class DocumentCollection : Table {
         this.prototypeStructure = structure
     }
 
-    override fun getPrimaryField(): String {
+    override fun getPrimary(): String {
         return "_id"
     }
 
-    override fun setPrimaryField(primary: String) {
+    override fun setPrimary(primary: String) {
         throw IllegalArgumentException()
     }
 

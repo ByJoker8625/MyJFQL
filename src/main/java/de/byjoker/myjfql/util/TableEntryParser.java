@@ -42,7 +42,7 @@ public class TableEntryParser {
 
     public static String stringifyTableEntries(Collection<TableEntry> entries, Collection<String> structure, ResultType resultType) {
         StringBuilder jsonBuilder = new StringBuilder();
-        jsonBuilder.append("{\"type\":\"RESULT\",\"resultType\":\"").append(resultType).append("\"\"structure\":").append(stringify(structure)).append(",");
+        jsonBuilder.append("{\"type\":\"RESULT\",\"resultType\":\"").append(resultType).append("\",\"structure\":").append(stringify(structure)).append(",");
 
         if (entries.size() != 0) {
             jsonBuilder.append("\"result\":[");

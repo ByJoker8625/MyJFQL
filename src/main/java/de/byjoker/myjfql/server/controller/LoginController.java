@@ -60,6 +60,10 @@ public class LoginController implements Handler {
                 if (config.showConnections())
                     MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " joined the session '" + session.getToken() + "'.");
 
+                /**
+                 * Sending response in old format that also these older systems can use version 1.5.5!
+                 */
+
                 sender.sendBytes(new JSONObject().put("type", "RESULT").put("structure", new String[]{"token"}).put("result", new String[]{token}).toString().getBytes(StandardCharsets.UTF_8));
                 return;
             }
@@ -86,6 +90,10 @@ public class LoginController implements Handler {
 
             if (config.showConnections())
                 MyJFQL.getInstance().getConsole().logInfo("Client " + context.ip() + " opened a session as '" + user.getName() + "'.");
+
+            /**
+             * Sending response in old format that also these older systems can use version 1.5.5!
+             */
 
             sender.sendBytes(new JSONObject().put("type", "RESULT").put("structure", new String[]{"token"}).put("result", new String[]{token}).toString().getBytes(StandardCharsets.UTF_8));
         } catch (Exception ex) {

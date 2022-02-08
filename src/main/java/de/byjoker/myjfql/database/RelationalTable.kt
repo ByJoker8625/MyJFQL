@@ -68,11 +68,11 @@ open class RelationalTable(private val name: String, structure: List<String>, pr
         reindex()
     }
 
-    override fun getPrimaryField(): String {
+    override fun getPrimary(): String {
         return primary
     }
 
-    override fun setPrimaryField(primary: String) {
+    override fun setPrimary(primary: String) {
         this.primary = primary
         reindex()
     }

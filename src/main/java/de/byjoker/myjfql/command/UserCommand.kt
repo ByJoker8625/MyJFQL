@@ -174,7 +174,7 @@ class UserCommand :
             tableEntry.insert("preferred_database_id", java.lang.String.valueOf(selectedUser.preferredDatabaseId))
 
             sender.sendResult(
-                mutableListOf(tableEntry) as Collection<TableEntry>?,
+                mutableListOf(tableEntry) as Collection<TableEntry>,
                 mutableListOf("id", "name", "accesses", "preferred_database_id"),
                 ResultType.LEGACY
             )
@@ -183,7 +183,7 @@ class UserCommand :
         if (args.containsKey("LIST")) {
             sender.sendResult(
                 userService.users.map { user -> OneFieldTableEntry("user_name", user.name) }
-                    .toMutableList() as Collection<TableEntry>?,
+                    .toMutableList() as Collection<TableEntry>,
                 mutableListOf("user_name"),
                 ResultType.LEGACY
             )
