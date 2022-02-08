@@ -1,5 +1,6 @@
 package de.byjoker.myjfql.database
 
+import de.byjoker.myjfql.exception.TableException
 import de.byjoker.myjfql.lang.TableEntryComparator
 import de.byjoker.myjfql.util.Order
 import java.util.Collections.reverse
@@ -24,7 +25,7 @@ class DocumentCollection : Table {
 
     override fun addEntry(tableEntry: TableEntry) {
         if (tableEntry !is Document) {
-            throw ClassCastException()
+            throw TableException("A document table can only contain document entries!")
         }
 
         tableEntry.compile()
@@ -67,7 +68,7 @@ class DocumentCollection : Table {
     }
 
     override fun setPrimary(primary: String) {
-        throw IllegalArgumentException()
+        throw TableException("A document table has a fixed and not changeable primary key ('_id')!")
     }
 
     override fun reformat(type: TableType): Table {
@@ -75,7 +76,7 @@ class DocumentCollection : Table {
             return this
         }
 
-        throw ClassCastException("A non-relational table cannot be formatted into a rational table, since it is not possible to relationalize all values!")
+        throw TableException("A non-relational table cannot be formatted into a rational table, since it is not possible to relationalize all values!")
     }
 
     override fun getType(): TableType {

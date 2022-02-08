@@ -1,5 +1,6 @@
 package de.byjoker.myjfql.console;
 
+import de.byjoker.myjfql.exception.ConsoleException;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
@@ -72,7 +73,7 @@ public class ConsoleImpl implements Console {
 
     @Override
     public void clear() {
-        throw new UnsupportedOperationException();
+        throw new ConsoleException("The standard java console doesn't offer any method for clearing the screen!");
     }
 
     private String time() {

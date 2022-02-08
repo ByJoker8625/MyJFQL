@@ -2,7 +2,7 @@ package de.byjoker.myjfql.user
 
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.DatabaseActionPerformType
-import de.byjoker.myjfql.exception.FileException
+import de.byjoker.myjfql.exception.UserException
 import de.byjoker.myjfql.util.FileFactory
 import de.byjoker.myjfql.util.IDGenerator.generateDigits
 import org.json.JSONObject
@@ -21,8 +21,8 @@ class UserServiceImpl : UserService {
     }
 
     override fun createUser(user: User) {
-        if (!existsUserByName(user.name)) {
-            throw FileException("User already exists!")
+        if (existsUserByName(user.name)) {
+            throw UserException("User already exists!")
         }
 
         if (existsUser(user.id)) {

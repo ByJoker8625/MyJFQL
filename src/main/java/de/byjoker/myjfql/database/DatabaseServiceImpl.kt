@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.database
 
 import de.byjoker.myjfql.core.MyJFQL
-import de.byjoker.myjfql.exception.FileException
+import de.byjoker.myjfql.exception.DatabaseException
 import de.byjoker.myjfql.util.FileFactory
 import org.apache.commons.io.FileUtils
 import org.json.JSONObject
@@ -17,7 +17,10 @@ class DatabaseServiceImpl() : DatabaseService {
     }
 
     override fun createDatabase(database: Database) {
-        if (getDatabaseByName(database.name) != null) throw FileException("Database already exists!")
+        if (existsDatabaseByName(database.name)) {
+            throw DatabaseException("Database already exists!")
+        }
+
         if (existsDatabase(database.id)) {
             database.regenerateId()
             createDatabase(database)
@@ -102,7 +105,7 @@ class DatabaseServiceImpl() : DatabaseService {
 
     override fun loadDatabase(type: DatabaseType, file: File): Database? {
         if (!file.exists()) {
-            return null;
+            return null
         }
 
         fun loadTable(json: JSONObject): Table? {

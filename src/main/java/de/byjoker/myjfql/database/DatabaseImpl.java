@@ -1,6 +1,6 @@
 package de.byjoker.myjfql.database;
 
-import de.byjoker.myjfql.exception.FileException;
+import de.byjoker.myjfql.exception.TableException;
 import de.byjoker.myjfql.util.IDGenerator;
 import org.apache.commons.io.FileUtils;
 
@@ -39,7 +39,7 @@ public class DatabaseImpl implements Database {
     @Override
     public void createTable(Table table) {
         if (getTable(table.getName()) != null)
-            throw new FileException("Table already exists in database!");
+            throw new TableException("Table already exists in database!");
 
         saveTable(table);
     }
@@ -60,7 +60,7 @@ public class DatabaseImpl implements Database {
             try {
                 FileUtils.deleteDirectory(new File("database/" + id + "/" + name));
             } catch (IOException ex) {
-                throw new FileException(ex);
+                throw new TableException(ex);
             }
         }
 

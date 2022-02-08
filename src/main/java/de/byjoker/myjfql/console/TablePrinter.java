@@ -25,16 +25,16 @@ public class TablePrinter {
     private static final String CROSSING_T = "\u252c";
     private static final String CROSSING_B = "\u253b";
 
-    private String[] descriptions;
-    private ArrayList<String[]> table;
-    private int[] tableSizes;
-    private int rows;
-    private int findex;
+    private final String[] descriptions;
+    private final ArrayList<String[]> table;
+    private final int[] tableSizes;
+    private final int rows;
+    private int index;
     private String filter;
     private boolean ucode;
     private Comparator<String[]> comparator;
     private int spacing;
-    private Alignment aligns[];
+    private final Alignment[] aligns;
 
     public TablePrinter(String... descriptions) {
         this(descriptions.length, descriptions);
@@ -44,6 +44,7 @@ public class TablePrinter {
         if (descriptions.length != columns) {
             throw new IllegalArgumentException();
         }
+
         this.filter = null;
         this.rows = columns;
         this.descriptions = descriptions;
@@ -94,13 +95,14 @@ public class TablePrinter {
         if (elements.length != rows) {
             throw new IllegalArgumentException();
         }
+
         table.add(elements);
         updateSizes(elements);
         return this;
     }
 
     public TablePrinter filterBy(int par0, String pattern) {
-        this.findex = par0;
+        this.index = par0;
         this.filter = pattern;
         return this;
     }
@@ -186,7 +188,7 @@ public class TablePrinter {
         if (filter != null) {
             Pattern p = Pattern.compile(filter);
             localTable.removeIf(arr -> {
-                String s = arr[findex];
+                String s = arr[index];
                 return !p.matcher(s).matches();
             });
         }

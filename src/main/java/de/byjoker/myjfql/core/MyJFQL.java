@@ -96,19 +96,16 @@ public final class MyJFQL {
                 console = new SimpleConsole();
             }
 
-            switch (config.encryption().toUpperCase()) {
-                case "ARGON2":
-                    encryptor = new Argon2Encryptor();
-                    break;
-                default:
-                    encryptor = new NoneEncryptor();
-                    break;
+            if ("ARGON2".equalsIgnoreCase(config.encryption())) {
+                encryptor = new Argon2Encryptor();
+            } else {
+                encryptor = new NoneEncryptor();
             }
 
             console.logInfo("Successfully initialized config.");
             console.clean();
         } catch (Exception ex) {
-            throw new FileException(ex);
+            throw new FileException("Failed to load and initialize config!");
         }
 
         if (config.updates()) {
@@ -150,7 +147,7 @@ public final class MyJFQL {
             try {
                 server.start(config.port());
             } catch (Exception ex) {
-                throw new NetworkException(ex);
+                throw new NetworkException("Failed to start javalin server because " + ex.getMessage());
             }
 
             console.clean();
