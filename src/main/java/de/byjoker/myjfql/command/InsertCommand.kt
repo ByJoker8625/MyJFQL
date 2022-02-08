@@ -182,11 +182,6 @@ class InsertCommand :
                     else -> RelationalTableEntry()
                 }
 
-                if (table is DocumentCollection && content.containsKey(table.primary)) {
-                    sender.sendError("Can't modify unique id of document entry!")
-                    return
-                }
-
                 /**
                  * To prevent duplication of an entry when the primary key is changed,
                  * the previous entry is removed

@@ -48,10 +48,6 @@ class Document : TableEntryMatcher {
     }
 
     override fun insert(key: String, value: Any?) {
-        if (key == "_id") {
-            throw IllegalArgumentException("Can't modify unique id of entry!")
-        }
-
         content[key] = value ?: "null"
     }
 
@@ -82,17 +78,11 @@ class Document : TableEntryMatcher {
     }
 
     override fun setContent(content: MutableMap<String, Any>) {
-        content["_id"] = this.content["_id"].toString()
         this.content = content
     }
 
     override fun applyContent(content: MutableMap<String, Any>) {
-        content.remove("_id")
         this.content.putAll(content)
-    }
-
-    fun setRawContent(content: MutableMap<String, Any>) {
-        this.content = content
     }
 
     @JsonGetter(value = "creation")
