@@ -27,7 +27,7 @@ class TableTests {
 
         table.addEntry(
             RelationalTableEntry(
-                mutableMapOf("id" to "primary key value") as Map<String, Any>,
+                mutableMapOf("id" to "primary key value"),
                 System.currentTimeMillis()
             )
         )
@@ -54,7 +54,7 @@ class TableTests {
 
         table.addEntry(
             RelationalTableEntry(
-                mutableMapOf("id" to "primary key value") as Map<String, Any>,
+                mutableMapOf("id" to "primary key value"),
                 System.currentTimeMillis()
             )
         )

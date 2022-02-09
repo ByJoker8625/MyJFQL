@@ -1,10 +1,12 @@
 package de.byjoker.myjfql.database
 
-import com.fasterxml.jackson.annotation.JsonGetter
-import org.json.JSONPropertyName
-
-abstract class SimpleTableEntry(private var content: MutableMap<String, Any>, private var createdAt: Long) :
+class RelationalTableEntry(
+    private var content: MutableMap<String, Any> = HashMap(),
+    private var createdAt: Long = System.currentTimeMillis()
+) :
     TableEntryMatcher() {
+
+    constructor(tableEntry: TableEntry) : this(tableEntry.content, tableEntry.createdAt)
 
     override fun select(key: String): Any? {
         return content[key]
@@ -12,6 +14,11 @@ abstract class SimpleTableEntry(private var content: MutableMap<String, Any>, pr
 
     override fun selectStringify(key: String): String {
         return content[key].toString()
+    }
+
+    override fun append(key: String, value: Any?): TableEntry {
+        insert(key, value)
+        return this
     }
 
     override fun insert(key: String, value: Any?) {
@@ -42,8 +49,6 @@ abstract class SimpleTableEntry(private var content: MutableMap<String, Any>, pr
         this.content.putAll(content)
     }
 
-    @JsonGetter(value = "creation")
-    @JSONPropertyName("creation")
     override fun getCreatedAt(): Long {
         return createdAt
     }

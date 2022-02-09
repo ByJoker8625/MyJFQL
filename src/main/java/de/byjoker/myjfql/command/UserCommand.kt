@@ -166,7 +166,7 @@ class UserCommand :
             }
 
             val selectedUser = userService.getUserByIdentifier(userIdentifier)
-            val tableEntry = LegacyTableEntry()
+            val tableEntry = RelationalTableEntry()
 
             tableEntry.insert("id", selectedUser.id)
             tableEntry.insert("name", selectedUser.name)
@@ -182,7 +182,7 @@ class UserCommand :
         }
         if (args.containsKey("LIST")) {
             sender.sendResult(
-                userService.users.map { user -> OneFieldTableEntry("user_name", user.name) }
+                userService.users.map { user -> RelationalTableEntry().append("user_name", user.name) }
                     .toMutableList() as Collection<TableEntry>,
                 mutableListOf("user_name"),
                 ResultType.LEGACY

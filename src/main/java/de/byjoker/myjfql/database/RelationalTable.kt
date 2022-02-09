@@ -10,13 +10,13 @@ open class RelationalTable(private val name: String, structure: List<String>, pr
     private var primary: String
 
     init {
+        this.entries = HashMap()
         this.structure = structure
         this.primary = primary
-        entries = HashMap()
     }
 
     override fun addEntry(tableEntry: TableEntry) {
-        if (tableEntry !is SimpleTableEntry) {
+        if (tableEntry !is RelationalTableEntry) {
             return
         }
 
@@ -24,7 +24,6 @@ open class RelationalTable(private val name: String, structure: List<String>, pr
             return
         }
 
-        tableEntry.compile()
         entries[tableEntry.selectStringify(primary)] = tableEntry
     }
 

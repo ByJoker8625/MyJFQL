@@ -28,7 +28,6 @@ class DocumentCollection : Table {
             throw TableException("A document table can only contain document entries!")
         }
 
-        tableEntry.compile()
         entries[tableEntry.selectStringify("_id")] = tableEntry
     }
 

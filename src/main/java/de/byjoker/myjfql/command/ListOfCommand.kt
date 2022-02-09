@@ -3,7 +3,7 @@ package de.byjoker.myjfql.command
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.Database
 import de.byjoker.myjfql.database.DatabaseActionPerformType
-import de.byjoker.myjfql.database.LegacyTableEntry
+import de.byjoker.myjfql.database.RelationalTableEntry
 import de.byjoker.myjfql.database.TableEntry
 import de.byjoker.myjfql.util.ResultType
 import org.jline.reader.ParsedLine
@@ -21,12 +21,7 @@ class ListOfCommand : ConsoleCommand("listof", mutableListOf("COMMAND", "TABLES"
                     DatabaseActionPerformType.READ
                 )
             }.map { database ->
-                LegacyTableEntry(
-                    mutableMapOf(
-                        "name" to database.name,
-                        "type" to database.type
-                    ) as Map<String, Any>, System.currentTimeMillis()
-                )
+                RelationalTableEntry().append("name", database.name).append("type", database.type)
             }.toMutableList() as Collection<TableEntry>, mutableListOf("name", "type"), ResultType.LEGACY)
             return
         }
@@ -45,12 +40,7 @@ class ListOfCommand : ConsoleCommand("listof", mutableListOf("COMMAND", "TABLES"
             }
 
             sender.sendResult(database.tables.map { table ->
-                LegacyTableEntry(
-                    mutableMapOf(
-                        "name" to table.name,
-                        "type" to table.type
-                    ) as Map<String, Any>, System.currentTimeMillis()
-                )
+                RelationalTableEntry().append("name", table.name).append("type", table.type)
             }.toMutableList() as Collection<TableEntry>, mutableListOf("name", "type"), ResultType.LEGACY)
             return
         }

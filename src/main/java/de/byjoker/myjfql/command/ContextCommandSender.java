@@ -6,8 +6,9 @@ import de.byjoker.myjfql.database.TableEntry;
 import de.byjoker.myjfql.exception.LanguageException;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.user.User;
+import de.byjoker.myjfql.util.Json;
 import de.byjoker.myjfql.util.ResultType;
-import de.byjoker.myjfql.util.TableEntryParser;
+import de.byjoker.myjfql.util.TableResult;
 import io.javalin.http.Context;
 import org.json.JSONObject;
 
@@ -67,7 +68,7 @@ public class ContextCommandSender extends CommandSender {
 
     @Override
     public void sendResult(Collection<TableEntry> entries, Collection<String> structure, ResultType resultType) {
-        send(TableEntryParser.stringifyTableEntries(entries, structure, resultType));
+        send(Json.INSTANCE.stringify(new TableResult(entries, ResponseType.RESULT, structure, resultType)));
     }
 
     @Override

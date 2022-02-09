@@ -1,22 +1,15 @@
 package de.byjoker.myjfql.database
 
-import com.fasterxml.jackson.annotation.JsonGetter
-import com.fasterxml.jackson.annotation.JsonIgnore
 import de.byjoker.myjfql.util.IDGenerator
-import de.byjoker.myjfql.util.TableEntryParser
-import org.json.JSONPropertyIgnore
-import org.json.JSONPropertyName
 
 class Document : TableEntryMatcher {
 
     private var content: MutableMap<String, Any>
     private var createdAt: Long
-    private var json: String
 
     constructor() {
         this.content = mutableMapOf("_id" to IDGenerator.generateMixed(32))
         this.createdAt = System.currentTimeMillis()
-        this.json = "{}"
     }
 
     constructor(content: MutableMap<String, Any>, createdAt: Long) {
@@ -26,7 +19,6 @@ class Document : TableEntryMatcher {
 
         this.content = content
         this.createdAt = createdAt
-        this.json = "{}"
     }
 
     constructor(tableEntry: TableEntry) {
@@ -36,7 +28,6 @@ class Document : TableEntryMatcher {
 
         this.content = tableEntry.content
         this.createdAt = tableEntry.createdAt
-        this.json = "{}"
     }
 
     override fun select(key: String): Any? {
@@ -47,6 +38,11 @@ class Document : TableEntryMatcher {
         return select(key).toString()
     }
 
+    override fun append(key: String, value: Any?): TableEntry {
+        insert(key, value)
+        return this
+    }
+
     override fun insert(key: String, value: Any?) {
         content[key] = value ?: "null"
     }
@@ -55,22 +51,12 @@ class Document : TableEntryMatcher {
         content.remove(key)
     }
 
-    override fun compile() {
-        json = TableEntryParser.stringify(this)
-    }
-
     override fun contains(key: String): Boolean {
         return content.containsKey(key)
     }
 
     override fun containsOrNotNullItem(key: String): Boolean {
         return content.containsKey(key) && content[key] != "null"
-    }
-
-    @JsonIgnore
-    @JSONPropertyIgnore
-    override fun json(): String {
-        return json
     }
 
     override fun getContent(): MutableMap<String, Any> {
@@ -85,8 +71,6 @@ class Document : TableEntryMatcher {
         this.content.putAll(content)
     }
 
-    @JsonGetter(value = "creation")
-    @JSONPropertyName("creation")
     override fun getCreatedAt(): Long {
         return createdAt
     }

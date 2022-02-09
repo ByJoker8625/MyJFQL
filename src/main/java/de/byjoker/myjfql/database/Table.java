@@ -5,6 +5,7 @@ import de.byjoker.myjfql.util.Order;
 
 import java.util.Collection;
 
+
 public interface Table {
 
     void addEntry(TableEntry tableEntry);
@@ -32,4 +33,5 @@ public interface Table {
     String getName();
 
     void clear();
+
 }

@@ -144,7 +144,7 @@ class DatabaseServiceImpl() : DatabaseService {
                         table.addEntry(
                             Document(
                                 column.getJSONObject("content").toMap(),
-                                column.getLong("creation")
+                                if (column.has("creation")) column.getLong("creation") else column.getLong("createdAt")
                             )
                         )
                     }
@@ -164,7 +164,7 @@ class DatabaseServiceImpl() : DatabaseService {
                         table.addEntry(
                             RelationalTableEntry(
                                 column.getJSONObject("content").toMap(),
-                                column.getLong("creation")
+                                if (column.has("creation")) column.getLong("creation") else column.getLong("createdAt")
                             )
                         )
                     }

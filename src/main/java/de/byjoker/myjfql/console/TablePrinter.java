@@ -29,12 +29,12 @@ public class TablePrinter {
     private final ArrayList<String[]> table;
     private final int[] tableSizes;
     private final int rows;
+    private final Alignment[] aligns;
     private int index;
     private String filter;
     private boolean ucode;
     private Comparator<String[]> comparator;
     private int spacing;
-    private final Alignment[] aligns;
 
     public TablePrinter(String... descriptions) {
         this(descriptions.length, descriptions);

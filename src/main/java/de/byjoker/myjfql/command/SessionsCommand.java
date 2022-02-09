@@ -2,7 +2,7 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.database.LegacyTableEntry;
+import de.byjoker.myjfql.database.RelationalTableEntry;
 import de.byjoker.myjfql.database.TableEntry;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.server.session.SessionService;
@@ -97,7 +97,7 @@ public class SessionsCommand extends ConsoleCommand {
                 final Session session = new Session(token, user.getId(), database, address, expire);
                 sessionService.openSession(session);
 
-                final TableEntry tableEntry = new LegacyTableEntry();
+                final TableEntry tableEntry = new RelationalTableEntry();
                 tableEntry.insert("token", session.getToken());
                 tableEntry.insert("address", session.getAddress());
                 tableEntry.insert("database_id", String.valueOf(session.getDatabaseId()));
@@ -227,7 +227,7 @@ public class SessionsCommand extends ConsoleCommand {
             final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
             sessionService.getSessionsByUserId(user.getId()).forEach(session -> {
-                final TableEntry tableEntry = new LegacyTableEntry();
+                final TableEntry tableEntry = new RelationalTableEntry();
                 tableEntry.insert("token", session.getToken());
                 tableEntry.insert("address", session.getAddress());
                 tableEntry.insert("database_id", String.valueOf(session.getDatabaseId()));

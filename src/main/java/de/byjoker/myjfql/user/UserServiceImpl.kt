@@ -5,10 +5,9 @@ import de.byjoker.myjfql.database.DatabaseActionPerformType
 import de.byjoker.myjfql.exception.UserException
 import de.byjoker.myjfql.util.FileFactory
 import de.byjoker.myjfql.util.IDGenerator.generateDigits
-import org.json.JSONObject
+import de.byjoker.myjfql.util.Json
 import java.io.File
 import java.util.*
-import java.util.function.Consumer
 import java.util.stream.Collectors
 
 class UserServiceImpl : UserService {
@@ -98,7 +97,8 @@ class UserServiceImpl : UserService {
             } else {
                 val user =
                     SimpleUser(id = name, name = jsonUser.getString("name"), password = jsonUser.getString("password"))
-                user.preferredDatabaseId = jsonUser.getString("preferred")
+                user.preferredDatabaseId =
+                    if (jsonUser.has("preferred")) jsonUser.getString("preferred") else jsonUser.getString("preferredDatabaseId")
                 user.accesses = jsonAccesses.keySet().stream().collect(
                     Collectors.toMap(
                         { key: String? -> key },
@@ -117,14 +117,6 @@ class UserServiceImpl : UserService {
     }
 
     override fun updateAll(space: File) {
-        users.forEach(Consumer { user ->
-            val file = File(space.path + "/" + user.id + ".json")
-            val jsonObject = JSONObject()
-            jsonObject.put("name", user.name)
-            jsonObject.put("password", user.password)
-            jsonObject.put("accesses", user.accesses)
-            jsonObject.put("preferred", user.preferredDatabaseId)
-            factory.save(file, jsonObject)
-        })
+        users.forEach { user -> Json.write(user, File("${space.path}/${user.id}.json")) }
     }
 }

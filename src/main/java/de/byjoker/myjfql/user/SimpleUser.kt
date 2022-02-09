@@ -1,5 +1,7 @@
 package de.byjoker.myjfql.user
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.DatabaseActionPerformType
 import de.byjoker.myjfql.util.IDGenerator
@@ -9,6 +11,7 @@ class SimpleUser(
     override var name: String,
     override var password: String,
     override var accesses: MutableMap<String, DatabaseActionPerformType> = HashMap(),
+    @JsonProperty(value = "preferred")
     override var preferredDatabaseId: String? = null
 ) : User {
 
@@ -26,6 +29,7 @@ class SimpleUser(
         accesses.remove(databaseId)
     }
 
+    @JsonIgnore
     override fun hasPreferredDatabase(): Boolean {
         return preferredDatabaseId != null
     }

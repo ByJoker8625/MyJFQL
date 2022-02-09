@@ -2,7 +2,7 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.BackupService;
-import de.byjoker.myjfql.database.OneFieldTableEntry;
+import de.byjoker.myjfql.database.RelationalTableEntry;
 import de.byjoker.myjfql.util.ResultType;
 
 import java.io.File;
@@ -124,12 +124,12 @@ public class BackupCommand extends ConsoleCommand {
                 return;
             }
 
-            sender.sendResult(Arrays.stream(files).map(file -> new OneFieldTableEntry("backup_name", file.getName())).collect(Collectors.toList()), Collections.singletonList("backup_name"), ResultType.LEGACY);
+            sender.sendResult(Arrays.stream(files).map(file -> new RelationalTableEntry().append("backup_name", file.getName())).collect(Collectors.toList()), Collections.singletonList("backup_name"), ResultType.LEGACY);
             return;
         }
 
         if (args.containsKey("LIST")) {
-            sender.sendResult(backupService.getBackups().stream().map(s -> new OneFieldTableEntry("backup_name", s)).collect(Collectors.toList()), Collections.singletonList("backup_name"), ResultType.LEGACY);
+            sender.sendResult(backupService.getBackups().stream().map(s -> new RelationalTableEntry().append("backup_name", s)).collect(Collectors.toList()), Collections.singletonList("backup_name"), ResultType.LEGACY);
             return;
         }
 

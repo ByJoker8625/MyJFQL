@@ -57,11 +57,11 @@ public class StructureCommand extends Command {
 
             if (!args.containsKey("ADD") && !args.containsKey("REMOVE") && !args.containsKey("SET") && !args.containsKey("MARK-PRIMARY")) {
                 if (args.containsKey("PRIMARY-KEY")) {
-                    sender.sendResult(Collections.singletonList(new OneFieldTableEntry("primary_field_name", primary)), Collections.singletonList("primary_key_name"), ResultType.RELATIONAL);
+                    sender.sendResult(Collections.singletonList(new RelationalTableEntry().append("primary_key_name", primary)), Collections.singletonList("primary_key_name"), ResultType.RELATIONAL);
                     return;
                 }
 
-                sender.sendResult(structure.stream().map(s -> new OneFieldTableEntry("field_name", s)).collect(Collectors.toList()), Collections.singletonList("field_name"), ResultType.RELATIONAL);
+                sender.sendResult(structure.stream().map(s -> new RelationalTableEntry().append("field_name", s)).collect(Collectors.toList()), Collections.singletonList("field_name"), ResultType.RELATIONAL);
                 return;
             }
 

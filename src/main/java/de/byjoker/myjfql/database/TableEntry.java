@@ -1,10 +1,7 @@
 package de.byjoker.myjfql.database;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.byjoker.myjfql.lang.Requirement;
-import org.json.JSONPropertyIgnore;
-import org.json.JSONPropertyName;
 
 import java.util.List;
 import java.util.Map;
@@ -15,11 +12,11 @@ public interface TableEntry {
 
     String selectStringify(String key);
 
+    TableEntry append(String key, Object value);
+
     void insert(String key, Object value);
 
     void remove(String key);
-
-    void compile();
 
     boolean contains(String key);
 
@@ -27,18 +24,13 @@ public interface TableEntry {
 
     boolean matches(List<List<Requirement>> conditions);
 
-    @JsonIgnore
-    @JSONPropertyIgnore
-    String json();
-
     Map<String, Object> getContent();
 
     void setContent(Map<String, Object> content);
 
     void applyContent(Map<String, Object> content);
 
-    @JsonGetter(value = "creation")
-    @JSONPropertyName("creation")
+    @JsonProperty(value = "creation")
     long getCreatedAt();
 
     void setCreatedAt(long createdAt);
