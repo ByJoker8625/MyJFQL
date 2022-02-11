@@ -26,7 +26,7 @@ class InsertCommand :
             return
         }
 
-        if (!sender.allowed(database.id, DatabaseActionPerformType.READ_WRITE)) {
+        if (!sender.allowed(database.id, DatabasePermissionLevel.READ_WRITE)) {
             sender.sendForbidden()
             return
         }
@@ -51,7 +51,7 @@ class InsertCommand :
         val table = database.getTable(into)
         val content: Map<String, Any>?
 
-        when (table.type) {
+        when (table!!.type) {
             TableType.DOCUMENT -> {
                 if (!args.containsKey("CONTENT")) {
                     sender.sendSyntax()
@@ -221,7 +221,7 @@ class InsertCommand :
         sender.session ?: return null
         val database: Database = sender.session!!.getDatabase(MyJFQL.getInstance().databaseService) ?: return null
 
-        if (!sender.allowed(database.id, DatabaseActionPerformType.READ_WRITE)) {
+        if (!sender.allowed(database.id, DatabasePermissionLevel.READ_WRITE)) {
             return null
         }
 

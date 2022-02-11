@@ -2,7 +2,7 @@ package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.Database
-import de.byjoker.myjfql.database.DatabaseActionPerformType
+import de.byjoker.myjfql.database.DatabasePermissionLevel
 import de.byjoker.myjfql.database.RelationalTableEntry
 import de.byjoker.myjfql.database.TableEntry
 import de.byjoker.myjfql.util.ResultType
@@ -18,7 +18,7 @@ class ListOfCommand : ConsoleCommand("listof", mutableListOf("COMMAND", "TABLES"
             sender.sendResult(databaseService.databases.filter { database ->
                 sender.allowed(
                     database.id,
-                    DatabaseActionPerformType.READ
+                    DatabasePermissionLevel.READ
                 )
             }.map { database ->
                 RelationalTableEntry().append("name", database.name).append("type", database.type)
@@ -34,7 +34,7 @@ class ListOfCommand : ConsoleCommand("listof", mutableListOf("COMMAND", "TABLES"
                 return
             }
 
-            if (!sender.allowed(database.id, DatabaseActionPerformType.READ_WRITE)) {
+            if (!sender.allowed(database.id, DatabasePermissionLevel.READ_WRITE)) {
                 sender.sendForbidden()
                 return
             }

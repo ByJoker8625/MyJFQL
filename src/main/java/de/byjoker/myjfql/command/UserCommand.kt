@@ -1,7 +1,10 @@
 package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
-import de.byjoker.myjfql.database.*
+import de.byjoker.myjfql.database.DatabasePermissionLevel
+import de.byjoker.myjfql.database.RelationalTableEntry
+import de.byjoker.myjfql.database.SimpleDatabase
+import de.byjoker.myjfql.database.TableEntry
 import de.byjoker.myjfql.user.SimpleUser
 import de.byjoker.myjfql.util.ResultType
 import java.util.*
@@ -60,9 +63,9 @@ class UserCommand :
                     sender.sendError("Database already exists!")
                     return
                 }
-                val database: Database = DatabaseImpl(databaseName)
+                val database = SimpleDatabase(databaseName)
                 databaseService.createDatabase(database)
-                user.grantAccess(database.id, DatabaseActionPerformType.READ_WRITE)
+                user.grantAccess(database.id, DatabasePermissionLevel.READ_WRITE)
                 user.preferredDatabaseId = database.id
             }
 
@@ -112,9 +115,9 @@ class UserCommand :
                 sender.sendError("Database doesn't exists!")
                 return
             }
-            val action: DatabaseActionPerformType
+            val action: DatabasePermissionLevel
             action = try {
-                DatabaseActionPerformType.valueOf(access.uppercase(Locale.getDefault()))
+                DatabasePermissionLevel.valueOf(access.uppercase(Locale.getDefault()))
             } catch (ex: Exception) {
                 sender.sendError("Unknown access action!")
                 return

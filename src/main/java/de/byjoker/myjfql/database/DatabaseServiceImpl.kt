@@ -1,20 +1,14 @@
 package de.byjoker.myjfql.database
 
-import de.byjoker.myjfql.core.MyJFQL
+import com.fasterxml.jackson.databind.JsonNode
 import de.byjoker.myjfql.exception.DatabaseException
-import de.byjoker.myjfql.util.FileFactory
+import de.byjoker.myjfql.util.Json
 import org.apache.commons.io.FileUtils
-import org.json.JSONObject
 import java.io.File
 
-class DatabaseServiceImpl() : DatabaseService {
+class DatabaseServiceImpl : DatabaseService {
 
-    private val factory: FileFactory = FileFactory()
-    private val databases: MutableMap<String, Database>
-
-    init {
-        databases = HashMap()
-    }
+    private val databases: MutableMap<String, Database> = mutableMapOf()
 
     override fun createDatabase(database: Database) {
         if (existsDatabaseByName(database.name)) {
@@ -92,9 +86,9 @@ class DatabaseServiceImpl() : DatabaseService {
 
         for (file in files) {
             val database: Database? = if (file.isDirectory) {
-                loadDatabase(DatabaseType.SPLIT_STORAGE_TARGET, file)
+                loadDatabase(DatabaseType.SPLIT, file)
             } else {
-                loadDatabase(DatabaseType.SINGLE_STORAGE_TARGET, file)
+                loadDatabase(DatabaseType.SINGLETON, file)
             }
 
             if (database != null) {
@@ -103,124 +97,96 @@ class DatabaseServiceImpl() : DatabaseService {
         }
     }
 
-    override fun loadDatabase(type: DatabaseType, file: File): Database? {
+    private fun parseTable(node: JsonNode): Table {
+        val reserved = listOf('%', '#', '\'')
+
+        if (reserved.any { char -> node.get("name").asText().contains(char) }) {
+            throw DatabaseException("Database used reserved character in id or name!")
+        }
+
+        val type = when {
+            node.has("type") -> {
+                TableType.valueOf(node.get("type").asText())
+            }
+            else -> {
+                TableType.RELATIONAL
+            }
+        }
+
+        val table: Table
+
+        val structure: MutableList<String> = Json.convert(node.get("structure"))
+        val entries = if (node.has("entries")) node.get("entries") else node.get("columns")
+
+        when (type) {
+            TableType.RELATIONAL -> {
+                table = RelationalTable(node.get("name").asText(), structure, node.get("primary").asText())
+
+                entries.forEach { entry ->
+                    table.addEntry(
+                        RelationalTableEntry(
+                            Json.convert(entry.get("content")),
+                            if (entry.has("createdAt")) entry.get("createdAt").asLong() else entry.get("creation")
+                                .asLong()
+                        )
+                    )
+                }
+            }
+            TableType.DOCUMENT -> {
+                table = RelationalTable(node.get("name").asText(), structure, node.get("primary").asText())
+
+                entries.forEach { entry ->
+                    table.addEntry(
+                        Document(
+                            Json.convert(entry.get("content")),
+                            if (entry.has("createdAt")) entry.get("createdAt").asLong() else entry.get("creation")
+                                .asLong()
+                        )
+                    )
+                }
+            }
+        }
+
+
+        return table
+    }
+
+    private fun loadDatabase(type: DatabaseType, file: File): Database? {
         if (!file.exists()) {
             return null
         }
 
-        fun loadTable(json: JSONObject): Table? {
-            val name = json.getString("name")
-
-            /**
-             * Loading column's field if present to make sure older versions run too.
-             */
-
-            val entries = if (json.has("columns")) json.getJSONArray("columns") else json.getJSONArray("entries")
-
-            if (name.contains("%") || name.contains("#") || name.contains("'")) {
-                MyJFQL.getInstance().console.logWarning("Database used unauthorized characters in the identifier!")
-                return null
-            }
-
-            /**
-             * If tables have not yet been created with the latest version, but are loaded with this version,
-             * the type is set to 'RELATIONAL' by default to prevent errors
-             */
-
-            if (!json.has("type")) {
-                json.put("type", "RELATIONAL")
-            }
-
-            when (json.getString("type")) {
-                TableType.DOCUMENT.name -> {
-                    val table = DocumentCollection(
-                        name,
-                        ArrayList(json.getJSONArray("structure").toMutableList().map { o -> o.toString() })
-                    )
-
-                    for (i in 0 until entries.length()) {
-                        val column: JSONObject = entries.getJSONObject(i)
-
-                        table.addEntry(
-                            Document(
-                                column.getJSONObject("content").toMap(),
-                                if (column.has("creation")) column.getLong("creation") else column.getLong("createdAt")
-                            )
-                        )
-                    }
-
-                    return table
-                }
-                else -> {
-                    val table = RelationalTable(
-                        name,
-                        ArrayList(json.getJSONArray("structure").toMutableList().map { o -> o.toString() }),
-                        json.getString("primary")
-                    )
-
-                    for (i in 0 until entries.length()) {
-                        val column: JSONObject = entries.getJSONObject(i)
-
-                        table.addEntry(
-                            RelationalTableEntry(
-                                column.getJSONObject("content").toMap(),
-                                if (column.has("creation")) column.getLong("creation") else column.getLong("createdAt")
-                            )
-                        )
-                    }
-
-                    return table
-                }
-            }
-        }
+        val reserved = listOf('%', '#', '\'')
 
         when (type) {
-            DatabaseType.SPLIT_STORAGE_TARGET -> {
-                val json = factory.load(File("${file.path}/%database%.json"))
-                val database = DatabaseImpl(
-                    if (json.has("id")) json.getString("id") else file.name.replace(
-                        ".json".toRegex(),
-                        ""
-                    ),
-                    json.getString("name"),
-                    DatabaseType.SPLIT_STORAGE_TARGET
-                )
+            DatabaseType.SINGLETON -> {
+                val node = Json.read(file)
+                val database = SimpleDatabase(node.get("id").asText(), node.get("name").asText(), type)
 
-                for (table in json.getJSONArray("tables").toList().map { any -> any.toString() }) {
-                    database.saveTable(loadTable(factory.load(File("${file.path}/${table}.json"))) ?: continue)
+                if (reserved.any { char -> database.name.contains(char) || database.id.contains(char) }) {
+                    throw DatabaseException("Database used reserved character in id or name!")
                 }
 
-                if (database.name.contains("%") || database.name.contains("#") || database.name.contains("'")
-                    || database.id.contains("%") || database.id.contains("#") || database.id.contains("'")
-                ) {
-                    MyJFQL.getInstance().console.logWarning("Database used unauthorized characters in the identifier!")
-                    return null
+                node.get("tables").forEach { table ->
+                    database.saveTable(parseTable(table))
                 }
 
                 return database
             }
-            else -> {
-                val json = factory.load(file)
-                val tables = json.getJSONArray("tables")
-
-                val database = DatabaseImpl(
-                    if (json.has("id")) json.getString("id") else file.name.replace(
-                        ".json".toRegex(),
-                        ""
-                    ),
-                    json.getString("name"),
-                    DatabaseType.SINGLE_STORAGE_TARGET
+            DatabaseType.SPLIT -> {
+                val node = Json.read(File("${file.path}/%database%.json"))
+                val database = SimpleDatabase(
+                    node.get("id").asText(),
+                    node.get("name").asText(),
+                    DatabaseType.valueOf(node.get("type").asText())
                 )
 
-                for (i in 0 until tables.length()) {
-                    database.saveTable(loadTable(tables.getJSONObject(i)) ?: continue)
+                if (reserved.any { char -> database.name.contains(char) || database.id.contains(char) }) {
+                    throw DatabaseException("Database used reserved character in id or name!")
                 }
 
-                if (database.name.contains("%") || database.name.contains("#") || database.name.contains("'")
-                    || database.id.contains("%") || database.id.contains("#") || database.id.contains("'")
-                ) {
-                    MyJFQL.getInstance().console.logWarning("Database used unauthorized characters in the identifier!")
-                    return null
+                node.get("tables").forEach { table ->
+                    database.saveTable(parseTable(Json.read(File("${file.path}/${table.asText()}.json"))))
                 }
 
                 return database
@@ -233,35 +199,22 @@ class DatabaseServiceImpl() : DatabaseService {
     }
 
     override fun updateAll(space: File) {
-        for (database in databases.values) {
-            when (database.type) {
-                DatabaseType.SPLIT_STORAGE_TARGET -> {
-                    val folder = File("${space.path}/${database.id}")
-                    folder.mkdirs()
+        for (database in databases.values) when (database.type) {
+            DatabaseType.SPLIT -> {
+                val folder = File("${space.path}/${database.id}")
+                folder.mkdirs()
 
-                    val json = JSONObject()
-                    json.put("id", database.id)
-                    json.put("name", database.name)
-                    json.put("tables", database.tables.map { table -> table.name })
-                    json.put("type", database.type)
-                    factory.save(File("${folder.path}/%database%.json"), json)
+                Json.write(DatabaseRepresentation(database), File("${folder.path}/%database%.json"))
 
-                    for (table in database.tables) factory.save(
-                        File("${folder.path}/${table.name}.json"),
-                        JSONObject(table)
+                database.tables.forEach { table ->
+                    Json.write(
+                        table,
+                        File("${folder.path}/${table.name}.json")
                     )
                 }
-                else -> {
-                    val file = File("${space.path}/${database.id}.json")
-                    val json = JSONObject()
-
-                    json.put("id", database.id)
-                    json.put("name", database.name)
-                    json.put("tables", database.tables)
-                    json.put("type", database.type)
-
-                    factory.save(file, json)
-                }
+            }
+            DatabaseType.SINGLETON -> {
+                Json.write(database, File("${space.path}/${database.id}.json"))
             }
         }
     }

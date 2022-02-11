@@ -2,7 +2,7 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Database;
-import de.byjoker.myjfql.database.DatabaseActionPerformType;
+import de.byjoker.myjfql.database.DatabasePermissionLevel;
 import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.server.session.Session;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,7 @@ public class UseCommand extends Command {
     }
 
     @Override
-    public void execute(CommandSender sender, Map<String, List<String>> args) {
+    public void execute(CommandSender sender, @NotNull Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
         final Session session = sender.getSession();
 
@@ -47,7 +47,7 @@ public class UseCommand extends Command {
 
             final Database database = databaseService.getDatabaseByIdentifier(databaseIdentifier);
 
-            if (!sender.allowed(database.getId(), DatabaseActionPerformType.READ)) {
+            if (!sender.allowed(database.getId(), DatabasePermissionLevel.READ)) {
                 sender.sendForbidden();
                 return;
             }

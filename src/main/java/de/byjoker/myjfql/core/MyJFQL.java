@@ -174,7 +174,7 @@ public final class MyJFQL {
                 console.logWarning("You are using no encryption! This state of password storing is very insecure!");
             }
 
-            if (databaseService.getDatabases().stream().anyMatch(database -> database.getType() == DatabaseType.SINGLE_STORAGE_TARGET)) {
+            if (databaseService.getDatabases().stream().anyMatch(database -> database.getType() == DatabaseType.SINGLETON)) {
                 console.logWarning("Some of your databases are single file databases! This can affect you scalability!");
             }
 

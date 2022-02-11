@@ -4,6 +4,7 @@ import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.*;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.util.ResultType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,7 +17,7 @@ public class StructureCommand extends Command {
     }
 
     @Override
-    public void execute(CommandSender sender, Map<String, List<String>> args) {
+    public void execute(CommandSender sender, @NotNull Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
         final Session session = sender.getSession();
 
@@ -46,7 +47,7 @@ public class StructureCommand extends Command {
             }
 
 
-            if (!sender.allowed(database.getId(), DatabaseActionPerformType.READ)) {
+            if (!sender.allowed(database.getId(), DatabasePermissionLevel.READ)) {
                 sender.sendForbidden();
                 return;
             }
@@ -65,7 +66,7 @@ public class StructureCommand extends Command {
                 return;
             }
 
-            if (!sender.allowed(database.getId(), DatabaseActionPerformType.READ_WRITE)) {
+            if (!sender.allowed(database.getId(), DatabasePermissionLevel.READ_WRITE)) {
                 sender.sendForbidden();
                 return;
             }

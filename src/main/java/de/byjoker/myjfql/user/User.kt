@@ -1,6 +1,6 @@
 package de.byjoker.myjfql.user
 
-import de.byjoker.myjfql.database.DatabaseActionPerformType
+import de.byjoker.myjfql.database.DatabasePermissionLevel
 
 interface User {
 
@@ -11,10 +11,10 @@ interface User {
     var id: String
     var name: String
     var password: String
-    var accesses: MutableMap<String, DatabaseActionPerformType>
+    var accesses: MutableMap<String, DatabasePermissionLevel>
     var preferredDatabaseId: String?
-    fun allowed(databaseId: String, type: DatabaseActionPerformType): Boolean
-    fun grantAccess(databaseId: String, type: DatabaseActionPerformType)
+    fun allowed(databaseId: String, type: DatabasePermissionLevel): Boolean
+    fun grantAccess(databaseId: String, type: DatabasePermissionLevel)
     fun revokeAccess(databaseId: String)
     fun hasPreferredDatabase(): Boolean
     fun validPassword(password: String): Boolean

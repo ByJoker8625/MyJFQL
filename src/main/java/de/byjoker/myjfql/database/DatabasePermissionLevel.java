@@ -1,6 +1,6 @@
 package de.byjoker.myjfql.database;
 
-public enum DatabaseActionPerformType {
+public enum DatabasePermissionLevel {
 
     NONE(0),
     READ(1),
@@ -8,11 +8,11 @@ public enum DatabaseActionPerformType {
 
     private final int level;
 
-    DatabaseActionPerformType(int level) {
+    DatabasePermissionLevel(int level) {
         this.level = level;
     }
 
-    public boolean can(DatabaseActionPerformType action) {
+    public boolean can(DatabasePermissionLevel action) {
         return level >= action.level;
     }
 

@@ -1,14 +1,14 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.DatabaseActionPerformType;
+import de.byjoker.myjfql.database.DatabasePermissionLevel;
 import de.byjoker.myjfql.database.TableEntry;
 import de.byjoker.myjfql.exception.LanguageException;
+import de.byjoker.myjfql.server.response.TableResult;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.user.User;
 import de.byjoker.myjfql.util.Json;
 import de.byjoker.myjfql.util.ResultType;
-import de.byjoker.myjfql.util.TableResult;
 import io.javalin.http.Context;
 import org.json.JSONObject;
 
@@ -27,7 +27,7 @@ public class ContextCommandSender extends CommandSender {
     }
 
     @Override
-    public boolean allowed(String database, DatabaseActionPerformType action) {
+    public boolean allowed(String database, DatabasePermissionLevel action) {
         return user.allowed(database, action);
     }
 
@@ -68,7 +68,7 @@ public class ContextCommandSender extends CommandSender {
 
     @Override
     public void sendResult(Collection<TableEntry> entries, Collection<String> structure, ResultType resultType) {
-        send(Json.INSTANCE.stringify(new TableResult(entries, ResponseType.RESULT, structure, resultType)));
+        send(Json.INSTANCE.stringify(new TableResult(entries, structure, resultType)));
     }
 
     @Override

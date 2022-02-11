@@ -4,7 +4,7 @@ import de.byjoker.myjfql.lang.TableEntryComparator
 import de.byjoker.myjfql.util.Order
 import java.util.function.Consumer
 
-open class RelationalTable(private val name: String, structure: List<String>, primary: String) : Table {
+class RelationalTable(private val name: String, structure: Collection<String>, primary: String) : Table {
     private var entries: MutableMap<String, TableEntry>
     private var structure: Collection<String>
     private var primary: String

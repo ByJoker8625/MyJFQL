@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
-import de.byjoker.myjfql.database.DatabaseActionPerformType
+import de.byjoker.myjfql.database.DatabasePermissionLevel
 import de.byjoker.myjfql.database.DatabaseType
 import de.byjoker.myjfql.database.TableType
 
@@ -58,7 +58,7 @@ class FormatCommand : ConsoleCommand("format", mutableListOf("COMMAND", "DATABAS
                 return
             }
 
-            if (!sender.allowed(database.id, DatabaseActionPerformType.READ_WRITE)) {
+            if (!sender.allowed(database.id, DatabasePermissionLevel.READ_WRITE)) {
                 sender.sendForbidden()
                 return
             }
@@ -91,7 +91,7 @@ class FormatCommand : ConsoleCommand("format", mutableListOf("COMMAND", "DATABAS
 
             val table = database.getTable(name)
 
-            if (table.type == type) {
+            if (table!!.type == type) {
                 sender.sendError("Table is already an instance of this type!")
                 return
             }

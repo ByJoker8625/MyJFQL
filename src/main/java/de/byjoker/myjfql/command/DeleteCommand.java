@@ -2,7 +2,7 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Database;
-import de.byjoker.myjfql.database.DatabaseActionPerformType;
+import de.byjoker.myjfql.database.DatabasePermissionLevel;
 import de.byjoker.myjfql.database.DatabaseService;
 import de.byjoker.myjfql.server.session.Session;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,17 @@ public class DeleteCommand extends Command {
                 return;
             }
 
-            if (!sender.allowed(database.getId(), DatabaseActionPerformType.READ_WRITE)) {
+            if (name == null) {
+                sender.sendError("Undefined table!");
+                return;
+            }
+
+            if (!database.existsTable(name)) {
+                sender.sendError("Table doesn't exist!");
+                return;
+            }
+
+            if (!sender.allowed(database.getId(), DatabasePermissionLevel.READ_WRITE)) {
                 sender.sendForbidden();
                 return;
             }

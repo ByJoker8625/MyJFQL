@@ -54,7 +54,7 @@ public class RemoveCommand extends Command {
                 return;
             }
 
-            if (!sender.allowed(database.getId(), DatabaseActionPerformType.READ_WRITE)) {
+            if (!sender.allowed(database.getId(), DatabasePermissionLevel.READ_WRITE)) {
                 sender.sendForbidden();
                 return;
             }

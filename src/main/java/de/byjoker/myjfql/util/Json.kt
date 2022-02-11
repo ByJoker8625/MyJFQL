@@ -1,5 +1,6 @@
 package de.byjoker.myjfql.util
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.File
@@ -30,6 +31,10 @@ object Json {
 
     fun <T> parse(node: JsonNode, clazz: Class<T>): T {
         return OBJECT_MAPPER.treeToValue(node, clazz)
+    }
+
+    fun <T> convert(node: JsonNode): T {
+        return OBJECT_MAPPER.convertValue(node, object : TypeReference<T>() {}) as T
     }
 
 }

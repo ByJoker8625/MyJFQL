@@ -1,14 +1,12 @@
 package de.byjoker.myjfql.user
 
 import de.byjoker.myjfql.core.MyJFQL
-import de.byjoker.myjfql.database.DatabaseActionPerformType
+import de.byjoker.myjfql.exception.FileException
 import de.byjoker.myjfql.exception.UserException
 import de.byjoker.myjfql.util.FileFactory
 import de.byjoker.myjfql.util.IDGenerator.generateDigits
 import de.byjoker.myjfql.util.Json
 import java.io.File
-import java.util.*
-import java.util.stream.Collectors
 
 class UserServiceImpl : UserService {
     private val factory: FileFactory
@@ -88,27 +86,42 @@ class UserServiceImpl : UserService {
     }
 
     override fun loadAll(space: File) {
-        Arrays.stream(Objects.requireNonNull(space.listFiles())).forEach { file: File ->
-            val jsonUser = factory.load(file)
-            val jsonAccesses = jsonUser.getJSONObject("accesses")
-            val name = file.name.replaceFirst(".json".toRegex(), "")
-            if (name.contains("%") || name.contains("#") || name.contains("'")) {
-                MyJFQL.getInstance().console.logWarning("Database used unauthorized characters in the id!")
-            } else {
-                val user =
-                    SimpleUser(id = name, name = jsonUser.getString("name"), password = jsonUser.getString("password"))
-                user.preferredDatabaseId =
-                    if (jsonUser.has("preferred")) jsonUser.getString("preferred") else jsonUser.getString("preferredDatabaseId")
-                user.accesses = jsonAccesses.keySet().stream().collect(
-                    Collectors.toMap(
-                        { key: String? -> key },
-                        { key: String? -> DatabaseActionPerformType.valueOf(jsonAccesses.getString(key)) },
-                        { _: DatabaseActionPerformType?, b: DatabaseActionPerformType -> b })
-                )
+        if (!space.isDirectory) {
+            throw FileException("${space.name} isn't a valid user file space!")
+        }
 
-                if (!user.name.contains("%") && !user.name.contains("#") && !user.name.contains("'")) users.add(user) else
-                    MyJFQL.getInstance().console.logWarning("User used unauthorized characters in the name!")
+        val reserved = listOf('%', '#', '\'')
+
+        space.listFiles()?.iterator()?.forEach { file ->
+            val node = Json.read(file)
+
+            val user = SimpleUser(
+                name = node.get("name").asText(),
+                password = node.get("password").asText(),
+                accesses = Json.convert(node.get("accesses"))
+            )
+
+            if (node.has("id")) {
+                user.id = node.get("id").asText()
+            } else {
+                user.id = file.name.replace(".json", "")
             }
+
+            if (reserved.any { char -> user.name.contains(char) || user.id.contains(char) }) {
+                throw UserException("User used reserved character in id or name!")
+            }
+
+            if (existsUserByName(user.name)) {
+                throw UserException("User already has been initialized!")
+            }
+
+            user.preferredDatabaseId = if (node.has("preferred")) {
+                node.get("preferred").asText()
+            } else {
+                node.get("preferredDatabaseId").asText()
+            }
+
+            users.add(user)
         }
     }
 

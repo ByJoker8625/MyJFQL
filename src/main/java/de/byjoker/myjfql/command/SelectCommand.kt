@@ -2,7 +2,7 @@ package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.Database
-import de.byjoker.myjfql.database.DatabaseActionPerformType
+import de.byjoker.myjfql.database.DatabasePermissionLevel
 import de.byjoker.myjfql.database.RelationalTable
 import de.byjoker.myjfql.database.TableEntry
 import de.byjoker.myjfql.lang.TableEntryComparator
@@ -47,13 +47,13 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
 
             val table = database.getTable(from)
 
-            if (!sender.allowed(database.id, DatabaseActionPerformType.READ)) {
+            if (!sender.allowed(database.id, DatabasePermissionLevel.READ)) {
                 sender.sendForbidden()
                 return
             }
 
             val structure: MutableCollection<String> = when {
-                formatString(args["VALUE"]) == "*" -> table.structure
+                formatString(args["VALUE"]) == "*" -> table!!.structure
                 else -> formatList(args["VALUE"]) ?: return
             }
 
@@ -104,7 +104,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                     return
                 }
 
-                if (sortedBy == null) sortedBy = table.primary
+                if (sortedBy == null) sortedBy = table!!.primary
             }
 
             val resultType = if (table is RelationalTable) ResultType.RELATIONAL else ResultType.DOCUMENT
@@ -117,7 +117,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                     return
                 }
 
-                val entry = table.getEntry(primaryKey)
+                val entry = table!!.getEntry(primaryKey)
 
                 if (entry == null) {
                     sender.sendError("Entry was not found!")
@@ -153,7 +153,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
 
                 sender.sendResult(entries, structure, resultType)
             } else {
-                val entries = if (sortedBy == null) table.entries else table.getEntries(
+                val entries = if (sortedBy == null) table!!.entries else table!!.getEntries(
                     TableEntryComparator(sortedBy), order
                 )
 
@@ -184,7 +184,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
         sender.session ?: return null
         val database: Database = sender.session!!.getDatabase(MyJFQL.getInstance().databaseService) ?: return null
 
-        if (!sender.allowed(database.id, DatabaseActionPerformType.READ)) {
+        if (!sender.allowed(database.id, DatabasePermissionLevel.READ)) {
             return null
         }
 

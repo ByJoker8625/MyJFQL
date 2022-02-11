@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.database
 
 class RelationalTableEntry(
-    private var content: MutableMap<String, Any> = HashMap(),
+    private var content: MutableMap<String, Any?> = HashMap(),
     private var createdAt: Long = System.currentTimeMillis()
 ) :
     TableEntryMatcher() {
@@ -37,11 +37,11 @@ class RelationalTableEntry(
         return content.containsKey(key) && content[key] != "null"
     }
 
-    override fun getContent(): Map<String, Any> {
+    override fun getContent(): Map<String, Any?> {
         return content
     }
 
-    override fun setContent(content: MutableMap<String, Any>) {
+    override fun setContent(content: MutableMap<String, Any?>) {
         this.content = content
     }
 

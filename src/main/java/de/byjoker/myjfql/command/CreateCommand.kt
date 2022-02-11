@@ -32,7 +32,7 @@ class CreateCommand :
                 return
             }
 
-            if (!sender.allowed(User.ALLOW_CREATE_DATABASES, DatabaseActionPerformType.READ_WRITE)) {
+            if (!sender.allowed(User.ALLOW_CREATE_DATABASES, DatabasePermissionLevel.READ_WRITE)) {
                 sender.sendForbidden()
                 return
             }
@@ -42,7 +42,7 @@ class CreateCommand :
                 return
             }
 
-            databaseService.createDatabase(DatabaseImpl(database))
+            databaseService.createDatabase(SimpleDatabase(database))
             sender.sendSuccess()
             return
         }
@@ -55,7 +55,7 @@ class CreateCommand :
                 return
             }
 
-            if (!sender.allowed(database.id, DatabaseActionPerformType.READ_WRITE)) {
+            if (!sender.allowed(database.id, DatabasePermissionLevel.READ_WRITE)) {
                 sender.sendForbidden()
                 return
             }

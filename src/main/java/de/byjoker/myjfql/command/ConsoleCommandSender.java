@@ -3,7 +3,7 @@ package de.byjoker.myjfql.command;
 import de.byjoker.myjfql.console.Console;
 import de.byjoker.myjfql.console.TablePrinter;
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.DatabaseActionPerformType;
+import de.byjoker.myjfql.database.DatabasePermissionLevel;
 import de.byjoker.myjfql.database.TableEntry;
 import de.byjoker.myjfql.server.session.Session;
 import de.byjoker.myjfql.util.ResultType;
@@ -18,7 +18,7 @@ public class ConsoleCommandSender extends CommandSender {
     }
 
     @Override
-    public boolean allowed(String database, DatabaseActionPerformType action) {
+    public boolean allowed(String database, DatabasePermissionLevel action) {
         return true;
     }
 

@@ -4,7 +4,7 @@ import de.byjoker.myjfql.util.IDGenerator
 
 class Document : TableEntryMatcher {
 
-    private var content: MutableMap<String, Any>
+    private var content: MutableMap<String, Any?>
     private var createdAt: Long
 
     constructor() {
@@ -12,7 +12,7 @@ class Document : TableEntryMatcher {
         this.createdAt = System.currentTimeMillis()
     }
 
-    constructor(content: MutableMap<String, Any>, createdAt: Long) {
+    constructor(content: MutableMap<String, Any?>, createdAt: Long) {
         if (!content.containsKey("_id")) {
             throw NullPointerException("No unique id in entry present!")
         }
@@ -59,11 +59,11 @@ class Document : TableEntryMatcher {
         return content.containsKey(key) && content[key] != "null"
     }
 
-    override fun getContent(): MutableMap<String, Any> {
+    override fun getContent(): MutableMap<String, Any?> {
         return content
     }
 
-    override fun setContent(content: MutableMap<String, Any>) {
+    override fun setContent(content: MutableMap<String, Any?>) {
         this.content = content
     }
 
