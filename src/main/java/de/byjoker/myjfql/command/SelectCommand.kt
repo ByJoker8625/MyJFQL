@@ -7,7 +7,7 @@ import de.byjoker.myjfql.database.RelationalTable
 import de.byjoker.myjfql.database.TableEntry
 import de.byjoker.myjfql.lang.TableEntryComparator
 import de.byjoker.myjfql.lang.TableEntryFilter
-import de.byjoker.myjfql.server.session.Session
+import de.byjoker.myjfql.network.session.Session
 import de.byjoker.myjfql.util.Order
 import de.byjoker.myjfql.util.ResultType
 import org.jline.reader.ParsedLine

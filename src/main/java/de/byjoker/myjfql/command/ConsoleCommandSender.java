@@ -5,7 +5,7 @@ import de.byjoker.myjfql.console.TablePrinter;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.DatabasePermissionLevel;
 import de.byjoker.myjfql.database.TableEntry;
-import de.byjoker.myjfql.server.session.Session;
+import de.byjoker.myjfql.network.session.Session;
 import de.byjoker.myjfql.util.ResultType;
 
 import java.util.Collection;

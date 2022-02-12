@@ -4,7 +4,8 @@ import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Database;
 import de.byjoker.myjfql.database.DatabasePermissionLevel;
 import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.server.session.Session;
+import de.byjoker.myjfql.network.session.Session;
+import de.byjoker.myjfql.user.User;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -65,7 +66,7 @@ public class DeleteCommand extends Command {
         }
 
         if (args.containsKey("DATABASE")) {
-            if (sender instanceof ContextCommandSender) {
+            if (!sender.allowed(User.ALLOW_CREATE_DATABASES, DatabasePermissionLevel.READ_WRITE)) {
                 sender.sendForbidden();
                 return;
             }

@@ -12,11 +12,6 @@ public class ConsoleImpl implements Console {
     private Scanner scanner = null;
 
     @Override
-    public void clean() {
-        println(null);
-    }
-
-    @Override
     public void log(String s) {
         println(s);
     }

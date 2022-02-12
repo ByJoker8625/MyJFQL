@@ -2,7 +2,7 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.*;
-import de.byjoker.myjfql.server.session.Session;
+import de.byjoker.myjfql.network.session.Session;
 import de.byjoker.myjfql.util.ResultType;
 import org.jetbrains.annotations.NotNull;
 

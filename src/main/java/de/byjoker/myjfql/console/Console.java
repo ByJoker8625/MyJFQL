@@ -4,8 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 public interface Console {
 
-    void clean();
-
     void log(String s);
 
     void logInfo(String s);

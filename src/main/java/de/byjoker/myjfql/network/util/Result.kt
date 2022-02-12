@@ -1,9 +1,9 @@
-package de.byjoker.myjfql.server.response
+package de.byjoker.myjfql.network.util
 
 import de.byjoker.myjfql.database.TableEntry
 import de.byjoker.myjfql.util.ResultType
 
-data class TableResult(
+data class Result(
     val result: Collection<TableEntry>,
     val structure: Collection<String>,
     val resultType: ResultType

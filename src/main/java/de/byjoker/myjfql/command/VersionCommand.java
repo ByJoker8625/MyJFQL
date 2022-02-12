@@ -35,7 +35,7 @@ public class VersionCommand extends ConsoleCommand {
             final List<String> update = args.get("UPDATE");
 
             if (update.size() == 0) {
-                MyJFQL.getInstance().getServer().shutdown();
+                MyJFQL.getInstance().getNetworkService().shutdown();
                 downloader.downloadLatestVersion();
             } else {
                 String version = formatString(update);
@@ -50,7 +50,7 @@ public class VersionCommand extends ConsoleCommand {
                     return;
                 }
 
-                MyJFQL.getInstance().getServer().shutdown();
+                MyJFQL.getInstance().getNetworkService().shutdown();
                 downloader.downloadByVersion(version);
                 return;
             }

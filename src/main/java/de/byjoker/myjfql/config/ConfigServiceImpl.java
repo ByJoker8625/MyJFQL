@@ -3,6 +3,7 @@ package de.byjoker.myjfql.config;
 import com.google.common.reflect.ClassPath;
 import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.util.FileFactory;
+import de.byjoker.myjfql.util.Json;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -93,7 +94,7 @@ public class ConfigServiceImpl implements ConfigService {
         file = new File("sessions.json");
 
         if (!file.exists())
-            factory.save(file, new JSONObject().put("sessions", Collections.emptyList()));
+            Json.write(Collections.emptyList(), file);
 
         file = new File("config.json");
 

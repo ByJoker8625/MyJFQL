@@ -10,23 +10,22 @@ import de.byjoker.myjfql.util.ResultType
 import java.util.*
 
 @CommandHandler
-class UserCommand :
-    ConsoleCommand(
-        "user", mutableListOf(
-            "COMMAND",
-            "CREATE",
-            "PASSWORD",
-            "GRANT",
-            "REVOKE",
-            "ACCESS",
-            "DATABASE",
-            "AT",
-            "FROM",
-            "DISPLAY",
-            "LIST",
-            "DELETE"
-        )
-    ) {
+class UserCommand : ConsoleCommand(
+    "user", mutableListOf(
+        "COMMAND",
+        "CREATE",
+        "PASSWORD",
+        "GRANT",
+        "REVOKE",
+        "ACCESS",
+        "DATABASE",
+        "AT",
+        "FROM",
+        "DISPLAY",
+        "LIST",
+        "DELETE"
+    )
+) {
 
     override fun executeAsConsole(sender: ConsoleCommandSender, args: MutableMap<String, MutableList<String>>) {
         val userService = MyJFQL.getInstance().userService

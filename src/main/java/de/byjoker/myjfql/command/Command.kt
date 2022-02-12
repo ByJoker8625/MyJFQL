@@ -10,7 +10,7 @@ abstract class Command(val name: String, val syntax: MutableList<String>) {
 
     open fun complete(sender: CommandSender, line: ParsedLine): MutableList<String>? = null
 
-    fun formatString(strings: MutableList<String>?): String? {
+    fun formatString(strings: List<String>?): String? {
         if (strings == null) {
             return null
         }
@@ -19,7 +19,7 @@ abstract class Command(val name: String, val syntax: MutableList<String>) {
             .collect(Collectors.joining("", strings[0], "")).replace("'", "")
     }
 
-    fun formatList(strings: MutableList<String>?): MutableList<String>? {
+    fun formatList(strings: List<String>?): MutableList<String>? {
         if (strings == null) {
             return null
         }
@@ -28,7 +28,7 @@ abstract class Command(val name: String, val syntax: MutableList<String>) {
             .collect(Collectors.toList())
     }
 
-    fun formatInteger(strings: MutableList<String>?): Int {
+    fun formatInteger(strings: List<String>?): Int {
         if (strings == null) return -1
 
         return if (strings.isEmpty()) -1 else IntStream.range(1, strings.size).mapToObj { i: Int -> " " + strings[i] }

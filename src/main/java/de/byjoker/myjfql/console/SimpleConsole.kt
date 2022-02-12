@@ -22,7 +22,7 @@ class SimpleConsole(
 
         System.setErr(object : PrintStream(System.err) {
             override fun print(s: String) {
-                this@SimpleConsole.print("[ERROR] $s")
+                this@SimpleConsole.print(s)
             }
 
             override fun println(s: String) {
@@ -41,24 +41,20 @@ class SimpleConsole(
         })
     }
 
-    override fun clean() {
-        println(null);
-    }
-
     override fun log(s: String) {
         println(s)
     }
 
     override fun logInfo(s: String) {
-        log("[INFO] $s")
+        log("INFO: $s")
     }
 
     override fun logWarning(s: String) {
-        log("[WARNING] $s")
+        log("WARNING: $s")
     }
 
     override fun logError(s: String) {
-        log("[ERROR] $s")
+        log("ERROR: $s")
     }
 
     override fun print(s: String?) {
@@ -68,9 +64,9 @@ class SimpleConsole(
             writer.print("[${time()}] $s")
 
             if (writeable && reader.isReading) {
-                reader.callWidget(LineReader.REDRAW_LINE);
-                reader.callWidget(LineReader.REDISPLAY);
-                reader.terminal.writer().flush();
+                reader.callWidget(LineReader.REDRAW_LINE)
+                reader.callWidget(LineReader.REDISPLAY)
+                reader.terminal.writer().flush()
             }
 
         }

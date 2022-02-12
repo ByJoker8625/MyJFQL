@@ -2,6 +2,7 @@ package de.byjoker.myjfql.database
 
 import com.fasterxml.jackson.databind.JsonNode
 import de.byjoker.myjfql.exception.DatabaseException
+import de.byjoker.myjfql.exception.FileException
 import de.byjoker.myjfql.util.Json
 import org.apache.commons.io.FileUtils
 import java.io.File
@@ -79,10 +80,14 @@ class DatabaseServiceImpl : DatabaseService {
         loadAll(File("database"))
     }
 
-    override fun loadAll(space: File) {
+    override fun loadAll(backend: File) {
+        if (!backend.isDirectory) {
+            throw FileException("${backend.name} isn't a valid database file space!")
+        }
+
         databases.clear()
 
-        val files: Array<File> = space.listFiles() ?: return
+        val files = backend.listFiles() ?: return
 
         for (file in files) {
             val database: Database? = if (file.isDirectory) {
@@ -198,10 +203,10 @@ class DatabaseServiceImpl : DatabaseService {
         updateAll(File("database"))
     }
 
-    override fun updateAll(space: File) {
+    override fun updateAll(backend: File) {
         for (database in databases.values) when (database.type) {
             DatabaseType.SPLIT -> {
-                val folder = File("${space.path}/${database.id}")
+                val folder = File("${backend.path}/${database.id}")
                 folder.mkdirs()
 
                 Json.write(DatabaseRepresentation(database), File("${folder.path}/%database%.json"))
@@ -214,7 +219,7 @@ class DatabaseServiceImpl : DatabaseService {
                 }
             }
             DatabaseType.SINGLETON -> {
-                Json.write(database, File("${space.path}/${database.id}.json"))
+                Json.write(database, File("${backend.path}/${database.id}.json"))
             }
         }
     }

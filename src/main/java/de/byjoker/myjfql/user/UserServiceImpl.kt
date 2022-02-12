@@ -1,6 +1,7 @@
 package de.byjoker.myjfql.user
 
 import de.byjoker.myjfql.core.MyJFQL
+import de.byjoker.myjfql.database.DatabasePermissionLevel
 import de.byjoker.myjfql.exception.FileException
 import de.byjoker.myjfql.exception.UserException
 import de.byjoker.myjfql.util.FileFactory
@@ -85,21 +86,27 @@ class UserServiceImpl : UserService {
         loadAll(File("user"))
     }
 
-    override fun loadAll(space: File) {
-        if (!space.isDirectory) {
-            throw FileException("${space.name} isn't a valid user file space!")
+    override fun loadAll(backend: File) {
+        if (!backend.isDirectory) {
+            throw FileException("${backend.name} isn't a valid user file space!")
         }
+
+        users.clear()
 
         val reserved = listOf('%', '#', '\'')
 
-        space.listFiles()?.iterator()?.forEach { file ->
+        backend.listFiles()?.iterator()?.forEach { file ->
             val node = Json.read(file)
 
             val user = SimpleUser(
                 name = node.get("name").asText(),
                 password = node.get("password").asText(),
-                accesses = Json.convert(node.get("accesses"))
             )
+
+            Json.convert<Map<String, String>>(node.get("accesses")).forEach { access ->
+                user.accesses[access.key] =
+                    DatabasePermissionLevel.valueOf(access.value)
+            }
 
             if (node.has("id")) {
                 user.id = node.get("id").asText()
@@ -129,7 +136,7 @@ class UserServiceImpl : UserService {
         updateAll(File("user"))
     }
 
-    override fun updateAll(space: File) {
-        users.forEach { user -> Json.write(user, File("${space.path}/${user.id}.json")) }
+    override fun updateAll(backend: File) {
+        users.forEach { user -> Json.write(user, File("${backend.path}/${user.id}.json")) }
     }
 }

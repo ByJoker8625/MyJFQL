@@ -3,7 +3,7 @@ package de.byjoker.myjfql.command;
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.*;
 import de.byjoker.myjfql.lang.TableEntryFilter;
-import de.byjoker.myjfql.server.session.Session;
+import de.byjoker.myjfql.network.session.Session;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

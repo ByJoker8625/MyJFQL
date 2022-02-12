@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.server.response
+package de.byjoker.myjfql.network.util
 
 enum class ResponseType {
 

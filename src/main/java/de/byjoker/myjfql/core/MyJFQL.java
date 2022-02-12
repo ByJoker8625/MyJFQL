@@ -16,10 +16,11 @@ import de.byjoker.myjfql.exception.FileException;
 import de.byjoker.myjfql.exception.NetworkException;
 import de.byjoker.myjfql.lang.Interpreter;
 import de.byjoker.myjfql.lang.JFQLInterpreter;
-import de.byjoker.myjfql.server.Server;
-import de.byjoker.myjfql.server.session.Session;
-import de.byjoker.myjfql.server.session.SessionService;
-import de.byjoker.myjfql.server.session.SessionServiceImpl;
+import de.byjoker.myjfql.network.HttpNetworkService;
+import de.byjoker.myjfql.network.NetworkService;
+import de.byjoker.myjfql.network.session.InternalSession;
+import de.byjoker.myjfql.network.session.SessionService;
+import de.byjoker.myjfql.network.session.SessionServiceImpl;
 import de.byjoker.myjfql.user.UserService;
 import de.byjoker.myjfql.user.UserServiceImpl;
 import de.byjoker.myjfql.util.*;
@@ -38,11 +39,11 @@ public final class MyJFQL {
     private final ConfigService configService;
     private final BackupService databaseBackupService;
     private final UserService userService;
-    private final SessionService sessionService;
     private final ConsoleCommandSender consoleCommandSender;
-    private final Server server;
     private final Updater updater;
     private final Downloader downloader;
+    private final SessionService sessionService;
+    private final NetworkService networkService;
     private Config config;
     private Console console;
     private Encryptor encryptor;
@@ -62,7 +63,7 @@ public final class MyJFQL {
         this.downloader = updater.getDownloader();
         this.databaseService = new DatabaseServiceImpl();
         this.databaseBackupService = new BackupServiceImpl(databaseService);
-        this.server = new Server();
+        this.networkService = new HttpNetworkService();
     }
 
     public static MyJFQL getInstance() {
@@ -77,11 +78,9 @@ public final class MyJFQL {
                 "| |__| | (_| |\\ V / (_| | |    | | |  __/ |__| | |_| |  __/ |  | |_| | |___| (_| | | | | (_| | |_| | (_| | (_| |  __/\n" +
                 " \\____/ \\__,_| \\_/ \\__,_|_|    |_|_|\\___|\\___\\_\\\\__,_|\\___|_|   \\__, |______\\__,_|_| |_|\\__, |\\__,_|\\__,_|\\__, |\\___|\n" +
                 "                                                                 __/ |                   __/ |             __/ |     \n" +
-                "                                                                |___/                   |___/             |___/      \n" +
-                "");
+                "                                                                |___/                   |___/             |___/      ");
         console.logInfo("Developer > ByJoker");
         console.logInfo("Version > v" + version);
-        console.clean();
 
         try {
             console.logInfo("Loading system configurations...");
@@ -103,7 +102,7 @@ public final class MyJFQL {
             }
 
             console.logInfo("Successfully initialized config.");
-            console.clean();
+
         } catch (Exception ex) {
             throw new FileException("Failed to load and initialize config!");
         }
@@ -118,7 +117,6 @@ public final class MyJFQL {
             }
 
             console.logInfo("Successfully connected.");
-            console.clean();
 
             switch (updater.getCompatibilityStatus()) {
                 case SAME:
@@ -137,20 +135,17 @@ public final class MyJFQL {
                     console.logWarning("You are using a pretty old version of MyJFQL! With this version you wouldn't be able to update to the latest version without many heavy changes.");
                     break;
             }
-
-            console.clean();
         }
 
         commandService.searchCommands("de.byjoker.myjfql.command");
 
+
         if (config.server()) {
             try {
-                server.start(config.port());
+                networkService.start(config.port());
             } catch (Exception ex) {
-                throw new NetworkException("Failed to start javalin server because " + ex.getMessage());
+                throw new NetworkException("Failed to start network service cause of " + ex.getMessage());
             }
-
-            console.clean();
         }
 
         {
@@ -165,7 +160,7 @@ public final class MyJFQL {
             }
 
             console.logInfo("Loading finished!");
-            console.clean();
+
         }
 
 
@@ -187,16 +182,13 @@ public final class MyJFQL {
             }
         }
 
-        sessionService.openSession(
-                new Session(consoleCommandSender.getName(), consoleCommandSender.getName(), null, "localhost", System.currentTimeMillis(), -1)
-        );
+        sessionService.openSession(new InternalSession(consoleCommandSender.getName()));
 
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 databaseService.updateAll();
                 userService.updateAll();
-                sessionService.collectExpiresSessions();
                 sessionService.updateAll();
             }
         }, 1000 * 60, 1000 * 60);
@@ -213,7 +205,6 @@ public final class MyJFQL {
             databaseService.updateAll();
             userService.updateAll();
             sessionService.updateAll();
-            server.shutdown();
         } catch (Exception ignore) {
         }
 
@@ -248,10 +239,6 @@ public final class MyJFQL {
         return configService;
     }
 
-    public Server getServer() {
-        return server;
-    }
-
     public Encryptor getEncryptor() {
         return encryptor;
     }
@@ -270,6 +257,10 @@ public final class MyJFQL {
 
     public BackupService getDatabaseBackupService() {
         return databaseBackupService;
+    }
+
+    public NetworkService getNetworkService() {
+        return networkService;
     }
 
     public Config getConfig() {

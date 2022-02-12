@@ -1,19 +1,10 @@
-package de.byjoker.myjfql.database;
+package de.byjoker.myjfql.database
 
-public enum DatabasePermissionLevel {
+enum class DatabasePermissionLevel(private val level: Int) {
 
-    NONE(0),
-    READ(1),
-    READ_WRITE(2);
+    NONE(0), READ(1), READ_WRITE(2);
 
-    private final int level;
-
-    DatabasePermissionLevel(int level) {
-        this.level = level;
+    fun can(action: DatabasePermissionLevel): Boolean {
+        return level >= action.level
     }
-
-    public boolean can(DatabasePermissionLevel action) {
-        return level >= action.level;
-    }
-
 }

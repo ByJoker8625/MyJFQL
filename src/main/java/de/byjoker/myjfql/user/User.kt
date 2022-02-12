@@ -1,21 +1,33 @@
 package de.byjoker.myjfql.user
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.DatabasePermissionLevel
 
-interface User {
+abstract class User(
+    var id: String,
+    var name: String,
+    var password: String,
+    var accesses: MutableMap<String, DatabasePermissionLevel>,
+    var preferredDatabaseId: String?
+) {
 
     companion object Permissions {
         const val ALLOW_CREATE_DATABASES = "%allow_create_databases%"
     }
 
-    var id: String
-    var name: String
-    var password: String
-    var accesses: MutableMap<String, DatabasePermissionLevel>
-    var preferredDatabaseId: String?
-    fun allowed(databaseId: String, type: DatabasePermissionLevel): Boolean
-    fun grantAccess(databaseId: String, type: DatabasePermissionLevel)
-    fun revokeAccess(databaseId: String)
-    fun hasPreferredDatabase(): Boolean
-    fun validPassword(password: String): Boolean
+    fun allowed(databaseId: String, type: DatabasePermissionLevel): Boolean {
+        return (accesses.containsKey("*") && accesses["*"]!!.can(type)) || (accesses.containsKey(databaseId) && accesses[databaseId]!!.can(
+            type
+        ))
+    }
+
+    fun grantAccess(databaseId: String, type: DatabasePermissionLevel) = accesses.put(databaseId, type)
+
+    fun revokeAccess(databaseId: String) = accesses.remove(databaseId)
+
+    @JsonIgnore
+    fun hasPreferredDatabase(): Boolean = preferredDatabaseId != null
+
+    fun validPassword(password: String): Boolean = this.password == MyJFQL.getInstance().encryptor.encrypt(password)
 }

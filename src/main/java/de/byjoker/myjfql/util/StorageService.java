@@ -6,10 +6,10 @@ public interface StorageService {
 
     void loadAll();
 
-    void loadAll(File space);
+    void loadAll(File backend);
 
     void updateAll();
 
-    void updateAll(File space);
+    void updateAll(File backend);
 
 }
