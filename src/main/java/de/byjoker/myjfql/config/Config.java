@@ -1,35 +1,51 @@
 package de.byjoker.myjfql.config;
 
-import org.json.JSONObject;
+public class Config {
 
-public interface Config {
+    private ServerConfig server;
+    private RegistryConfig registry;
+    private String encryption;
+    private boolean jline;
 
-    int port();
+    public Config() {
+    }
 
-    boolean server();
+    public Config(ServerConfig server, RegistryConfig registry, String encryption, boolean jline) {
+        this.server = server;
+        this.registry = registry;
+        this.encryption = encryption;
+        this.jline = jline;
+    }
 
-    boolean updates();
+    public boolean isJline() {
+        return jline;
+    }
 
-    boolean autoUpdate();
+    public void setJline(boolean jline) {
+        this.jline = jline;
+    }
 
-    boolean crossTokenRequests();
+    public String getEncryption() {
+        return encryption;
+    }
 
-    boolean memorySessions();
+    public void setEncryption(String encryption) {
+        this.encryption = encryption;
+    }
 
-    boolean onlyManualSessionControl();
+    public ServerConfig getServer() {
+        return server;
+    }
 
-    String updateHost();
+    public void setServer(ServerConfig server) {
+        this.server = server;
+    }
 
-    String updateFile();
+    public RegistryConfig getRegistry() {
+        return registry;
+    }
 
-    String encryption();
-
-    boolean jline();
-
-    boolean showConnections();
-
-    boolean showQueries();
-
-    JSONObject asJson();
-
+    public void setRegistry(RegistryConfig registry) {
+        this.registry = registry;
+    }
 }

@@ -14,7 +14,7 @@ interface SessionService : StorageService {
 
     fun getSession(token: String): Session?
 
-    fun getSessionsByUser(userId: String): MutableList<Session>
+    fun getSessionsByUserId(userId: String): MutableList<Session>
 
     val sessions: MutableList<Session>
 

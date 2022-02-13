@@ -3,8 +3,8 @@ package de.byjoker.myjfql.command
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.*
 import de.byjoker.myjfql.lang.TableEntryFilter
+import de.byjoker.myjfql.util.Json
 import org.jline.reader.ParsedLine
-import org.json.JSONObject
 
 @CommandHandler
 class InsertCommand :
@@ -66,13 +66,13 @@ class InsertCommand :
                 }
 
                 val json = try {
-                    JSONObject(raw)
+                    Json.parse(raw)
                 } catch (ex: Exception) {
                     sender.sendError("Invalid json format: ${ex.message}")
                     return
                 }
 
-                content = json.toMap()
+                content = Json.convert(json)
             }
             else -> {
                 if (!args.containsKey("KEY") && !args.containsKey("VALUE")) {

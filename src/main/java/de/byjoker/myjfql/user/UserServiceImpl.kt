@@ -4,19 +4,12 @@ import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.DatabasePermissionLevel
 import de.byjoker.myjfql.exception.FileException
 import de.byjoker.myjfql.exception.UserException
-import de.byjoker.myjfql.util.FileFactory
 import de.byjoker.myjfql.util.IDGenerator.generateDigits
 import de.byjoker.myjfql.util.Json
 import java.io.File
 
 class UserServiceImpl : UserService {
-    private val factory: FileFactory
-    private val users: MutableList<User>
-
-    init {
-        users = ArrayList()
-        factory = FileFactory()
-    }
+    private val users: MutableList<User> = mutableListOf()
 
     override fun createUser(user: User) {
         if (existsUserByName(user.name)) {

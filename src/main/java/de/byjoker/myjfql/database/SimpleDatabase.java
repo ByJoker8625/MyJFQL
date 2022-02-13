@@ -2,11 +2,9 @@ package de.byjoker.myjfql.database;
 
 import de.byjoker.myjfql.exception.TableException;
 import de.byjoker.myjfql.util.IDGenerator;
-import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,11 +56,7 @@ public class SimpleDatabase implements Database {
     @Override
     public void deleteTable(@NotNull String name) {
         if (type == DatabaseType.SPLIT) {
-            try {
-                FileUtils.deleteDirectory(new File("database/" + id + "/" + name));
-            } catch (IOException ex) {
-                throw new TableException(ex);
-            }
+            new File("database/" + id + "/" + name).delete();
         }
 
         tables.remove(name);

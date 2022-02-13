@@ -49,7 +49,7 @@ public class SessionServiceImpl implements SessionService {
 
     @NotNull
     @Override
-    public List<Session> getSessionsByUser(@NotNull String userId) {
+    public List<Session> getSessionsByUserId(@NotNull String userId) {
         return sessions.stream().filter(session -> session.getUserId().equals(userId)).collect(Collectors.toList());
     }
 

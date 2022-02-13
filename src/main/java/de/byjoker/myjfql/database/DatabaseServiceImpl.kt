@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import de.byjoker.myjfql.exception.DatabaseException
 import de.byjoker.myjfql.exception.FileException
 import de.byjoker.myjfql.util.Json
-import org.apache.commons.io.FileUtils
 import java.io.File
 
 class DatabaseServiceImpl : DatabaseService {
@@ -50,8 +49,6 @@ class DatabaseServiceImpl : DatabaseService {
 
         if (file.exists()) {
             file.delete()
-        } else {
-            FileUtils.deleteDirectory(File("database/$id"))
         }
 
         databases.remove(id)

@@ -86,32 +86,32 @@ public final class MyJFQL {
             console.logInfo("Loading system configurations...");
 
             {
-                configService.load();
-                configService.searchConfigBuilders("de.byjoker.myjfql.config");
-                config = configService.getConfig();
+                configService.mkdirs();
+                config = configService.load();
             }
 
-            if (config.jline()) {
+            System.out.println(config.getServer().getPort());
+
+            if (config.isJline()) {
                 console = new SimpleConsole();
             }
 
-            if ("ARGON2".equalsIgnoreCase(config.encryption())) {
+            if ("ARGON2".equalsIgnoreCase(config.getEncryption())) {
                 encryptor = new Argon2Encryptor();
             } else {
                 encryptor = new NoneEncryptor();
             }
 
             console.logInfo("Successfully initialized config.");
-
         } catch (Exception ex) {
             throw new FileException("Failed to load and initialize config!");
         }
 
-        if (config.updates()) {
-            console.logInfo("Connecting to " + config.updateHost() + "...");
+        if (config.getRegistry().isLookup()) {
+            console.logInfo("Connecting to " + config.getRegistry().getHost() + "...");
 
             try {
-                updater.connect(config.updateHost());
+                updater.connect(config.getRegistry().getHost());
             } catch (Exception ex) {
                 throw new NetworkException("Server connection failed!");
             }
@@ -123,7 +123,7 @@ public final class MyJFQL {
                     console.logInfo("Your are up to date with you MyJFQL version. You can enjoy all features of this system :D");
                     break;
                 case JUST_FINE:
-                    if (config.autoUpdate())
+                    if (config.getRegistry().isUpdates())
                         downloader.downloadLatestVersion();
                     else
                         console.logWarning("You aren't up to date. Please download the latest version.");
@@ -140,9 +140,9 @@ public final class MyJFQL {
         commandService.searchCommands("de.byjoker.myjfql.command");
 
 
-        if (config.server()) {
+        if (config.getServer().isEnabled()) {
             try {
-                networkService.start(config.port());
+                networkService.start(config.getServer().getPort());
             } catch (Exception ex) {
                 throw new NetworkException("Failed to start network service cause of " + ex.getMessage());
             }

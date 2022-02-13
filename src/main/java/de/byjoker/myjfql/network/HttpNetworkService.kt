@@ -51,7 +51,7 @@ class HttpNetworkService : NetworkService {
                         )
 
                     val connection = HttpNetworkConnection(context, session)
-                    val request = HttpNetworkRequest(
+                    val request = NetworkRequest(
                         connection,
                         Json.parse(context.body()),
                         RequestMethod.valueOf(context.method().uppercase())
