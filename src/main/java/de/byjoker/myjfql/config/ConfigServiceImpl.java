@@ -16,7 +16,7 @@ public class ConfigServiceImpl implements ConfigService {
         File file = new File("config.yml");
 
         if (!file.exists())
-            Yaml.write(new ConfigDefaults(), file);
+            Yaml.write(new Config(), file);
 
         file = new File("sessions.json");
 

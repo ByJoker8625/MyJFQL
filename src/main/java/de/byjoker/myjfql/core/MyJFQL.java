@@ -3,17 +3,13 @@ package de.byjoker.myjfql.core;
 import de.byjoker.myjfql.command.CommandService;
 import de.byjoker.myjfql.command.CommandServiceImpl;
 import de.byjoker.myjfql.command.ConsoleCommandSender;
-import de.byjoker.myjfql.config.Config;
-import de.byjoker.myjfql.config.ConfigDefaults;
-import de.byjoker.myjfql.config.ConfigService;
-import de.byjoker.myjfql.config.ConfigServiceImpl;
+import de.byjoker.myjfql.config.*;
 import de.byjoker.myjfql.console.Console;
 import de.byjoker.myjfql.console.ConsoleCommandCompleter;
 import de.byjoker.myjfql.console.ConsoleImpl;
 import de.byjoker.myjfql.console.SimpleConsole;
 import de.byjoker.myjfql.database.*;
 import de.byjoker.myjfql.exception.FileException;
-import de.byjoker.myjfql.exception.NetworkException;
 import de.byjoker.myjfql.lang.Interpreter;
 import de.byjoker.myjfql.lang.JFQLInterpreter;
 import de.byjoker.myjfql.network.HttpNetworkService;
@@ -25,8 +21,7 @@ import de.byjoker.myjfql.user.UserService;
 import de.byjoker.myjfql.user.UserServiceImpl;
 import de.byjoker.myjfql.util.*;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public final class MyJFQL {
 
@@ -52,7 +47,7 @@ public final class MyJFQL {
         instance = this;
         this.configService = new ConfigServiceImpl();
         this.console = new ConsoleImpl();
-        this.config = new ConfigDefaults();
+        this.config = new Config();
         this.encryptor = new NoneEncryptor();
         this.interpreter = new JFQLInterpreter();
         this.sessionService = new SessionServiceImpl();
@@ -90,8 +85,6 @@ public final class MyJFQL {
                 config = configService.load();
             }
 
-            System.out.println(config.getServer().getPort());
-
             if (config.isJline()) {
                 console = new SimpleConsole();
             }
@@ -104,16 +97,20 @@ public final class MyJFQL {
 
             console.logInfo("Successfully initialized config.");
         } catch (Exception ex) {
-            throw new FileException("Failed to load and initialize config!");
+            console.logInfo("Failed to load and initialize config!");
+            return;
         }
 
-        if (config.getRegistry().isLookup()) {
-            console.logInfo("Connecting to " + config.getRegistry().getHost() + "...");
+        final RegistryConfig registryConfig = config.getRegistry();
+
+        if (registryConfig.isLookup()) {
+            console.logInfo("Connecting to " + registryConfig.getHost() + "...");
 
             try {
-                updater.connect(config.getRegistry().getHost());
+                updater.lookup(registryConfig.getHost());
             } catch (Exception ex) {
-                throw new NetworkException("Server connection failed!");
+                console.logError("Server connection failed!");
+                return;
             }
 
             console.logInfo("Successfully connected.");
@@ -123,7 +120,7 @@ public final class MyJFQL {
                     console.logInfo("Your are up to date with you MyJFQL version. You can enjoy all features of this system :D");
                     break;
                 case JUST_FINE:
-                    if (config.getRegistry().isUpdates())
+                    if (registryConfig.issAutoUpdates())
                         downloader.downloadLatestVersion();
                     else
                         console.logWarning("You aren't up to date. Please download the latest version.");
@@ -139,12 +136,14 @@ public final class MyJFQL {
 
         commandService.searchCommands("de.byjoker.myjfql.command");
 
+        final ServerConfig serverConfig = config.getServer();
 
-        if (config.getServer().isEnabled()) {
+        if (serverConfig.isEnabled()) {
             try {
-                networkService.start(config.getServer().getPort());
+                networkService.start(serverConfig.getPort());
             } catch (Exception ex) {
-                throw new NetworkException("Failed to start network service cause of " + ex.getMessage());
+                console.logError("Failed to start network service!");
+                return;
             }
         }
 
@@ -160,9 +159,7 @@ public final class MyJFQL {
             }
 
             console.logInfo("Loading finished!");
-
         }
-
 
         {
             if (encryptor.name().equals("NONE")) {
@@ -183,6 +180,20 @@ public final class MyJFQL {
         }
 
         sessionService.openSession(new InternalSession(consoleCommandSender.getName()));
+
+        if (config.isDocker()) {
+            console.logInfo("Docker mode enabled.");
+
+            final Map<String, String> environment = System.getenv();
+            final List<String> required = Arrays.asList("MYJFQL_USER_NAME", "MYJFQL_USER_PASSWORD", "MYJFQL_DATABASE");
+
+            if (required.stream().anyMatch(field -> !environment.containsKey(field))) {
+                console.logError("Not all docker env variables found!");
+                return;
+            }
+
+            commandService.execute(consoleCommandSender, String.format("user create %s password %s database %s", environment.get("MYJFQL_USER_NAME"), environment.get("MYJFQL_USER_PASSWORD"), environment.get("MYJFQL_DATABASE")));
+        }
 
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override

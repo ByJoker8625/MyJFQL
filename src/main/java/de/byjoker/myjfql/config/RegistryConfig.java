@@ -4,16 +4,16 @@ public class RegistryConfig {
 
     private String host;
     private boolean lookup;
-    private boolean updates;
+    private boolean autoUpdates;
     private String output;
 
     public RegistryConfig() {
     }
 
-    public RegistryConfig(String host, boolean lookup, boolean updates, String output) {
+    public RegistryConfig(String host, boolean lookup, boolean autoUpdates, String output) {
         this.host = host;
         this.lookup = lookup;
-        this.updates = updates;
+        this.autoUpdates = autoUpdates;
         this.output = output;
     }
 
@@ -33,12 +33,12 @@ public class RegistryConfig {
         this.lookup = lookup;
     }
 
-    public boolean isUpdates() {
-        return updates;
+    public boolean issAutoUpdates() {
+        return autoUpdates;
     }
 
-    public void setUpdates(boolean updates) {
-        this.updates = updates;
+    public void setAutoUpdates(boolean updates) {
+        this.autoUpdates = updates;
     }
 
     public String getOutput() {

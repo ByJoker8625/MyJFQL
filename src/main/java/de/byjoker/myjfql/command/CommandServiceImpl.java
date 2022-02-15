@@ -63,9 +63,9 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    public void execute(CommandSender sender, String name) {
+    public void execute(CommandSender sender, String instructions) {
         try {
-            final Map<String, List<String>> arguments = interpreter.interpretCommand(name);
+            final Map<String, List<String>> arguments = interpreter.interpretCommand(instructions);
 
             if (arguments == null) {
                 sender.sendError("Command was not found!");
