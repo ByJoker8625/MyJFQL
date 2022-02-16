@@ -1,17 +1,15 @@
 package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
-import de.byjoker.myjfql.database.Database
 import de.byjoker.myjfql.database.DatabasePermissionLevel
 import de.byjoker.myjfql.database.RelationalTableEntry
-import de.byjoker.myjfql.database.TableEntry
 import de.byjoker.myjfql.util.ResultType
 import org.jline.reader.ParsedLine
 
 @CommandHandler
-class ListOfCommand : ConsoleCommand("listof", mutableListOf("COMMAND", "TABLES", "DATABASES")) {
+class ListCommand : Command("list", listOf("COMMAND", "TABLES", "DATABASES")) {
 
-    override fun executeAsConsole(sender: ConsoleCommandSender, args: MutableMap<String, MutableList<String>>) {
+    override fun execute(sender: CommandSender, args: Map<String, List<String>>) {
         val databaseService = MyJFQL.getInstance().databaseService
 
         if (args.containsKey("DATABASES")) {
@@ -22,12 +20,12 @@ class ListOfCommand : ConsoleCommand("listof", mutableListOf("COMMAND", "TABLES"
                 )
             }.map { database ->
                 RelationalTableEntry().append("name", database.name).append("type", database.type)
-            }.toMutableList() as Collection<TableEntry>, mutableListOf("name", "type"), ResultType.LEGACY)
+            }, mutableListOf("name", "type"), ResultType.RELATIONAL)
             return
         }
 
         if (args.containsKey("TABLES")) {
-            val database: Database? = sender.session.getDatabase(databaseService)
+            val database = sender.session.getDatabase(databaseService)
 
             if (database == null) {
                 sender.sendError("No database is in use for this user!")
@@ -41,7 +39,7 @@ class ListOfCommand : ConsoleCommand("listof", mutableListOf("COMMAND", "TABLES"
 
             sender.sendResult(database.tables.map { table ->
                 RelationalTableEntry().append("name", table.name).append("type", table.type)
-            }.toMutableList() as Collection<TableEntry>, mutableListOf("name", "type"), ResultType.LEGACY)
+            }, listOf("name", "type"), ResultType.RELATIONAL)
             return
         }
 
@@ -62,5 +60,4 @@ class ListOfCommand : ConsoleCommand("listof", mutableListOf("COMMAND", "TABLES"
             }
         }
     }
-
 }

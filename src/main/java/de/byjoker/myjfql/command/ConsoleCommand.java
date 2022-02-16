@@ -11,10 +11,10 @@ public abstract class ConsoleCommand extends Command {
         super(name, syntax);
     }
 
-    public abstract void executeAsConsole(ConsoleCommandSender sender, final Map<String, List<String>> args);
+    public abstract void executeAsConsole(ConsoleCommandSender sender, @NotNull Map<String, ? extends List<String>> args);
 
     @Override
-    public final void execute(@NotNull CommandSender sender, @NotNull Map<String, List<String>> args) {
+    public final void execute(@NotNull CommandSender sender, @NotNull Map<String, ? extends List<String>> args) {
         if (!(sender instanceof ConsoleCommandSender)) {
             sender.sendForbidden();
             return;

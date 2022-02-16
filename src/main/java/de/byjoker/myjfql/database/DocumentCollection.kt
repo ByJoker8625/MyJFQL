@@ -9,15 +9,15 @@ class DocumentCollection : Table {
 
     private var name: String
     private var entries: MutableMap<String, TableEntry>
-    private var prototypeStructure: MutableCollection<String>
+    private var prototypeStructure: Collection<String>
 
-    constructor(name: String, entries: MutableMap<String, TableEntry>, structure: MutableCollection<String>) {
+    constructor(name: String, entries: MutableMap<String, TableEntry>, structure: Collection<String>) {
         this.name = name
         this.entries = entries
         this.prototypeStructure = structure
     }
 
-    constructor(name: String, structure: MutableCollection<String>) {
+    constructor(name: String, structure: Collection<String>) {
         this.name = name
         this.entries = mutableMapOf()
         this.prototypeStructure = structure
@@ -39,7 +39,7 @@ class DocumentCollection : Table {
         return entries[identifier]
     }
 
-    override fun getEntries(): MutableCollection<TableEntry> {
+    override fun getEntries(): Collection<TableEntry> {
         return entries.values
     }
 
@@ -54,11 +54,11 @@ class DocumentCollection : Table {
         return entries
     }
 
-    override fun getStructure(): MutableCollection<String> {
+    override fun getStructure(): Collection<String> {
         return prototypeStructure
     }
 
-    override fun setStructure(structure: MutableCollection<String>) {
+    override fun setStructure(structure: Collection<String>) {
         this.prototypeStructure = structure
     }
 

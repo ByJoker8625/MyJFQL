@@ -2,7 +2,6 @@ package de.byjoker.myjfql.database
 
 import de.byjoker.myjfql.lang.TableEntryComparator
 import de.byjoker.myjfql.util.Order
-import java.util.function.Consumer
 
 class RelationalTable(private val name: String, structure: Collection<String>, primary: String) : Table {
     private var entries: MutableMap<String, TableEntry>
@@ -100,7 +99,7 @@ class RelationalTable(private val name: String, structure: Collection<String>, p
     private fun reindex() {
         val entries: Collection<TableEntry> = ArrayList(entries.values)
         this.entries.clear()
-        entries.forEach(Consumer { tableEntry: TableEntry -> addEntry(tableEntry) })
+        entries.forEach { entry: TableEntry -> addEntry(entry) }
     }
 
 }

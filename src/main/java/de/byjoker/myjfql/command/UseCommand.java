@@ -23,7 +23,7 @@ public class UseCommand extends Command {
     }
 
     @Override
-    public void execute(CommandSender sender, @NotNull Map<String, List<String>> args) {
+    public void execute(CommandSender sender, @NotNull Map<String, ? extends List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
         final Session session = sender.getSession();
 

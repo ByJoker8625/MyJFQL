@@ -8,9 +8,9 @@ import org.jline.reader.ParsedLine
 
 @CommandHandler
 class CreateCommand :
-    Command("create", mutableListOf("COMMAND", "DATABASE", "TABLE", "STRUCTURE", "LIKE", "PRIMARY-KEY")) {
+    Command("create", listOf("COMMAND", "DATABASE", "TABLE", "STRUCTURE", "LIKE", "PRIMARY-KEY")) {
 
-    override fun execute(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
+    override fun execute(sender: CommandSender, args: Map<String, List<String>>) {
         val databaseService: DatabaseService = MyJFQL.getInstance().databaseService
         val session: Session? = sender.session
 
@@ -92,8 +92,10 @@ class CreateCommand :
 
             when (type) {
                 TableType.DOCUMENT -> {
-                    val structure: MutableList<String>? =
-                        if (!args.containsKey("STRUCTURE")) mutableListOf("_id") else formatList(args["STRUCTURE"])
+                    val structure = when {
+                        !args.containsKey("STRUCTURE") -> listOf("_id")
+                        else -> formatList(args["STRUCTURE"])
+                    }
 
                     if (structure == null) {
                         sender.sendError("Undefined table structure!")
@@ -108,15 +110,17 @@ class CreateCommand :
                         return
                     }
 
-                    val structure: MutableList<String>? = formatList(args["STRUCTURE"])
+                    val structure = formatList(args["STRUCTURE"])
 
                     if (structure == null) {
                         sender.sendError("Undefined table structure!")
                         return
                     }
 
-                    val primary: String? =
-                        if (args.containsKey("PRIMARY-KEY")) formatString(args["PRIMARY-KEY"]) else structure[0]
+                    val primary: String? = when {
+                        args.containsKey("PRIMARY-KEY") -> formatString(args["PRIMARY-KEY"])
+                        else -> structure[0]
+                    }
 
                     if (primary == null) {
                         sender.sendError("Undefined primary key!")
@@ -147,14 +151,14 @@ class CreateCommand :
         sender.sendSyntax()
     }
 
-    override fun complete(sender: CommandSender, line: ParsedLine): MutableList<String>? {
+    override fun complete(sender: CommandSender, line: ParsedLine): List<String>? {
         sender.session ?: return null
 
         val args = line.line().uppercase()
 
         return when {
             !args.contains(" TABLE") && !args.contains(" DATABASE") -> {
-                mutableListOf("table", "database")
+                listOf("table", "database")
             }
             else -> {
                 null

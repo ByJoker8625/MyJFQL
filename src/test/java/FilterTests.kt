@@ -12,7 +12,7 @@ class FilterTests {
 
     private val table = RelationalTable(
         "testing_table",
-        mutableListOf("id", "username", "name", "password", "email", "locked", "verified"),
+        listOf("id", "username", "name", "password", "email", "locked", "verified"),
         "id"
     )
     private val random = Random()

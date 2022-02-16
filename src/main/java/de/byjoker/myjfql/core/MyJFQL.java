@@ -85,7 +85,7 @@ public final class MyJFQL {
                 config = configService.load();
             }
 
-            if (config.isJline()) {
+            if (config.getJline()) {
                 console = new SimpleConsole();
             }
 
@@ -103,7 +103,7 @@ public final class MyJFQL {
 
         final RegistryConfig registryConfig = config.getRegistry();
 
-        if (registryConfig.isLookup()) {
+        if (registryConfig.getLookup()) {
             console.logInfo("Connecting to " + registryConfig.getHost() + "...");
 
             try {
@@ -120,7 +120,7 @@ public final class MyJFQL {
                     console.logInfo("Your are up to date with you MyJFQL version. You can enjoy all features of this system :D");
                     break;
                 case JUST_FINE:
-                    if (registryConfig.issAutoUpdates())
+                    if (registryConfig.getAutoUpdates())
                         downloader.downloadLatestVersion();
                     else
                         console.logWarning("You aren't up to date. Please download the latest version.");
@@ -138,7 +138,7 @@ public final class MyJFQL {
 
         final ServerConfig serverConfig = config.getServer();
 
-        if (serverConfig.isEnabled()) {
+        if (serverConfig.getEnabled()) {
             try {
                 networkService.start(serverConfig.getPort());
             } catch (Exception ex) {
@@ -181,7 +181,7 @@ public final class MyJFQL {
 
         sessionService.openSession(new InternalSession(consoleCommandSender.getName()));
 
-        if (config.isDocker()) {
+        if (config.getDocker()) {
             console.logInfo("Docker mode enabled.");
 
             final Map<String, String> environment = System.getenv();

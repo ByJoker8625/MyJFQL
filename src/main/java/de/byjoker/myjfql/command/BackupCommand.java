@@ -4,6 +4,7 @@ import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.BackupService;
 import de.byjoker.myjfql.database.RelationalTableEntry;
 import de.byjoker.myjfql.util.ResultType;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Arrays;
@@ -20,7 +21,7 @@ public class BackupCommand extends ConsoleCommand {
     }
 
     @Override
-    public void executeAsConsole(ConsoleCommandSender sender, Map<String, List<String>> args) {
+    public void executeAsConsole(ConsoleCommandSender sender, @NotNull Map<String, ? extends List<String>> args) {
         final BackupService backupService = MyJFQL.getInstance().getDatabaseBackupService();
 
         if (args.containsKey("CREATE")) {
@@ -124,12 +125,12 @@ public class BackupCommand extends ConsoleCommand {
                 return;
             }
 
-            sender.sendResult(Arrays.stream(files).map(file -> new RelationalTableEntry().append("backup_name", file.getName())).collect(Collectors.toList()), Collections.singletonList("backup_name"), ResultType.LEGACY);
+            sender.sendResult(Arrays.stream(files).map(file -> new RelationalTableEntry().append("backup_name", file.getName())).collect(Collectors.toList()), Collections.singletonList("name"), ResultType.RELATIONAL);
             return;
         }
 
         if (args.containsKey("LIST")) {
-            sender.sendResult(backupService.getBackups().stream().map(s -> new RelationalTableEntry().append("backup_name", s)).collect(Collectors.toList()), Collections.singletonList("backup_name"), ResultType.LEGACY);
+            sender.sendResult(backupService.getBackups().stream().map(s -> new RelationalTableEntry().append("backup_name", s)).collect(Collectors.toList()), Collections.singletonList("name"), ResultType.RELATIONAL);
             return;
         }
 

@@ -13,13 +13,11 @@ public class LegacyNetworkCommandSender extends CommandSender {
 
     private final User user;
     private final Connection connection;
-    private final Session session;
 
     public LegacyNetworkCommandSender(User user, Connection connection, Session session) {
         super(user.getName(), session);
         this.user = user;
         this.connection = connection;
-        this.session = session;
     }
 
     @Override
