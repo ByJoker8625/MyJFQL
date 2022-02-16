@@ -14,7 +14,7 @@ public class ShutdownCommand extends ConsoleCommand {
     }
 
     @Override
-    public void handleConsoleCommand(ConsoleCommandSender sender, Map<String, List<String>> args) {
+    public void executeAsConsole(ConsoleCommandSender sender, Map<String, List<String>> args) {
         MyJFQL.getInstance().shutdown();
     }
 

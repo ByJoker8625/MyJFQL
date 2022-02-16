@@ -1,18 +1,23 @@
 package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
-import de.byjoker.myjfql.database.*
-import de.byjoker.myjfql.lang.ColumnComparator
-import de.byjoker.myjfql.lang.ColumnFilter
-import de.byjoker.myjfql.lang.SortingOrder
-import de.byjoker.myjfql.server.session.Session
+import de.byjoker.myjfql.database.Database
+import de.byjoker.myjfql.database.DatabasePermissionLevel
+import de.byjoker.myjfql.database.RelationalTable
+import de.byjoker.myjfql.database.TableEntry
+import de.byjoker.myjfql.lang.TableEntryComparator
+import de.byjoker.myjfql.lang.TableEntryFilter
+import de.byjoker.myjfql.network.session.Session
+import de.byjoker.myjfql.util.Order
+import de.byjoker.myjfql.util.ResultType
+import org.jline.reader.ParsedLine
 import java.util.stream.Collectors
 
 @CommandHandler
 class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM", "WHERE", "SORT", "ORDER", "LIMIT")) {
 
-    override fun handleCommand(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
-        val databaseService: DatabaseService = MyJFQL.getInstance().databaseService
+    override fun execute(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
+        val databaseService = MyJFQL.getInstance().databaseService
         val session: Session? = sender.session
 
         if (session == null) {
@@ -40,16 +45,16 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                 return
             }
 
-            val table: Table = database.getTable(from)
+            val table = database.getTable(from)
 
-            if (!sender.allowed(database.id, DatabaseAction.READ)) {
+            if (!sender.allowed(database.id, DatabasePermissionLevel.READ)) {
                 sender.sendForbidden()
                 return
             }
 
-            val structure: Collection<String> = when {
-                formatString(args["VALUE"]) == "*" -> table.structure
-                else -> formatList(args["VALUE"])
+            val structure: MutableCollection<String> = when {
+                formatString(args["VALUE"]) == "*" -> table!!.structure
+                else -> formatList(args["VALUE"]) ?: return
             }
 
             if (table is RelationalTable && structure.stream().anyMatch { entry -> !table.structure.contains(entry) }) {
@@ -57,9 +62,9 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                 return
             }
 
-            var order: SortingOrder? = null
+            var order: Order? = null
             var sortedBy: String? = null
-            var limit: Int = -1
+            var limit = -1
 
             if (args.containsKey("LIMIT")) {
                 limit = try {
@@ -93,14 +98,16 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
 
             if (args.containsKey("ORDER")) {
                 order = try {
-                    SortingOrder.valueOf(formatString(args["ORDER"]))
+                    Order.valueOf(formatString(args["ORDER"])!!)
                 } catch (ex: Exception) {
                     sender.sendError("Unknown sort order!")
                     return
                 }
 
-                if (sortedBy == null) sortedBy = table.primary
+                if (sortedBy == null) sortedBy = table!!.primary
             }
+
+            val resultType = if (table is RelationalTable) ResultType.RELATIONAL else ResultType.DOCUMENT
 
             if (args.containsKey("PRIMARY-KEY")) {
                 val primaryKey = formatString(args["PRIMARY-KEY"])
@@ -110,57 +117,97 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                     return
                 }
 
-                val column = table.getColumn(primaryKey)
+                val entry = table!!.getEntry(primaryKey)
 
-                if (column == null) {
-                    sender.sendError("Column was not found!")
+                if (entry == null) {
+                    sender.sendError("Entry was not found!")
                     return
                 }
 
-                sender.sendResult(listOf(column), structure)
+                sender.sendResult(mutableListOf(entry), structure, resultType)
             } else if (args.containsKey("WHERE")) {
-                val columns: List<Column>? = try {
-                    ColumnFilter.filterByCommandLineArguments(
-                        table, args["WHERE"], if (sortedBy == null) null else ColumnComparator(sortedBy), order
+                val entries: MutableList<TableEntry>? = try {
+                    TableEntryFilter.filterByCommandLineArguments(
+                        table, args["WHERE"], if (sortedBy == null) null else TableEntryComparator(
+                            sortedBy
+                        ), order
                     )
                 } catch (ex: Exception) {
                     sender.sendError(ex)
                     return
                 }
 
-                if (columns == null) {
+                if (entries == null) {
                     sender.sendError("Unknown statement error!")
                     return
                 }
 
                 if (limit != -1) {
-                    sender.sendResult(columns.stream().limit(limit.toLong()).collect(Collectors.toList()), structure)
+                    sender.sendResult(
+                        entries.stream().limit(limit.toLong()).collect(Collectors.toList()),
+                        structure,
+                        resultType
+                    )
                     return
                 }
 
-                sender.sendResult(columns, structure)
+                sender.sendResult(entries, structure, resultType)
             } else {
-                val columns = if (sortedBy == null) table.columns else table.getColumns(
-                    ColumnComparator(sortedBy), order
+                val entries = if (sortedBy == null) table!!.entries else table!!.getEntries(
+                    TableEntryComparator(sortedBy), order
                 )
 
-                if (columns.isEmpty()) {
-                    sender.sendResult(ArrayList<Column>(), structure)
+                if (entries.isEmpty()) {
+                    sender.sendResult(ArrayList<TableEntry>(), structure, resultType)
                     return
                 }
 
                 if (limit != -1) {
-                    sender.sendResult(columns.stream().limit(limit.toLong()).collect(Collectors.toList()), structure)
+                    sender.sendResult(
+                        entries.stream().limit(limit.toLong()).collect(Collectors.toList()),
+                        structure,
+                        resultType
+                    )
                     return
                 }
 
-                sender.sendResult(columns, structure)
+                sender.sendResult(entries, structure, resultType)
             }
 
             return
         }
 
         sender.sendSyntax()
+    }
+
+    override fun complete(sender: CommandSender, line: ParsedLine): MutableList<String>? {
+        sender.session ?: return null
+        val database: Database = sender.session!!.getDatabase(MyJFQL.getInstance().databaseService) ?: return null
+
+        if (!sender.allowed(database.id, DatabasePermissionLevel.READ)) {
+            return null
+        }
+
+        val args = line.line().uppercase()
+        val before = line.words()[line.wordIndex() - 1].uppercase()
+
+        return when {
+            !args.contains(" VALUE") -> mutableListOf("value")
+            before == "VALUE" -> mutableListOf("*")
+            !args.contains(" FROM") -> mutableListOf("from")
+            before == "FROM" -> database.tables.map { table -> table.name }.toMutableList()
+            !args.contains(" WHERE") && !args.contains(" PRIMARY-KEY") -> mutableListOf("where", "primary-key")
+            before == "WHERE" || before == "PRIMARY-KEY" -> null
+            !args.contains(" SORT") && !args.contains(" ORDER") && !args.contains(" LIMIT") -> mutableListOf(
+                "sort",
+                "order",
+                "limit"
+            )
+            before == "SORT" -> null
+            before == "ORDER" -> mutableListOf("asc", "desc")
+            before == "LIMIT" -> null
+            else -> null
+        }
     }
 
 }

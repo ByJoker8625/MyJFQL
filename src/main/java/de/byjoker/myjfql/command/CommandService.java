@@ -12,7 +12,7 @@ public interface CommandService {
 
     boolean existsCommand(String name);
 
-    void execute(CommandSender sender, String name);
+    void execute(CommandSender sender, String instructions);
 
     Command getCommand(String name);
 

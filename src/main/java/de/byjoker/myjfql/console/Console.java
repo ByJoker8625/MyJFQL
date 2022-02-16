@@ -1,8 +1,8 @@
 package de.byjoker.myjfql.console;
 
-public interface Console {
+import org.jetbrains.annotations.NotNull;
 
-    void clean();
+public interface Console {
 
     void log(String s);
 
@@ -16,16 +16,10 @@ public interface Console {
 
     void println(String s);
 
-    void printWarning(String s);
-
-    void printInfo(String s);
-
-    void printError(String s);
-
     String readPrompt();
 
-    void clear();
+    void bind(@NotNull Object... parameters);
 
-    void complete();
+    void clear();
 
 }

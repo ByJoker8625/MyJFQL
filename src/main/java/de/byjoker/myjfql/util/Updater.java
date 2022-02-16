@@ -20,7 +20,7 @@ public class Updater {
         this.version = version;
     }
 
-    public void connect(String url) throws Exception {
+    public void lookup(String url) throws Exception {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url).openStream(), StandardCharsets.UTF_8));
         final StringBuilder builder = new StringBuilder();
 

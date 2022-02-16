@@ -12,7 +12,7 @@ public class ClearCommand extends ConsoleCommand {
     }
 
     @Override
-    public void handleConsoleCommand(ConsoleCommandSender sender, Map<String, List<String>> args) {
+    public void executeAsConsole(ConsoleCommandSender sender, Map<String, List<String>> args) {
         sender.getConsole().clear();
     }
 

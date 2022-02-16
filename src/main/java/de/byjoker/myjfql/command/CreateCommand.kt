@@ -2,13 +2,15 @@ package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.*
-import de.byjoker.myjfql.server.session.Session
+import de.byjoker.myjfql.network.session.Session
+import de.byjoker.myjfql.user.User
+import org.jline.reader.ParsedLine
 
 @CommandHandler
 class CreateCommand :
     Command("create", mutableListOf("COMMAND", "DATABASE", "TABLE", "STRUCTURE", "LIKE", "PRIMARY-KEY")) {
 
-    override fun handleCommand(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
+    override fun execute(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
         val databaseService: DatabaseService = MyJFQL.getInstance().databaseService
         val session: Session? = sender.session
 
@@ -30,11 +32,7 @@ class CreateCommand :
                 return
             }
 
-            /**
-             * todo come up with a good permission handling for this case
-             */
-
-            if (!sender.allowed("%", DatabaseAction.READ_WRITE)) {
+            if (!sender.allowed(User.ALLOW_CREATE_DATABASES, DatabasePermissionLevel.READ_WRITE)) {
                 sender.sendForbidden()
                 return
             }
@@ -44,7 +42,7 @@ class CreateCommand :
                 return
             }
 
-            databaseService.createDatabase(DatabaseImpl(database))
+            databaseService.createDatabase(SimpleDatabase(database))
             sender.sendSuccess()
             return
         }
@@ -57,7 +55,7 @@ class CreateCommand :
                 return
             }
 
-            if (!sender.allowed(database.id, DatabaseAction.READ_WRITE)) {
+            if (!sender.allowed(database.id, DatabasePermissionLevel.READ_WRITE)) {
                 sender.sendForbidden()
                 return
             }
@@ -84,11 +82,8 @@ class CreateCommand :
              * the default value of the table type is set to 'RELATIONAL'.
              */
 
-            if (!args.containsKey("LIKE")) {
-                args["LIKE"] = mutableListOf("THE_THING_I_EVER_USED_BEFORE")
-            }
-
-            val type: TableType? = TableType.likeTableType(formatString(args["LIKE"]))
+            val type: TableType? =
+                if (!args.containsKey("LIKE")) TableType.RELATIONAL else TableType.likeTableType(formatString(args["LIKE"]))
 
             if (type == null) {
                 sender.sendError("Unknown table type!")
@@ -96,7 +91,7 @@ class CreateCommand :
             }
 
             when (type) {
-                TableType.NON_RELATIONAL -> {
+                TableType.DOCUMENT -> {
                     val structure: MutableList<String>? =
                         if (!args.containsKey("STRUCTURE")) mutableListOf("_id") else formatList(args["STRUCTURE"])
 
@@ -105,10 +100,7 @@ class CreateCommand :
                         return
                     }
 
-                    database.createTable(NonRelationalTable(table, structure))
-                }
-                TableType.KEY_VALUE -> {
-                    database.createTable(KeyValueTable(table))
+                    database.createTable(DocumentCollection(table, structure))
                 }
                 else -> {
                     if (!args.containsKey("STRUCTURE")) {
@@ -136,7 +128,13 @@ class CreateCommand :
                         return
                     }
 
-                    database.createTable(RelationalTable(table, structure, primary))
+                    database.createTable(
+                        RelationalTable(
+                            table,
+                            structure,
+                            primary
+                        )
+                    )
                 }
             }
 
@@ -147,6 +145,21 @@ class CreateCommand :
         }
 
         sender.sendSyntax()
+    }
+
+    override fun complete(sender: CommandSender, line: ParsedLine): MutableList<String>? {
+        sender.session ?: return null
+
+        val args = line.line().uppercase()
+
+        return when {
+            !args.contains(" TABLE") && !args.contains(" DATABASE") -> {
+                mutableListOf("table", "database")
+            }
+            else -> {
+                null
+            }
+        }
     }
 
 }

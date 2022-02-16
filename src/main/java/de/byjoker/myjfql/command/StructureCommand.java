@@ -1,13 +1,13 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.Database;
-import de.byjoker.myjfql.database.DatabaseAction;
-import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.database.Table;
-import de.byjoker.myjfql.server.session.Session;
+import de.byjoker.myjfql.database.*;
+import de.byjoker.myjfql.network.session.Session;
+import de.byjoker.myjfql.util.ResultType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @CommandHandler
 public class StructureCommand extends Command {
@@ -17,7 +17,7 @@ public class StructureCommand extends Command {
     }
 
     @Override
-    public void handleCommand(CommandSender sender, Map<String, List<String>> args) {
+    public void execute(CommandSender sender, @NotNull Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
         final Session session = sender.getSession();
 
@@ -47,7 +47,7 @@ public class StructureCommand extends Command {
             }
 
 
-            if (!sender.allowed(database.getId(), DatabaseAction.READ)) {
+            if (!sender.allowed(database.getId(), DatabasePermissionLevel.READ)) {
                 sender.sendForbidden();
                 return;
             }
@@ -58,15 +58,15 @@ public class StructureCommand extends Command {
 
             if (!args.containsKey("ADD") && !args.containsKey("REMOVE") && !args.containsKey("SET") && !args.containsKey("MARK-PRIMARY")) {
                 if (args.containsKey("PRIMARY-KEY")) {
-                    sender.sendResult(Collections.singletonList(primary), new String[]{"primary"});
+                    sender.sendResult(Collections.singletonList(new RelationalTableEntry().append("primary_key_name", primary)), Collections.singletonList("primary_key_name"), ResultType.RELATIONAL);
                     return;
                 }
 
-                sender.sendResult(structure, new String[]{"structure"});
+                sender.sendResult(structure.stream().map(s -> new RelationalTableEntry().append("field_name", s)).collect(Collectors.toList()), Collections.singletonList("field_name"), ResultType.RELATIONAL);
                 return;
             }
 
-            if (!sender.allowed(database.getId(), DatabaseAction.READ_WRITE)) {
+            if (!sender.allowed(database.getId(), DatabasePermissionLevel.READ_WRITE)) {
                 sender.sendForbidden();
                 return;
             }
@@ -135,6 +135,11 @@ public class StructureCommand extends Command {
 
             if (args.containsKey("SET")) {
                 final List<String> newStructure = formatList(args.get("SET"));
+
+                if (newStructure == null) {
+                    sender.sendError("Undefined structure!");
+                    return;
+                }
 
                 if (newStructure.size() == 0) {
                     sender.sendError("Structures size cant be 0!");

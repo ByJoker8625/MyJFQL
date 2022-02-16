@@ -1,9 +1,6 @@
 package de.byjoker.myjfql.database;
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -33,11 +30,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public void deleteBackup(String name) {
-        try {
-            FileUtils.deleteDirectory(new File("backup/" + name));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        new File("backup/" + name).delete();
     }
 
     @Override

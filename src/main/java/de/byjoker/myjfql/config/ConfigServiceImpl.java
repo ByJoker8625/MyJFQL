@@ -1,116 +1,43 @@
 package de.byjoker.myjfql.config;
 
-import com.google.common.reflect.ClassPath;
-import de.byjoker.myjfql.exception.FileException;
-import de.byjoker.myjfql.util.FileFactory;
-import org.json.JSONObject;
+import de.byjoker.myjfql.network.session.Session;
+import de.byjoker.myjfql.util.Json;
+import de.byjoker.myjfql.util.Yaml;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static com.google.common.reflect.ClassPath.from;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ConfigServiceImpl implements ConfigService {
 
-    private final List<ConfigBuilder> configBuilders;
-    private final FileFactory factory;
-    private JSONObject config;
-
-    public ConfigServiceImpl() {
-        this.factory = new FileFactory();
-        this.configBuilders = new ArrayList<>();
-        this.config = null;
-    }
-
     @Override
-    public void registerConfigBuilder(ConfigBuilder configBuilder) {
-        configBuilders.add(configBuilder);
-    }
+    public void buildDefaults() {
+        File file = new File("config.yml");
 
-    @Override
-    public void unregisterConfigBuilder(ConfigBuilder configBuilder) {
-        configBuilders.remove(configBuilder);
-    }
+        if (!file.exists())
+            Yaml.write(new Config(), file);
 
-    @Override
-    public void searchConfigBuilders(String path) {
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        file = new File("sessions.json");
 
-        try {
-            for (ClassPath.ClassInfo info : from(loader).getTopLevelClasses()) {
-                if (info.getName().startsWith(path)) {
-                    try {
-                        final Class<? extends ConfigBuilder> clazz = (Class<? extends ConfigBuilder>) info.load();
-
-                        if (clazz.isAnnotationPresent(ConfigHandler.class))
-                            registerConfigBuilder(clazz.newInstance());
-                    } catch (Exception ignore) {
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!file.exists()) {
+            Json.write(new ArrayList<Session>(), file);
         }
     }
 
     @Override
-    public ConfigBuilder getConfigBuilder(JSONObject json) {
-        final List<String> fields = new ArrayList<>(json.toMap().keySet());
-        return configBuilders.stream().filter(configBuilder -> configBuilder.getIdentifiers().equals(fields)).findFirst().orElse(null);
+    public void mkdirs() {
+        for (File file : Stream.of("database", "backup", "user").map(File::new).collect(Collectors.toList())) {
+            if (!file.exists())
+                file.mkdirs();
+        }
+
+        buildDefaults();
     }
 
     @Override
-    public List<ConfigBuilder> getConfigBuilders() {
-        return configBuilders;
+    public Config load() {
+        return Yaml.parse(Yaml.read(new File("config.yml")), Config.class);
     }
 
-    @Override
-    public void load() {
-        buildRequirements();
-        config = factory.load(new File("config.json"));
-    }
-
-    @Override
-    public void buildRequirements() {
-        File file = new File("database");
-
-        if (!file.exists())
-            file.mkdirs();
-
-        file = new File("user");
-
-        if (!file.exists())
-            file.mkdirs();
-
-        file = new File("backup");
-
-        if (!file.exists())
-            file.mkdirs();
-
-        file = new File("sessions.json");
-
-        if (!file.exists())
-            factory.save(file, new JSONObject().put("sessions", Collections.emptyList()));
-
-        file = new File("config.json");
-
-        if (!file.exists())
-            factory.save(file, new ConfigDefaults().asJson());
-    }
-
-    @Override
-    public Config getConfig() {
-        if (config == null)
-            throw new FileException("File 'config.json' wasn't load!");
-
-        ConfigBuilder builder = getConfigBuilder(config);
-
-        if (builder == null)
-            throw new FileException("File 'config.json' is incompatible!");
-
-        return builder.build(config);
-    }
 }

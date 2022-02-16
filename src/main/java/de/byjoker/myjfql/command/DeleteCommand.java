@@ -2,9 +2,11 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Database;
-import de.byjoker.myjfql.database.DatabaseAction;
+import de.byjoker.myjfql.database.DatabasePermissionLevel;
 import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.server.session.Session;
+import de.byjoker.myjfql.network.session.Session;
+import de.byjoker.myjfql.user.User;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +20,7 @@ public class DeleteCommand extends Command {
     }
 
     @Override
-    public void handleCommand(CommandSender sender, Map<String, List<String>> args) {
+    public void execute(@NotNull CommandSender sender, @NotNull Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
         final Session session = sender.getSession();
 
@@ -36,7 +38,17 @@ public class DeleteCommand extends Command {
                 return;
             }
 
-            if (!sender.allowed(database.getId(), DatabaseAction.READ_WRITE)) {
+            if (name == null) {
+                sender.sendError("Undefined table!");
+                return;
+            }
+
+            if (!database.existsTable(name)) {
+                sender.sendError("Table doesn't exist!");
+                return;
+            }
+
+            if (!sender.allowed(database.getId(), DatabasePermissionLevel.READ_WRITE)) {
                 sender.sendForbidden();
                 return;
             }
@@ -54,7 +66,7 @@ public class DeleteCommand extends Command {
         }
 
         if (args.containsKey("DATABASE")) {
-            if (sender instanceof RestCommandSender) {
+            if (!sender.allowed(User.ALLOW_CREATE_DATABASES, DatabasePermissionLevel.READ_WRITE)) {
                 sender.sendForbidden();
                 return;
             }

@@ -31,7 +31,7 @@ public class Downloader {
 
         try {
             final URL url = new URL(download);
-            final File file = new File(MyJFQL.getInstance().getConfigService().getConfig().updateFile());
+            final File file = new File(MyJFQL.getInstance().getConfig().getRegistry().getOutput());
 
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             final BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());

@@ -152,9 +152,9 @@ request.
 |:----------|:-------------:|------------------------------------------------------------|
 | state      | response state | the state of the response                                   |
 | structure | string array  | the table structure of response                            |
-| result    | column array  | the actual content *(a standalone string or column based)* |
+| result    | tableEntry array  | the actual content *(a standalone string or tableEntry based)* |
 
-##### SelectResponse example *(column based)*
+##### SelectResponse example *(tableEntry based)*
 
 ```json
 {
@@ -472,7 +472,7 @@ create table ${name} structure ${structure} primary-key ${primary_key}
 ```
 
 * The table will be created in the database you are currently working in.
-* The structure are all the column names seperated by a space. Like this ``id username email password``.
+* The structure are all the tableEntry names seperated by a space. Like this ``id username email password``.
 * You can leave the ```primary-key``` field empty and the first structure item will be the primary key of that table.
 
 #### Delete tables
@@ -506,7 +506,7 @@ structure of ${table}
 structure of ${table} mark-primary ${column_name}
 ```
 
-#### Add entry to structure
+#### Add tableEntry to structure
 
 ```jfql
 structure of ${table} add ${column_name}
@@ -538,7 +538,7 @@ You have three different possible ways of inserting data into your table:
 
     * This dataset **has to contain the primary key**!
     * The key field contains all colum names in which data is going to be inserted.
-    * The value filed contains all values for the columns and every value belongs to the key at the same index. For
+    * The value filed contains all values for the entries and every value belongs to the key at the same index. For
       example ``key id name value VALUE_OF_ID VALUE_OF_NAME``
     * Like everywhere an argument goes to the next space. If you want to prevent this add a ``'`` at start and end of
       your argument.
@@ -548,7 +548,7 @@ You have three different possible ways of inserting data into your table:
     ```jfql
    insert into ${table} key ${colum_names} value ${values} primary-key ${primary_key}
    ```
-    * The data fill be exactly inserted at in the first way but this data goes in the table entry with the entered
+    * The data fill be exactly inserted at in the first way but this data goes in the table tableEntry with the entered
       primary key
 
 3. Editing multiple dataset by passing conditions to them which get edited.
@@ -567,21 +567,21 @@ You have three different possible ways of inserting data into your table:
 
 Like in the insert query you have three possible ways to select data from a table:
 
-1. Select every entry of the database
+1. Select every tableEntry of the database
 
     ```jfql
    select value ${colum_names} from ${table}
    ```
     * You can also sort your response using the ``order`` tag. Enter a ``ASC`` or ``DESC`` as sequence. To sort a
-      specific column add ``sort ${column_name}``.
+      specific tableEntry add ``sort ${column_name}``.
     * To limit the amount of entries add ``limit ${limit}`` to your query.
-    * The ``value`` field contains all colum names you want to select. Enter ``*`` to select all possible columns.
+    * The ``value`` field contains all colum names you want to select. Enter ``*`` to select all possible entries.
 
-2. Select one table entry with entering the primary key
+2. Select one table tableEntry with entering the primary key
     ```jfql
    select value ${colum_names} from ${table} primary-key ${primary_key}
    ```
-    * This is same as the first, but you only select one entry by the primary key.
+    * This is same as the first, but you only select one tableEntry by the primary key.
 
 3. Selecting multiple table entries by passing conditions to them which get edited.
     ```jfql
@@ -592,18 +592,18 @@ Like in the insert query you have three possible ways to select data from a tabl
 
 #### Remove table entries
 
-If you want to remove a column you can do this by passing the primary key or by passing conditions.
+If you want to remove a tableEntry you can do this by passing the primary key or by passing conditions.
 
 1. Using primary key
    ```jfql
-   remove column ${primary_key_value} from ${table}
+   remove tableEntry ${primary_key_value} from ${table}
    ```
 
     * In case you want to remove all table entries enter ``*`` as primary key value.
 
 2. By passing conditions
    ```jfql
-   remove column * from ${table} where ${conditions}
+   remove tableEntry * from ${table} where ${conditions}
    ```
     * **Look at the insert** query for the condition system.
     * All table entries which apply to these conditions get removed.

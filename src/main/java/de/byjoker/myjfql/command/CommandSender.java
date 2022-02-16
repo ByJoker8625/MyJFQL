@@ -1,7 +1,11 @@
 package de.byjoker.myjfql.command;
 
-import de.byjoker.myjfql.database.DatabaseAction;
-import de.byjoker.myjfql.server.session.Session;
+import de.byjoker.myjfql.database.DatabasePermissionLevel;
+import de.byjoker.myjfql.database.TableEntry;
+import de.byjoker.myjfql.network.session.Session;
+import de.byjoker.myjfql.util.ResultType;
+
+import java.util.Collection;
 
 public abstract class CommandSender {
 
@@ -13,7 +17,7 @@ public abstract class CommandSender {
         this.session = session;
     }
 
-    public abstract boolean allowed(String database, DatabaseAction action);
+    public abstract boolean allowed(String database, DatabasePermissionLevel action);
 
     public abstract void sendError(Object obj);
 
@@ -23,7 +27,7 @@ public abstract class CommandSender {
 
     public abstract void sendSuccess();
 
-    public abstract void sendResult(Object obj, Object structure);
+    public abstract void sendResult(Collection<TableEntry> entries, Collection<String> structure, ResultType resultType);
 
     public abstract void send(Object obj);
 

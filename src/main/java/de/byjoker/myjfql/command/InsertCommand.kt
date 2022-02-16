@@ -2,14 +2,15 @@ package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.*
-import de.byjoker.myjfql.lang.ColumnFilter
-import org.json.JSONObject
+import de.byjoker.myjfql.lang.TableEntryFilter
+import de.byjoker.myjfql.util.Json
+import org.jline.reader.ParsedLine
 
 @CommandHandler
 class InsertCommand :
     Command("insert", mutableListOf("COMMAND", "INTO", "CONTENT", "KEY", "VALUE", "PRIMARY-KEY", "WHERE", "FULLY")) {
 
-    override fun handleCommand(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
+    override fun execute(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
         val databaseService = MyJFQL.getInstance().databaseService
         val session = sender.session
 
@@ -25,12 +26,10 @@ class InsertCommand :
             return
         }
 
-        if (!sender.allowed(database.id, DatabaseAction.READ_WRITE)) {
+        if (!sender.allowed(database.id, DatabasePermissionLevel.READ_WRITE)) {
             sender.sendForbidden()
             return
         }
-
-        println(args)
 
         if (!args.containsKey("INTO")) {
             sender.sendSyntax()
@@ -49,15 +48,11 @@ class InsertCommand :
             return
         }
 
-        val table: Table = database.getTable(into)
-
-        println(table)
-        println(table.type)
-
+        val table = database.getTable(into)
         val content: Map<String, Any>?
 
-        when (table.type) {
-            TableType.NON_RELATIONAL -> {
+        when (table!!.type) {
+            TableType.DOCUMENT -> {
                 if (!args.containsKey("CONTENT")) {
                     sender.sendSyntax()
                     return
@@ -70,14 +65,14 @@ class InsertCommand :
                     return
                 }
 
-                val json: JSONObject = try {
-                    JSONObject(raw)
+                val json = try {
+                    Json.parse(raw)
                 } catch (ex: Exception) {
                     sender.sendError("Invalid json format: ${ex.message}")
                     return
                 }
 
-                content = json.toMap()
+                content = Json.convert(json)
             }
             else -> {
                 if (!args.containsKey("KEY") && !args.containsKey("VALUE")) {
@@ -117,8 +112,6 @@ class InsertCommand :
             }
         }
 
-        println(content)
-
         if (content == null) {
             sender.sendError("Undefined content!")
             return
@@ -126,36 +119,36 @@ class InsertCommand :
 
         when {
             args.containsKey("WHERE") -> {
-                val columns: MutableList<Column>? = try {
-                    ColumnFilter.filterByCommandLineArguments(table, args["WHERE"])
+                val entries: MutableList<TableEntry>? = try {
+                    TableEntryFilter.filterByCommandLineArguments(table, args["WHERE"])
                 } catch (ex: Exception) {
                     sender.sendError(ex)
                     return
                 }
 
-                if (columns == null) {
+                if (entries == null) {
                     sender.sendError("Unknown statement error!")
                     return
                 }
 
-                if (content.containsKey(table.primary) && table is NonRelationalTable) {
-                    sender.sendError("Can't modify unique id of column!")
+                if (content.containsKey(table.primary) && table is DocumentCollection) {
+                    sender.sendError("Can't modify unique id of document entry!")
                     return
                 }
 
-                for (column in columns) {
+                for (entry in entries) {
                     /**
                      * To prevent duplication of an entry when the primary key is changed, the previous entry is removed
                      */
 
                     if (content.containsKey(table.primary)) {
-                        table.removeColumn(column.selectStringify(table.primary))
+                        table.removeEntry(entry.selectStringify(table.primary))
                     }
 
                     if (args.containsKey("FULLY")) {
-                        column.content = content
+                        entry.content = content
                     } else {
-                        column.applyContent(content)
+                        entry.applyContent(content)
                     }
                 }
 
@@ -184,30 +177,24 @@ class InsertCommand :
                     }
                 }
 
-                val column: Column = table.getColumn(primary) ?: when (table.type) {
-                    TableType.NON_RELATIONAL -> NonRelationalColumn()
-                    TableType.KEY_VALUE -> KeyValueColumn()
-                    else -> RelationalColumn()
-                }
-
-                if (content.containsKey(table.primary) && table is NonRelationalTable) {
-                    sender.sendError("Can't modify unique id of column!")
-                    return
+                val entry = table.getEntry(primary) ?: when (table.type) {
+                    TableType.DOCUMENT -> Document()
+                    else -> RelationalTableEntry()
                 }
 
                 /**
-                 * To prevent duplication of an entry when the primary key is changed, the previous entry is removed
+                 * To prevent duplication of an entry when the primary key is changed,
+                 * the previous entry is removed
                  */
 
-                if (content.contains(table.primary)) {
-                    table.removeColumn(column.selectStringify(table.primary))
-                    return
+                if (content.contains(table.primary) && entry.select(table.primary) != content[table.primary]) {
+                    table.removeEntry(entry.selectStringify(table.primary))
                 }
 
                 if (args.containsKey("FULLY")) {
-                    column.content = content
+                    entry.content = content
                 } else {
-                    column.applyContent(content)
+                    entry.applyContent(content)
                 }
 
                 /**
@@ -215,17 +202,44 @@ class InsertCommand :
                  * argument and the entry does not yet exist, it will be added later
                  */
 
-                if (!column.contains(table.primary)) {
-                    column.insert(table.primary, primary)
+                if (!entry.contains(table.primary)) {
+                    entry.insert(table.primary, primary)
                 }
 
                 sender.sendSuccess()
 
-                table.addColumn(column)
+                table.addEntry(entry)
                 database.saveTable(table)
                 databaseService.saveDatabase(database)
                 return
             }
+        }
+    }
+
+    override fun complete(sender: CommandSender, line: ParsedLine)
+            : MutableList<String>? {
+        sender.session ?: return null
+        val database: Database = sender.session!!.getDatabase(MyJFQL.getInstance().databaseService) ?: return null
+
+        if (!sender.allowed(database.id, DatabasePermissionLevel.READ_WRITE)) {
+            return null
+        }
+
+        val args = line.line().uppercase()
+        val before = line.words()[line.wordIndex() - 1].uppercase()
+
+        return when {
+            !args.contains(" INTO") -> mutableListOf("into")
+            before == "INTO" -> database.tables.map { table -> table.name }.toMutableList()
+            !args.contains(" CONTENT") && !args.contains(" KEY") -> mutableListOf("content", "key")
+            before == "CONTENT" -> null
+            before == "KEY" -> null
+            args.contains(" KEY") && !args.contains(" VALUE") -> mutableListOf("value")
+            before == "VALUE" -> null
+            !args.contains(" WHERE") && !args.contains(" PRIMARY-KEY") -> mutableListOf("where", "primary-key")
+            before == "WHERE" || before == "PRIMARY-KEY" -> null
+            !args.contains(" FULLY") -> mutableListOf("fully")
+            else -> null
         }
     }
 

@@ -2,8 +2,9 @@ package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.*;
-import de.byjoker.myjfql.lang.ColumnFilter;
-import de.byjoker.myjfql.server.session.Session;
+import de.byjoker.myjfql.lang.TableEntryFilter;
+import de.byjoker.myjfql.network.session.Session;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +18,7 @@ public class RemoveCommand extends Command {
     }
 
     @Override
-    public void handleCommand(CommandSender sender, Map<String, List<String>> args) {
+    public void execute(CommandSender sender, @NotNull Map<String, List<String>> args) {
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
         final Session session = sender.getSession();
 
@@ -36,15 +37,15 @@ public class RemoveCommand extends Command {
         if (args.containsKey("FROM")
                 && args.containsKey("COLUMN")) {
             final String name = formatString(args.get("FROM"));
-            final String column = formatString(args.get("COLUMN"));
+            final String entry = formatString(args.get("COLUMN"));
 
             if (name == null) {
                 sender.sendError("Undefined table!");
                 return;
             }
 
-            if (column == null) {
-                sender.sendError("Undefined column!");
+            if (entry == null) {
+                sender.sendError("Undefined entry!");
                 return;
             }
 
@@ -53,53 +54,47 @@ public class RemoveCommand extends Command {
                 return;
             }
 
-            if (!sender.allowed(database.getId(), DatabaseAction.READ_WRITE)) {
+            if (!sender.allowed(database.getId(), DatabasePermissionLevel.READ_WRITE)) {
                 sender.sendForbidden();
                 return;
             }
 
             final Table table = database.getTable(name);
 
-            if (!column.equals("*")
-                    && table.getColumn(column) == null) {
-                sender.sendError("Column doesn't exist!");
+            if (!entry.equals("*")
+                    && table.getEntry(entry) == null) {
+                sender.sendError("Entry doesn't exist!");
                 return;
             }
 
             if (args.containsKey("WHERE")) {
-                List<Column> columns;
+                List<TableEntry> entries;
 
                 try {
-                    columns = ColumnFilter.filterByCommandLineArguments(table, args.get("WHERE"));
+                    entries = TableEntryFilter.filterByCommandLineArguments(table, args.get("WHERE"));
                 } catch (Exception ex) {
                     sender.sendError(ex);
                     return;
                 }
 
-                if (columns == null) {
+                if (entries == null) {
                     sender.sendError("Unknown statement error!");
                     return;
                 }
 
-                final String primary = table.getPrimary();
-                columns.stream().map(col -> col.selectStringify(primary)).forEach(table::removeColumn);
+                entries.stream().map(col -> col.selectStringify(table.getPrimary())).forEach(table::removeEntry);
 
-                sender.sendSuccess();
-
-                database.saveTable(table);
-                databaseService.saveDatabase(database);
             } else {
-                if (!column.equals("*")) {
-                    table.removeColumn(column);
+                if (!entry.equals("*")) {
+                    table.removeEntry(entry);
                 } else {
                     table.clear();
                 }
-
-                sender.sendSuccess();
-
-                database.saveTable(table);
-                databaseService.saveDatabase(database);
             }
+
+            sender.sendSuccess();
+            database.saveTable(table);
+            databaseService.saveDatabase(database);
 
             return;
         }

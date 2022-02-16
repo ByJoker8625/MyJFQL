@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.exception.LanguageException;
-import de.byjoker.myjfql.lang.CommandFormatter;
+import de.byjoker.myjfql.lang.Interpreter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,11 +14,11 @@ import static com.google.common.reflect.ClassPath.from;
 public class CommandServiceImpl implements CommandService {
 
     private final List<Command> commands;
-    private final CommandFormatter formatter;
+    private final Interpreter interpreter;
 
-    public CommandServiceImpl(CommandFormatter formatter) {
+    public CommandServiceImpl(Interpreter interpreter) {
         this.commands = new ArrayList<>();
-        this.formatter = formatter;
+        this.interpreter = interpreter;
     }
 
     @Override
@@ -63,9 +63,9 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    public void execute(CommandSender sender, String name) {
+    public void execute(CommandSender sender, String instructions) {
         try {
-            final Map<String, List<String>> arguments = formatter.formatCommand(name);
+            final Map<String, List<String>> arguments = interpreter.interpretCommand(instructions);
 
             if (arguments == null) {
                 sender.sendError("Command was not found!");
@@ -79,7 +79,7 @@ public class CommandServiceImpl implements CommandService {
                 return;
             }
 
-            command.handleCommand(sender, arguments);
+            command.execute(sender, arguments);
         } catch (Exception ex) {
             new LanguageException(ex).printStackTrace();
         }

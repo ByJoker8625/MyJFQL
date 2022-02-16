@@ -1,11 +1,11 @@
 package de.byjoker.myjfql.config;
 
-public interface ConfigService extends ConfigBuilderService {
+public interface ConfigService {
 
-    void load();
+    void buildDefaults();
 
-    void buildRequirements();
+    void mkdirs();
 
-    Config getConfig();
+    Config load();
 
 }

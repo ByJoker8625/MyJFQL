@@ -1,17 +1,19 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
-import de.byjoker.myjfql.database.Column;
 import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.database.LegacyColumn;
-import de.byjoker.myjfql.server.session.Session;
-import de.byjoker.myjfql.server.session.SessionService;
+import de.byjoker.myjfql.database.RelationalTableEntry;
+import de.byjoker.myjfql.database.TableEntry;
+import de.byjoker.myjfql.network.session.Session;
+import de.byjoker.myjfql.network.session.SessionService;
+import de.byjoker.myjfql.network.session.StaticSession;
 import de.byjoker.myjfql.user.User;
 import de.byjoker.myjfql.user.UserService;
 import de.byjoker.myjfql.util.IDGenerator;
+import de.byjoker.myjfql.util.ResultType;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
+
 
 @CommandHandler
 public class SessionsCommand extends ConsoleCommand {
@@ -21,7 +23,7 @@ public class SessionsCommand extends ConsoleCommand {
     }
 
     @Override
-    public void handleConsoleCommand(ConsoleCommandSender sender, Map<String, List<String>> args) {
+    public void executeAsConsole(ConsoleCommandSender sender, Map<String, List<String>> args) {
         final UserService userService = MyJFQL.getInstance().getUserService();
         final SessionService sessionService = MyJFQL.getInstance().getSessionService();
         final DatabaseService databaseService = MyJFQL.getInstance().getDatabaseService();
@@ -42,27 +44,8 @@ public class SessionsCommand extends ConsoleCommand {
             final User user = userService.getUserByIdentifier(userIdentifier);
 
             if (args.containsKey("OPEN")) {
-                final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                long expire = -1;
-
-                if (args.containsKey("EXPIRE") && args.get("EXPIRE").size() != 0
-                        && !Objects.requireNonNull(formatString(args.get("EXPIRE"))).equalsIgnoreCase("never")) {
-
-                    try {
-                        expire = dateFormat.parse(formatString(args.get("EXPIRE"))).getTime();
-                    } catch (Exception ex) {
-                        sender.sendError("Unknown date format!");
-                        return;
-                    }
-
-                    if (expire <= System.currentTimeMillis()) {
-                        sender.sendError("Session already expired!");
-                        return;
-                    }
-                }
-
                 String token = null;
-                String database = user.getPreferredDatabase();
+                String database = user.getPreferredDatabaseId();
                 String address = "*";
 
                 if (args.containsKey("TOKEN") && args.get("TOKEN").size() != 0) {
@@ -93,17 +76,15 @@ public class SessionsCommand extends ConsoleCommand {
                     token = IDGenerator.generateMixed(25);
                 }
 
-                final Session session = new Session(token, user.getId(), database, address, expire);
+                final Session session = new StaticSession(token, user.getId(), database, Collections.singletonList(address));
                 sessionService.openSession(session);
 
-                final Column column = new LegacyColumn();
-                column.insert("token", session.getToken());
-                column.insert("address", session.getAddress());
-                column.insert("database_id", String.valueOf(session.getDatabaseId()));
-                column.insert("start", dateFormat.format(new Date(session.getOpen())));
-                column.insert("expire", session.getExpire() == -1 ? "never" : dateFormat.format(new Date(session.getExpire())));
+                final TableEntry entry = new RelationalTableEntry();
+                entry.insert("token", session.getToken());
+                entry.insert("addresses", session.getAddresses());
+                entry.insert("database_id", String.valueOf(session.getDatabaseId()));
 
-                sender.sendResult(Collections.singletonList(column), new String[]{"token", "address", "database_id", "start", "expire"});
+                sender.sendResult(Collections.singletonList(entry), Arrays.asList("token", "addresses", "database_id"), ResultType.LEGACY);
                 return;
             }
 
@@ -121,7 +102,7 @@ public class SessionsCommand extends ConsoleCommand {
                     return;
                 }
 
-                if (!sessionService.existsSession(token)) {
+                if (sessionService.getSession(token) == null) {
                     sender.sendError("Session doesn't exists!");
                     return;
                 }
@@ -139,7 +120,7 @@ public class SessionsCommand extends ConsoleCommand {
                     return;
                 }
 
-                if (!sessionService.existsSession(token)) {
+                if (sessionService.getSession(token) == null) {
                     sender.sendError("Session doesn't exists!");
                     return;
                 }
@@ -174,69 +155,30 @@ public class SessionsCommand extends ConsoleCommand {
                     }
 
                     final Session session = sessionService.getSession(token);
-                    session.setAddress(address);
+                    session.getAddresses().clear();
+                    session.getAddresses().add(address);
                     sessionService.saveSession(session);
 
                     sender.sendSuccess();
                     return;
                 }
 
-                if (args.containsKey("EXPIRE")) {
-                    final String expire = formatString(args.get("EXPIRE"));
-
-                    if (expire == null) {
-                        sender.sendError("Undefined date!");
-                        return;
-                    }
-
-                    if (expire.equalsIgnoreCase("never")) {
-                        final Session session = sessionService.getSession(token);
-                        session.setExpire(-1);
-                        sessionService.saveSession(session);
-                        sender.sendSuccess();
-                        return;
-                    }
-
-                    long date;
-
-                    try {
-                        date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(formatString(args.get("EXPIRE"))).getTime();
-                    } catch (Exception ex) {
-                        sender.sendError("Unknown date format!");
-                        return;
-                    }
-
-                    if (date <= System.currentTimeMillis()) {
-                        sender.sendError("Session already expired!");
-                        return;
-                    }
-
-                    final Session session = sessionService.getSession(token);
-                    session.setExpire(date);
-                    sessionService.saveSession(session);
-                    sender.sendSuccess();
-                    return;
-                }
 
                 sender.sendSyntax();
                 return;
             }
 
-            final List<Column> sessions = new ArrayList<>();
-            final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            final List<TableEntry> sessions = new ArrayList<>();
 
             sessionService.getSessionsByUserId(user.getId()).forEach(session -> {
-                final Column column = new LegacyColumn();
-                column.insert("token", session.getToken());
-                column.insert("address", session.getAddress());
-                column.insert("database_id", String.valueOf(session.getDatabaseId()));
-                column.insert("start", dateFormat.format(new Date(session.getOpen())));
-                column.insert("expire", session.getExpire() == -1 ? "never" : dateFormat.format(new Date(session.getExpire())));
-
-                sessions.add(column);
+                final TableEntry entry = new RelationalTableEntry();
+                entry.insert("token", session.getToken());
+                entry.insert("addresses", session.getAddresses());
+                entry.insert("database_id", String.valueOf(session.getDatabaseId()));
+                sessions.add(entry);
             });
 
-            sender.sendResult(sessions, new String[]{"token", "address", "database_id", "start", "expire"});
+            sender.sendResult(sessions, Arrays.asList("token", "addresses", "database_id"), ResultType.LEGACY);
             return;
         }
 

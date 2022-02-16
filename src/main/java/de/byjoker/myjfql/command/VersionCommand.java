@@ -1,7 +1,9 @@
 package de.byjoker.myjfql.command;
 
 import de.byjoker.myjfql.core.MyJFQL;
+import de.byjoker.myjfql.database.RelationalTableEntry;
 import de.byjoker.myjfql.util.Downloader;
+import de.byjoker.myjfql.util.ResultType;
 import de.byjoker.myjfql.util.Updater;
 
 import java.util.Arrays;
@@ -17,12 +19,15 @@ public class VersionCommand extends ConsoleCommand {
     }
 
     @Override
-    public void handleConsoleCommand(ConsoleCommandSender sender, Map<String, List<String>> args) {
+    public void executeAsConsole(ConsoleCommandSender sender, Map<String, List<String>> args) {
         final Updater updater = MyJFQL.getInstance().getUpdater();
         final Downloader downloader = MyJFQL.getInstance().getDownloader();
 
         if (args.containsKey("DISPLAY")) {
-            sender.sendResult(Collections.singletonList(MyJFQL.getInstance().getVersion()), new String[]{"version"});
+            sender.sendResult(
+                    Collections.singletonList(new RelationalTableEntry().append("version", MyJFQL.getInstance().getVersion())),
+                    Collections.singletonList("version"), ResultType.LEGACY
+            );
             return;
         }
 
@@ -30,7 +35,7 @@ public class VersionCommand extends ConsoleCommand {
             final List<String> update = args.get("UPDATE");
 
             if (update.size() == 0) {
-                MyJFQL.getInstance().getServer().shutdown();
+                MyJFQL.getInstance().getNetworkService().shutdown();
                 downloader.downloadLatestVersion();
             } else {
                 String version = formatString(update);
@@ -45,7 +50,7 @@ public class VersionCommand extends ConsoleCommand {
                     return;
                 }
 
-                MyJFQL.getInstance().getServer().shutdown();
+                MyJFQL.getInstance().getNetworkService().shutdown();
                 downloader.downloadByVersion(version);
                 return;
             }
