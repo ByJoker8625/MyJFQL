@@ -3,12 +3,13 @@ package de.byjoker.myjfql.command
 import org.jline.reader.ParsedLine
 import java.util.stream.Collectors
 import java.util.stream.IntStream
+import kotlin.streams.toList
 
-abstract class Command(val name: String, val syntax: MutableList<String>) {
+abstract class Command(val name: String, val syntax: List<String>) {
 
-    abstract fun execute(sender: CommandSender, args: MutableMap<String, MutableList<String>>)
+    abstract fun execute(sender: CommandSender, args: Map<String, List<String>>)
 
-    open fun complete(sender: CommandSender, line: ParsedLine): MutableList<String>? = null
+    open fun complete(sender: CommandSender, line: ParsedLine): List<String>? = null
 
     fun formatString(strings: List<String>?): String? {
         if (strings == null) {
@@ -19,13 +20,12 @@ abstract class Command(val name: String, val syntax: MutableList<String>) {
             .collect(Collectors.joining("", strings[0], "")).replace("'", "")
     }
 
-    fun formatList(strings: List<String>?): MutableList<String>? {
+    fun formatList(strings: List<String>?): List<String>? {
         if (strings == null) {
             return null
         }
 
-        return if (strings.isEmpty()) ArrayList() else strings.stream().map { s: String -> s.replace("'", "") }
-            .collect(Collectors.toList())
+        return if (strings.isEmpty()) listOf() else strings.stream().map { s: String -> s.replace("'", "") }.toList()
     }
 
     fun formatInteger(strings: List<String>?): Int {

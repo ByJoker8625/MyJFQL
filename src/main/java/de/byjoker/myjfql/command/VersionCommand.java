@@ -5,6 +5,7 @@ import de.byjoker.myjfql.database.RelationalTableEntry;
 import de.byjoker.myjfql.util.Downloader;
 import de.byjoker.myjfql.util.ResultType;
 import de.byjoker.myjfql.util.Updater;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,14 +20,14 @@ public class VersionCommand extends ConsoleCommand {
     }
 
     @Override
-    public void executeAsConsole(ConsoleCommandSender sender, Map<String, List<String>> args) {
+    public void executeAsConsole(ConsoleCommandSender sender, @NotNull Map<String, ? extends List<String>> args) {
         final Updater updater = MyJFQL.getInstance().getUpdater();
         final Downloader downloader = MyJFQL.getInstance().getDownloader();
 
         if (args.containsKey("DISPLAY")) {
             sender.sendResult(
                     Collections.singletonList(new RelationalTableEntry().append("version", MyJFQL.getInstance().getVersion())),
-                    Collections.singletonList("version"), ResultType.LEGACY
+                    Collections.singletonList("version"), ResultType.RELATIONAL
             );
             return;
         }

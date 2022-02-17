@@ -8,9 +8,9 @@ import org.jline.reader.ParsedLine
 
 @CommandHandler
 class InsertCommand :
-    Command("insert", mutableListOf("COMMAND", "INTO", "CONTENT", "KEY", "VALUE", "PRIMARY-KEY", "WHERE", "FULLY")) {
+    Command("insert", listOf("COMMAND", "INTO", "CONTENT", "KEY", "VALUE", "PRIMARY-KEY", "WHERE", "FULLY")) {
 
-    override fun execute(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
+    override fun execute(sender: CommandSender, args: Map<String, List<String>>) {
         val databaseService = MyJFQL.getInstance().databaseService
         val session = sender.session
 
@@ -80,14 +80,14 @@ class InsertCommand :
                     return
                 }
 
-                val keys: MutableList<String>? = formatList(args["KEY"])
+                val keys = formatList(args["KEY"])
 
                 if (keys == null) {
                     sender.sendError("Undefined keys!")
                     return
                 }
 
-                val values: MutableList<String>? = formatList(args["VALUE"])
+                val values = formatList(args["VALUE"])
 
                 if (values == null) {
                     sender.sendError("Undefined values!")
@@ -99,7 +99,7 @@ class InsertCommand :
                     return
                 }
 
-                content = HashMap()
+                content = mutableMapOf()
 
                 for (key in keys) {
                     if (!table.structure.contains(key)) {
@@ -119,7 +119,7 @@ class InsertCommand :
 
         when {
             args.containsKey("WHERE") -> {
-                val entries: MutableList<TableEntry>? = try {
+                val entries = try {
                     TableEntryFilter.filterByCommandLineArguments(table, args["WHERE"])
                 } catch (ex: Exception) {
                     sender.sendError(ex)
@@ -216,9 +216,9 @@ class InsertCommand :
         }
     }
 
-    override fun complete(sender: CommandSender, line: ParsedLine)
-            : MutableList<String>? {
+    override fun complete(sender: CommandSender, line: ParsedLine): List<String>? {
         sender.session ?: return null
+
         val database: Database = sender.session!!.getDatabase(MyJFQL.getInstance().databaseService) ?: return null
 
         if (!sender.allowed(database.id, DatabasePermissionLevel.READ_WRITE)) {
@@ -229,16 +229,16 @@ class InsertCommand :
         val before = line.words()[line.wordIndex() - 1].uppercase()
 
         return when {
-            !args.contains(" INTO") -> mutableListOf("into")
-            before == "INTO" -> database.tables.map { table -> table.name }.toMutableList()
-            !args.contains(" CONTENT") && !args.contains(" KEY") -> mutableListOf("content", "key")
+            !args.contains(" INTO") -> listOf("into")
+            before == "INTO" -> database.tables.map { table -> table.name }.toList()
+            !args.contains(" CONTENT") && !args.contains(" KEY") -> listOf("content", "key")
             before == "CONTENT" -> null
             before == "KEY" -> null
-            args.contains(" KEY") && !args.contains(" VALUE") -> mutableListOf("value")
+            args.contains(" KEY") && !args.contains(" VALUE") -> listOf("value")
             before == "VALUE" -> null
-            !args.contains(" WHERE") && !args.contains(" PRIMARY-KEY") -> mutableListOf("where", "primary-key")
+            !args.contains(" WHERE") && !args.contains(" PRIMARY-KEY") -> listOf("where", "primary-key")
             before == "WHERE" || before == "PRIMARY-KEY" -> null
-            !args.contains(" FULLY") -> mutableListOf("fully")
+            !args.contains(" FULLY") -> listOf("fully")
             else -> null
         }
     }

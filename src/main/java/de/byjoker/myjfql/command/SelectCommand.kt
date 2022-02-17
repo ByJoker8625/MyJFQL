@@ -4,7 +4,6 @@ import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.Database
 import de.byjoker.myjfql.database.DatabasePermissionLevel
 import de.byjoker.myjfql.database.RelationalTable
-import de.byjoker.myjfql.database.TableEntry
 import de.byjoker.myjfql.lang.TableEntryComparator
 import de.byjoker.myjfql.lang.TableEntryFilter
 import de.byjoker.myjfql.network.session.Session
@@ -14,9 +13,9 @@ import org.jline.reader.ParsedLine
 import java.util.stream.Collectors
 
 @CommandHandler
-class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM", "WHERE", "SORT", "ORDER", "LIMIT")) {
+class SelectCommand : Command("select", listOf("COMMAND", "VALUE", "FROM", "WHERE", "SORT", "ORDER", "LIMIT")) {
 
-    override fun execute(sender: CommandSender, args: MutableMap<String, MutableList<String>>) {
+    override fun execute(sender: CommandSender, args: Map<String, List<String>>) {
         val databaseService = MyJFQL.getInstance().databaseService
         val session: Session? = sender.session
 
@@ -52,7 +51,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                 return
             }
 
-            val structure: MutableCollection<String> = when {
+            val structure = when {
                 formatString(args["VALUE"]) == "*" -> table!!.structure
                 else -> formatList(args["VALUE"]) ?: return
             }
@@ -124,9 +123,9 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                     return
                 }
 
-                sender.sendResult(mutableListOf(entry), structure, resultType)
+                sender.sendResult(listOf(entry), structure, resultType)
             } else if (args.containsKey("WHERE")) {
-                val entries: MutableList<TableEntry>? = try {
+                val entries = try {
                     TableEntryFilter.filterByCommandLineArguments(
                         table, args["WHERE"], if (sortedBy == null) null else TableEntryComparator(
                             sortedBy
@@ -158,7 +157,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
                 )
 
                 if (entries.isEmpty()) {
-                    sender.sendResult(ArrayList<TableEntry>(), structure, resultType)
+                    sender.sendResult(listOf(), structure, resultType)
                     return
                 }
 
@@ -180,7 +179,7 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
         sender.sendSyntax()
     }
 
-    override fun complete(sender: CommandSender, line: ParsedLine): MutableList<String>? {
+    override fun complete(sender: CommandSender, line: ParsedLine): List<String>? {
         sender.session ?: return null
         val database: Database = sender.session!!.getDatabase(MyJFQL.getInstance().databaseService) ?: return null
 
@@ -192,19 +191,19 @@ class SelectCommand : Command("select", mutableListOf("COMMAND", "VALUE", "FROM"
         val before = line.words()[line.wordIndex() - 1].uppercase()
 
         return when {
-            !args.contains(" VALUE") -> mutableListOf("value")
-            before == "VALUE" -> mutableListOf("*")
-            !args.contains(" FROM") -> mutableListOf("from")
-            before == "FROM" -> database.tables.map { table -> table.name }.toMutableList()
-            !args.contains(" WHERE") && !args.contains(" PRIMARY-KEY") -> mutableListOf("where", "primary-key")
+            !args.contains(" VALUE") -> listOf("value")
+            before == "VALUE" -> listOf("*")
+            !args.contains(" FROM") -> listOf("from")
+            before == "FROM" -> database.tables.map { table -> table.name }.toList()
+            !args.contains(" WHERE") && !args.contains(" PRIMARY-KEY") -> listOf("where", "primary-key")
             before == "WHERE" || before == "PRIMARY-KEY" -> null
-            !args.contains(" SORT") && !args.contains(" ORDER") && !args.contains(" LIMIT") -> mutableListOf(
+            !args.contains(" SORT") && !args.contains(" ORDER") && !args.contains(" LIMIT") -> listOf(
                 "sort",
                 "order",
                 "limit"
             )
             before == "SORT" -> null
-            before == "ORDER" -> mutableListOf("asc", "desc")
+            before == "ORDER" -> listOf("asc", "desc")
             before == "LIMIT" -> null
             else -> null
         }

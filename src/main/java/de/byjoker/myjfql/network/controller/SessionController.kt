@@ -50,12 +50,12 @@ class SessionController : Controller {
 
         connection.respond(
             Result(
-                mutableListOf(
+                listOf(
                     RelationalTableEntry().append(
                         "token",
                         session.token
                     )
-                ), mutableListOf("token"), ResultType.RELATIONAL
+                ), listOf("token"), ResultType.RELATIONAL
             )
         )
     }

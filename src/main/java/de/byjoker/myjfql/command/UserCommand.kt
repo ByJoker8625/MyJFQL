@@ -4,14 +4,13 @@ import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.DatabasePermissionLevel
 import de.byjoker.myjfql.database.RelationalTableEntry
 import de.byjoker.myjfql.database.SimpleDatabase
-import de.byjoker.myjfql.database.TableEntry
 import de.byjoker.myjfql.user.SimpleUser
 import de.byjoker.myjfql.util.ResultType
 import java.util.*
 
 @CommandHandler
 class UserCommand : ConsoleCommand(
-    "user", mutableListOf(
+    "user", listOf(
         "COMMAND",
         "CREATE",
         "PASSWORD",
@@ -27,7 +26,7 @@ class UserCommand : ConsoleCommand(
     )
 ) {
 
-    override fun executeAsConsole(sender: ConsoleCommandSender, args: MutableMap<String, MutableList<String>>) {
+    override fun executeAsConsole(sender: ConsoleCommandSender, args: Map<String, List<String>>) {
         val userService = MyJFQL.getInstance().userService
         val databaseService = MyJFQL.getInstance().databaseService
         if (args.containsKey("CREATE") && args.containsKey("PASSWORD")) {
@@ -176,18 +175,18 @@ class UserCommand : ConsoleCommand(
             tableEntry.insert("preferred_database_id", java.lang.String.valueOf(selectedUser.preferredDatabaseId))
 
             sender.sendResult(
-                mutableListOf(tableEntry) as Collection<TableEntry>,
-                mutableListOf("id", "name", "accesses", "preferred_database_id"),
-                ResultType.LEGACY
+                listOf(tableEntry),
+                listOf("id", "name", "accesses", "preferred_database_id"),
+                ResultType.RELATIONAL
             )
             return
         }
         if (args.containsKey("LIST")) {
             sender.sendResult(
                 userService.users.map { user -> RelationalTableEntry().append("user_name", user.name) }
-                    .toMutableList() as Collection<TableEntry>,
-                mutableListOf("user_name"),
-                ResultType.LEGACY
+                    .toList(),
+                listOf("user_name"),
+                ResultType.RELATIONAL
             )
             return
         }
