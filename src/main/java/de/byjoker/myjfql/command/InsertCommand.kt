@@ -49,7 +49,7 @@ class InsertCommand :
         }
 
         val table = database.getTable(into)
-        val content: Map<String, Any>?
+        val content: MutableMap<String, Any>?
 
         when (table!!.type) {
             TableType.DOCUMENT -> {
@@ -101,13 +101,13 @@ class InsertCommand :
 
                 content = mutableMapOf()
 
-                for (key in keys) {
+                for ((index, key) in keys.withIndex()) {
                     if (!table.structure.contains(key)) {
                         sender.sendError("Specified keys don't match table structure!")
                         return
                     }
 
-                    content.put(key, key)
+                    content[key] = values[index]
                 }
             }
         }
