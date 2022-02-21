@@ -11,7 +11,7 @@ order to achieve better performance, parts of the data are temporarily stored in
 
 - Easy to use syntax **without** all kinds of commas and brackets
 - Handle **relational** and **non-relational** *(NoSQL)* data
-- Fast responsetimes up to less than 100 ms with more than **1.000.000** table entries
+- Fast responsetimes
 - Runs anywhere where Java is installed
 
 ## Documentation
