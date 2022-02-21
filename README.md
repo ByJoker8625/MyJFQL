@@ -10,7 +10,7 @@ order to achieve better performance, parts of the data are temporarily stored in
 ## Features
 
 - Easy to use syntax **without** all kinds of commas and brackets
-- Handle **relational** and **non-relational** *(NoSQL)* data
+- Handle **relational** and **non-relational** data
 - Fast responsetimes
 - Runs anywhere where Java is installed
 
