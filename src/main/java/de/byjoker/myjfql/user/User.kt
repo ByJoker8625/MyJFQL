@@ -1,6 +1,5 @@
 package de.byjoker.myjfql.user
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.DatabasePermissionLevel
 
@@ -25,9 +24,6 @@ abstract class User(
     fun grantAccess(databaseId: String, type: DatabasePermissionLevel) = accesses.put(databaseId, type)
 
     fun revokeAccess(databaseId: String) = accesses.remove(databaseId)
-
-    @JsonIgnore
-    fun hasPreferredDatabase(): Boolean = preferredDatabaseId != null
 
     fun validPassword(password: String): Boolean = this.password == MyJFQL.getInstance().encryptor.encrypt(password)
 }

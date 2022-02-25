@@ -176,10 +176,8 @@ public class TablePrinter {
             }
         }
         if (ucode) {
-            assert line != null;
             line.append(CROSSING_R);
         }
-        assert line != null;
         System.out.println(line);
 
         line = null;
@@ -254,7 +252,7 @@ public class TablePrinter {
             if (ucode) {
                 line.append(gc(VERTICAL_BSEP));
             }
-            System.out.println(line.toString());
+            System.out.println(line);
 
             line = null;
         }

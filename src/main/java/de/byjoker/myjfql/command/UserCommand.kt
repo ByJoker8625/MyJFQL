@@ -29,25 +29,31 @@ class UserCommand : ConsoleCommand(
     override fun executeAsConsole(sender: ConsoleCommandSender, args: Map<String, List<String>>) {
         val userService = MyJFQL.getInstance().userService
         val databaseService = MyJFQL.getInstance().databaseService
+
         if (args.containsKey("CREATE") && args.containsKey("PASSWORD")) {
             val name = formatString(args["CREATE"])
             val password = formatString(args["PASSWORD"])
+
             if (name == null) {
                 sender.sendError("Undefined name!")
                 return
             }
+
             if (name.contains("%") || name.contains("#") || name.contains("'")) {
                 sender.sendError("Unauthorized characters in the name!")
                 return
             }
+
             if (password == null) {
                 sender.sendError("Undefined password!")
                 return
             }
+
             if (password.length < 8) {
                 sender.sendError("Password to short!")
                 return
             }
+
             if (userService.existsUserByName(name)) {
                 sender.sendError("User already exists!")
                 return
@@ -56,15 +62,21 @@ class UserCommand : ConsoleCommand(
             val user = SimpleUser(name = name, password = password)
 
             if (args.containsKey("DATABASE")) {
-                val databaseName: String = if (args["DATABASE"]!!.size == 0) name else formatString(args["DATABASE"])!!
+                val databaseName: String = when {
+                    args["DATABASE"]!!.isEmpty() -> name
+                    else -> formatString(args["DATABASE"])!!
+                }
+
                 if (databaseService.existsDatabaseByName(databaseName)) {
                     sender.sendError("Database already exists!")
                     return
                 }
+
                 val database = SimpleDatabase(databaseName)
-                databaseService.createDatabase(database)
+
                 user.grantAccess(database.id, DatabasePermissionLevel.READ_WRITE)
                 user.preferredDatabaseId = database.id
+                databaseService.createDatabase(database)
             }
 
             userService.createUser(user)
@@ -74,16 +86,20 @@ class UserCommand : ConsoleCommand(
 
         if (args.containsKey("DELETE")) {
             val userIdentifier = formatString(args["DELETE"])
+
             if (userIdentifier == null) {
                 sender.sendError("Undefined user!")
                 return
             }
+
             if (!userService.existsUserByIdentifier(userIdentifier)) {
                 sender.sendError("User doesn't exists!")
                 return
             }
+
             val userId = userService.getUserByIdentifier(userIdentifier).id
             MyJFQL.getInstance().sessionService.closeSessions(userId)
+
             userService.deleteUser(userId)
             sender.sendSuccess()
             return
@@ -93,33 +109,39 @@ class UserCommand : ConsoleCommand(
             val userIdentifier = formatString(args["GRANT"])
             val access = formatString(args["ACCESS"])
             val databaseIdentifier = formatString(args["AT"])
+
             if (userIdentifier == null) {
                 sender.sendError("Undefined user!")
                 return
             }
+
             if (access == null) {
                 sender.sendError("Undefined access action!")
                 return
             }
+
             if (databaseIdentifier == null) {
                 sender.sendError("Undefined database!")
                 return
             }
+
             if (!userService.existsUserByIdentifier(userIdentifier)) {
                 sender.sendError("User doesn't exists!")
                 return
             }
+
             if (!databaseService.existsDatabaseByIdentifier(databaseIdentifier)) {
                 sender.sendError("Database doesn't exists!")
                 return
             }
-            val action: DatabasePermissionLevel
-            action = try {
-                DatabasePermissionLevel.valueOf(access.uppercase(Locale.getDefault()))
+
+            val action: DatabasePermissionLevel = try {
+                DatabasePermissionLevel.valueOf(access.uppercase())
             } catch (ex: Exception) {
                 sender.sendError("Unknown access action!")
                 return
             }
+
             val user = userService.getUserByIdentifier(userIdentifier)
             user.grantAccess(databaseService.getDatabaseByIdentifier(databaseIdentifier).id, action)
             userService.saveUser(user)
@@ -130,22 +152,27 @@ class UserCommand : ConsoleCommand(
         if (args.containsKey("REVOKE") && args.containsKey("ACCESS") && args.containsKey("FROM")) {
             val userIdentifier = formatString(args["REVOKE"])
             val databaseIdentifier = formatString(args["FROM"])
+
             if (userIdentifier == null) {
                 sender.sendError("Undefined user!")
                 return
             }
+
             if (databaseIdentifier == null) {
                 sender.sendError("Undefined database!")
                 return
             }
+
             if (!userService.existsUserByIdentifier(userIdentifier)) {
                 sender.sendError("User doesn't exists!")
                 return
             }
+
             if (!databaseService.existsDatabaseByIdentifier(databaseIdentifier)) {
                 sender.sendError("Database doesn't exists!")
                 return
             }
+
             val user = userService.getUserByName(userIdentifier)
             user.revokeAccess(databaseService.getDatabaseByIdentifier(databaseIdentifier).id)
             userService.saveUser(user)
@@ -171,7 +198,7 @@ class UserCommand : ConsoleCommand(
 
             tableEntry.insert("id", selectedUser.id)
             tableEntry.insert("name", selectedUser.name)
-            tableEntry.insert("accesses", selectedUser.accesses.toString())
+            tableEntry.insert("accesses", selectedUser.accesses)
             tableEntry.insert("preferred_database_id", java.lang.String.valueOf(selectedUser.preferredDatabaseId))
 
             sender.sendResult(
@@ -179,6 +206,7 @@ class UserCommand : ConsoleCommand(
                 listOf("id", "name", "accesses", "preferred_database_id"),
                 ResultType.RELATIONAL
             )
+
             return
         }
         if (args.containsKey("LIST")) {
@@ -188,8 +216,10 @@ class UserCommand : ConsoleCommand(
                 listOf("user_name"),
                 ResultType.RELATIONAL
             )
+
             return
         }
+
         sender.sendSyntax()
     }
 }

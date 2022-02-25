@@ -17,19 +17,19 @@ class FormatCommand : ConsoleCommand("format", listOf("COMMAND", "DATABASE", "TA
         }
 
         if (args.containsKey("DATABASE")) {
-            val identifier: String? = formatString(args["DATABASE"])
+            val databaseIdenf = formatString(args["DATABASE"])
 
-            if (identifier == null) {
+            if (databaseIdenf == null) {
                 sender.sendError("Undefined database!")
                 return
             }
 
-            if (!databaseService.existsDatabaseByIdentifier(identifier)) {
+            if (!databaseService.existsDatabaseByIdentifier(databaseIdenf)) {
                 sender.sendError("Database doesn't exist!")
                 return
             }
 
-            val into: String? = formatString(args["INTO"])
+            val into = formatString(args["INTO"])
 
             if (into == null) {
                 sender.sendError("Undefined type!")
@@ -43,7 +43,7 @@ class FormatCommand : ConsoleCommand("format", listOf("COMMAND", "DATABASE", "TA
                 return
             }
 
-            val database = databaseService.getDatabaseByIdentifier(identifier)
+            val database = databaseService.getDatabaseByIdentifier(databaseIdenf)
             database.reformat(type, databaseService)
 
             sender.sendSuccess()
@@ -63,7 +63,7 @@ class FormatCommand : ConsoleCommand("format", listOf("COMMAND", "DATABASE", "TA
                 return
             }
 
-            val name: String? = formatString(args["TABLE"])
+            val name = formatString(args["TABLE"])
 
             if (name == null) {
                 sender.sendError("Undefined table!")
@@ -75,14 +75,14 @@ class FormatCommand : ConsoleCommand("format", listOf("COMMAND", "DATABASE", "TA
                 return
             }
 
-            val into: String? = formatString(args["INTO"])
+            val into = formatString(args["INTO"])
 
             if (into == null) {
                 sender.sendError("Undefined type!")
                 return
             }
 
-            val type: TableType? = TableType.likeTableType(into)
+            val type = TableType.likeTableType(into)
 
             if (type == null) {
                 sender.sendError("Type doesn't exist!")

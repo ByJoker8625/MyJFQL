@@ -98,7 +98,6 @@ class SimpleConsole(
         reader.completer = parameters[0] as Completer
 
         val autosuggestionWidgets = AutosuggestionWidgets(reader)
-        reader.putString("shutdown")
         autosuggestionWidgets.enable()
 
         writeable = true
