@@ -23,18 +23,23 @@ abstract class TableEntryMatcher : TableEntry {
 
         val given = selectStringify(key)
 
+        println(given)
+        println(value)
+        println(method)
+        println(given.contains(value))
+
         return when (method) {
             Requirement.Method.EQUALS -> {
-                return value == given
+                return given == value
             }
             Requirement.Method.EQUALS_IGNORE_CASE -> {
-                return value.equals(given, ignoreCase = true)
+                return given.equals(value, ignoreCase = true)
             }
             Requirement.Method.CONTAINS -> {
-                return value.contains(given)
+                return given.contains(value)
             }
             Requirement.Method.CONTAINS_EQUALS_IGNORE_CASE -> {
-                return value.contains(given, ignoreCase = true)
+                return given.contains(value, ignoreCase = true)
             }
             else -> {
                 when {
