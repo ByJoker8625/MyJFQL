@@ -23,11 +23,6 @@ abstract class TableEntryMatcher : TableEntry {
 
         val given = selectStringify(key)
 
-        println(given)
-        println(value)
-        println(method)
-        println(given.contains(value))
-
         return when (method) {
             Requirement.Method.EQUALS -> {
                 return given == value
