@@ -6,7 +6,6 @@ import de.byjoker.myjfql.database.RelationalTableEntry
 import de.byjoker.myjfql.database.SimpleDatabase
 import de.byjoker.myjfql.user.SimpleUser
 import de.byjoker.myjfql.util.ResultType
-import java.util.*
 
 @CommandHandler
 class UserCommand : ConsoleCommand(

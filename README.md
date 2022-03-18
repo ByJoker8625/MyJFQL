@@ -2,8 +2,8 @@
 
 MyJFQL is an easy to use open source database management system written in **Kotlin** and **Java** for smaller
 applications. MyJFQL **combines** relational databases like PostgreSQL and noSQL databases like MongoDB in one system.
-You can use a document collection and a relational table in one database. The syntax is extremely simple and **beginner-friendly**.
-JFQL (Java File Query Language) is used as the "language", which partly includes SQL. But all kinds
+You can use a document collection and a relational table in one database. The syntax is extremely simple and **
+beginner-friendly**. JFQL (Java File Query Language) is used as the "language", which partly includes SQL. But all kinds
 of commas and brackets as well as the semilocon are omitted. Since it's based on Java 8, it runs just about anywhere. In
 order to achieve better performance, parts of the data are temporarily stored in RAM for **faster response times**.
 
