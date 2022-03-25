@@ -4,6 +4,7 @@ import de.byjoker.myjfql.core.MyJFQL;
 import de.byjoker.myjfql.database.Database;
 import de.byjoker.myjfql.database.DatabasePermissionLevel;
 import de.byjoker.myjfql.database.DatabaseService;
+import de.byjoker.myjfql.database.DatabaseType;
 import de.byjoker.myjfql.network.session.Session;
 import de.byjoker.myjfql.user.User;
 import org.jetbrains.annotations.NotNull;
@@ -80,6 +81,11 @@ public class DeleteCommand extends Command {
 
             if (!databaseService.existsDatabaseByIdentifier(identifier)) {
                 sender.sendError("Database doesn't exist!");
+                return;
+            }
+
+            if (databaseService.getDatabaseByIdentifier(identifier).getType() == DatabaseType.INTERNAL) {
+                sender.sendError("The id of the internal database cannot be deleted!");
                 return;
             }
 

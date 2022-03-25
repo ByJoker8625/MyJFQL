@@ -27,7 +27,7 @@ class UserServiceImpl : UserService {
     }
 
     override fun saveUser(user: User) {
-        for (i in users.indices) if (users[i].name == user.name) {
+        for (i in users.indices) if (users[i].id == user.id) {
             users[i] = user
             return
         }

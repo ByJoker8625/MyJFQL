@@ -193,6 +193,9 @@ class DatabaseServiceImpl : DatabaseService {
 
                 return database
             }
+            DatabaseType.INTERNAL -> {
+                throw DatabaseException("System-internal tables cannot be created manually!")
+            }
         }
     }
 
@@ -218,6 +221,7 @@ class DatabaseServiceImpl : DatabaseService {
             DatabaseType.SINGLETON -> {
                 Json.write(database, File("${backend.path}/${database.id}.json"))
             }
+            DatabaseType.INTERNAL -> continue
         }
     }
 

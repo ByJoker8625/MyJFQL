@@ -3,6 +3,7 @@ package de.byjoker.myjfql.command
 import org.jline.reader.ParsedLine
 import java.util.stream.Collectors
 import java.util.stream.IntStream
+import kotlin.streams.toList
 
 abstract class Command(val name: String, val syntax: List<String>) {
 

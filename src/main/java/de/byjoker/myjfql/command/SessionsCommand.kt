@@ -118,6 +118,11 @@ class SessionsCommand :
                 return
             }
 
+            if (session.userId != user.id) {
+                sender.sendError("Session doesn't belongs to user!")
+                return
+            }
+
             if (args.containsKey("DATABASE")) {
                 val databaseIdenf = formatString(args["DATABASE"])
 

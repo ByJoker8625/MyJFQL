@@ -1,6 +1,5 @@
 package de.byjoker.myjfql.command;
 
-import de.byjoker.myjfql.exception.LanguageException;
 import de.byjoker.myjfql.lang.Interpreter;
 
 import java.io.IOException;
@@ -81,7 +80,7 @@ public class CommandServiceImpl implements CommandService {
 
             command.execute(sender, arguments);
         } catch (Exception ex) {
-            new LanguageException(ex).printStackTrace();
+            sender.sendError(ex);
         }
     }
 

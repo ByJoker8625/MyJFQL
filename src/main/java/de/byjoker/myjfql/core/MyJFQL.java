@@ -27,7 +27,7 @@ public final class MyJFQL {
 
     private static MyJFQL instance;
 
-    private final String version = "1.5.5";
+    private final String version = "1.5.6";
     private final Interpreter interpreter;
     private final CommandService commandService;
     private final DatabaseService databaseService;
@@ -158,6 +158,7 @@ public final class MyJFQL {
                 throw new FileException(ex);
             }
 
+            databaseService.saveDatabase(new InternalDatabase(Arrays.asList(new UserTable(userService), new SessionTable(sessionService))));
             console.logInfo("Loading finished!");
         }
 

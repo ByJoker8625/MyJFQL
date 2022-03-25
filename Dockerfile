@@ -10,6 +10,6 @@ CMD mkdir /var/lib/myjfql/
 CMD mkdir /opt/myjfql/
 
 WORKDIR /var/lib/myjfql
-COPY target/MyJFQL-1.5.5-jar-with-dependencies.jar /opt/myjfql/MyJFQL.jar
+COPY target/MyJFQL-1.5.6-jar-with-dependencies.jar /opt/myjfql/MyJFQL.jar
 COPY myjfql-docker-config.yml /var/lib/myjfql/config.yml
 CMD ["java", "-jar", "/opt/myjfql/MyJFQL.jar"]

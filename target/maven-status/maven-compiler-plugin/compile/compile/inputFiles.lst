@@ -3,6 +3,7 @@ D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\lang\Requirement.ja
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\network\util\HttpNetworkConnection.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\command\BackupCommand.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\database\SimpleDatabase.java
+D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\database\SessionTable.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\console\Console.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\network\controller\Mapping.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\command\VersionCommand.java
@@ -22,6 +23,7 @@ D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\exception\LanguageE
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\exception\NetworkException.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\command\CommandService.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\command\CommandServiceImpl.java
+D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\database\UserTable.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\user\UserService.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\command\ConsoleCommand.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\core\MyJFQL.java
@@ -41,6 +43,7 @@ D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\lang\StringComparat
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\console\ConsoleImpl.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\exception\FileException.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\database\Table.java
+D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\database\InternalTable.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\util\Downloader.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\lang\JFQLInterpreter.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\lang\Interpreter.java
@@ -53,5 +56,6 @@ D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\lang\TableEntryFilt
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\util\Encryptor.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\command\DeleteCommand.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\command\ConsoleCommandSender.java
+D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\database\InternalDatabase.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\network\controller\LegacyController.java
 D:\Documents\Projects\MyJFQL\src\main\java\de\byjoker\myjfql\lang\TableEntryComparator.java

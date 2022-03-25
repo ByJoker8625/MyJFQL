@@ -17,6 +17,7 @@ de\byjoker\myjfql\util\Updater$1.class
 de\byjoker\myjfql\core\MyJFQL.class
 de\byjoker\myjfql\command\VersionCommand.class
 de\byjoker\myjfql\command\NetworkCommandSender.class
+de\byjoker\myjfql\database\InternalDatabase.class
 de\byjoker\myjfql\console\Console.class
 de\byjoker\myjfql\network\controller\LegacyController.class
 de\byjoker\myjfql\util\NoneEncryptor.class
@@ -27,6 +28,7 @@ de\byjoker\myjfql\database\BackupService.class
 de\byjoker\myjfql\network\session\SessionServiceImpl.class
 de\byjoker\myjfql\network\controller\Mapping.class
 de\byjoker\myjfql\command\ClearCommand.class
+de\byjoker\myjfql\database\SessionTable$1.class
 de\byjoker\myjfql\core\MyJFQL$1.class
 de\byjoker\myjfql\util\Updater$VersionCompatibilityStatus.class
 de\byjoker\myjfql\database\SimpleDatabase.class
@@ -37,13 +39,16 @@ de\byjoker\myjfql\lang\JFQLInterpreter.class
 de\byjoker\myjfql\lang\TableEntryComparator.class
 de\byjoker\myjfql\util\Updater.class
 de\byjoker\myjfql\lang\StringComparator.class
+de\byjoker\myjfql\database\UserTable.class
 de\byjoker\myjfql\lang\Requirement$State.class
 de\byjoker\myjfql\command\CommandSender.class
+de\byjoker\myjfql\database\SessionTable.class
 de\byjoker\myjfql\exception\FileException.class
 de\byjoker\myjfql\database\TableEntry.class
 de\byjoker\myjfql\exception\NetworkException.class
 de\byjoker\myjfql\command\ConsoleCommandSender.class
 de\byjoker\myjfql\command\LegacyNetworkCommandSender.class
+de\byjoker\myjfql\database\InternalTable.class
 de\byjoker\myjfql\command\CommandHandler.class
 de\byjoker\myjfql\user\UserService.class
 de\byjoker\myjfql\command\BackupCommand.class
