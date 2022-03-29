@@ -34,4 +34,25 @@ abstract class Command(val name: String, val syntax: List<String>) {
         return if (strings.isEmpty()) -1 else IntStream.range(1, strings.size).mapToObj { i: Int -> " " + strings[i] }
             .collect(Collectors.joining("", strings[0], "")).replace("'", "").toInt()
     }
+
+    override fun toString(): String {
+        return "Command(name='$name', syntax=$syntax)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Command
+
+        if (name != other.name) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return name.hashCode()
+    }
+
+
 }

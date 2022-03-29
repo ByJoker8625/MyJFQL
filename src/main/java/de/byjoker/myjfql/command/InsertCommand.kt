@@ -2,6 +2,7 @@ package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.*
+import de.byjoker.myjfql.exception.TableException
 import de.byjoker.myjfql.lang.TableEntryFilter
 import de.byjoker.myjfql.util.Json
 import org.jline.reader.ParsedLine
@@ -43,15 +44,16 @@ class InsertCommand :
             return
         }
 
-        if (!database.existsTable(into)) {
+        val table = database.getTable(into)
+
+        if (table == null) {
             sender.sendError("Table doesn't exist!")
             return
         }
 
-        val table = database.getTable(into)
         val content: MutableMap<String, Any>?
 
-        when (table!!.type) {
+        when (table.type) {
             TableType.DOCUMENT -> {
                 if (!args.containsKey("CONTENT")) {
                     sender.sendSyntax()
@@ -74,7 +76,7 @@ class InsertCommand :
 
                 content = Json.convert(json)
             }
-            else -> {
+            TableType.RELATIONAL -> {
                 if (!args.containsKey("KEY") && !args.containsKey("VALUE")) {
                     sender.sendSyntax()
                     return
@@ -110,6 +112,7 @@ class InsertCommand :
                     content[key] = values[index]
                 }
             }
+            else -> throw TableException("Unknown table type!")
         }
 
         if (content == null) {
@@ -131,11 +134,6 @@ class InsertCommand :
                     return
                 }
 
-                if (content.containsKey(table.primary) && table is DocumentCollection) {
-                    sender.sendError("Can't modify unique id of document entry!")
-                    return
-                }
-
                 for (entry in entries) {
                     /**
                      * To prevent duplication of an entry when the primary key is changed, the previous entry is removed
@@ -150,6 +148,8 @@ class InsertCommand :
                     } else {
                         entry.applyContent(content)
                     }
+
+                    table.addEntry(entry)
                 }
 
                 sender.sendSuccess()
@@ -171,7 +171,7 @@ class InsertCommand :
                 } else {
                     primary = content[table.primary]?.toString()
 
-                    if (table is RelationalTable && primary == null) {
+                    if (table.type == TableType.RELATIONAL && primary == null) {
                         sender.sendError("No primary key in form of unique identifier specified!")
                         return
                     }
@@ -179,7 +179,8 @@ class InsertCommand :
 
                 val entry = table.getEntry(primary) ?: when (table.type) {
                     TableType.DOCUMENT -> Document()
-                    else -> RelationalTableEntry()
+                    TableType.RELATIONAL -> RelationalTableEntry()
+                    else -> throw TableException("Unknown entry type!")
                 }
 
                 /**

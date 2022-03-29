@@ -2,9 +2,8 @@ package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.DatabasePermissionLevel
-import de.byjoker.myjfql.database.DocumentCollection
-import de.byjoker.myjfql.database.RelationalTable
 import de.byjoker.myjfql.database.RelationalTableEntry
+import de.byjoker.myjfql.database.TableType
 import de.byjoker.myjfql.util.ResultType
 
 @CommandHandler
@@ -104,7 +103,7 @@ class StructureCommand :
                 return
             }
 
-            if (table is RelationalTable && columns.any { column -> column == primary }) {
+            if (table.type == TableType.RELATIONAL && columns.any { column -> column == primary }) {
                 sender.sendError("Primary key cannot be removed of the table structure!")
                 return
             }
@@ -157,7 +156,7 @@ class StructureCommand :
         }
 
         if (args.containsKey("MARK-PRIMARY")) {
-            if (table is DocumentCollection) {
+            if (table.type == TableType.DOCUMENT) {
                 sender.sendError("A document table has a fixed and not changeable primary key!")
                 return
             }

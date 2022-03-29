@@ -79,4 +79,27 @@ class Document : TableEntryMatcher {
         this.createdAt = createdAt
     }
 
+    override fun toString(): String {
+        return "Document(content=$content, createdAt=$createdAt)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Document
+
+        if (content != other.content) return false
+        if (createdAt != other.createdAt) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = content.hashCode()
+        result = 31 * result + createdAt.hashCode()
+        return result
+    }
+
+
 }

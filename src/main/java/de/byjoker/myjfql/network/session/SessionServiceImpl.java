@@ -39,7 +39,14 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public void saveSession(@NotNull Session session) {
-        sessions.set(sessions.indexOf(session), session);
+        for (int i = 0; i < sessions.size(); i++) {
+            if (sessions.get(i).getToken().equals(session.getToken())) {
+                sessions.set(i, session);
+                return;
+            }
+        }
+
+        sessions.add(session);
     }
 
     @Override
@@ -67,8 +74,8 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public void loadAll(File backend) {
         final JsonNode node = Json.read(backend);
-
         sessions.clear();
+
         node.forEach(entry -> sessions.add(new StaticSession(entry.get("token").asText(), entry.get("userId").asText(), entry.get("databaseId").asText(), Json.convert(entry.get("addresses")))));
     }
 

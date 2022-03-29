@@ -122,7 +122,12 @@ class DatabaseServiceImpl : DatabaseService {
 
         when (type) {
             TableType.RELATIONAL -> {
-                table = RelationalTable(node.get("name").asText(), structure, node.get("primary").asText())
+                table = RelationalTable(
+                    if (node.has("id")) node.get("id").asText() else node.get("name").asText(),
+                    node.get("name").asText(),
+                    structure,
+                    node.get("primary").asText()
+                )
 
                 entries.forEach { entry ->
                     table.addEntry(
@@ -135,7 +140,11 @@ class DatabaseServiceImpl : DatabaseService {
                 }
             }
             TableType.DOCUMENT -> {
-                table = RelationalTable(node.get("name").asText(), structure, node.get("primary").asText())
+                table = DocumentCollection(
+                    if (node.has("id")) node.get("id").asText() else node.get("name").asText(),
+                    node.get("name").asText(),
+                    structure
+                )
 
                 entries.forEach { entry ->
                     table.addEntry(

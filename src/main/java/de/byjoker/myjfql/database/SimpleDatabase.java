@@ -8,13 +8,14 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class SimpleDatabase implements Database {
 
     private final String name;
     private final Map<String, Table> tables;
-    private DatabaseType type;
     private String id;
+    private DatabaseType type;
 
     public SimpleDatabase(String name) {
         this.id = IDGenerator.generateMixed(16);
@@ -98,4 +99,26 @@ public class SimpleDatabase implements Database {
         return name;
     }
 
+    @Override
+    public String toString() {
+        return "SimpleDatabase{" +
+                "name='" + name + '\'' +
+                ", tables=" + tables +
+                ", type=" + type +
+                ", id='" + id + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SimpleDatabase that = (SimpleDatabase) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

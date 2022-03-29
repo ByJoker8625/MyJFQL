@@ -19,8 +19,9 @@ class ListCommand : Command("list", listOf("COMMAND", "TABLES", "DATABASES")) {
                     DatabasePermissionLevel.READ
                 )
             }.map { database ->
-                RelationalTableEntry().append("name", database.name).append("type", database.type)
-            }, mutableListOf("name", "type"), ResultType.RELATIONAL)
+                RelationalTableEntry().append("id", database.id).append("name", database.name)
+                    .append("type", database.type)
+            }, mutableListOf("id", "name", "type"), ResultType.RELATIONAL)
             return
         }
 
@@ -38,8 +39,8 @@ class ListCommand : Command("list", listOf("COMMAND", "TABLES", "DATABASES")) {
             }
 
             sender.sendResult(database.tables.map { table ->
-                RelationalTableEntry().append("name", table.name).append("type", table.type)
-            }, listOf("name", "type"), ResultType.RELATIONAL)
+                RelationalTableEntry().append("id", table.id).append("name", table.name).append("type", table.type)
+            }, listOf("id", "name", "type"), ResultType.RELATIONAL)
             return
         }
 

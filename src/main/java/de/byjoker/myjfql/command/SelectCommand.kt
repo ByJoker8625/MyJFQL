@@ -3,7 +3,7 @@ package de.byjoker.myjfql.command
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.Database
 import de.byjoker.myjfql.database.DatabasePermissionLevel
-import de.byjoker.myjfql.database.RelationalTable
+import de.byjoker.myjfql.database.TableType
 import de.byjoker.myjfql.lang.TableEntryComparator
 import de.byjoker.myjfql.lang.TableEntryFilter
 import de.byjoker.myjfql.network.session.Session
@@ -39,12 +39,12 @@ class SelectCommand : Command("select", listOf("COMMAND", "VALUE", "FROM", "WHER
                 return
             }
 
-            if (!database.existsTable(from)) {
+            val table = database.getTable(from)
+
+            if (table == null) {
                 sender.sendError("Table doesn't exists!")
                 return
             }
-
-            val table = database.getTable(from)
 
             if (!sender.allowed(database.id, DatabasePermissionLevel.READ)) {
                 sender.sendForbidden()
@@ -52,11 +52,13 @@ class SelectCommand : Command("select", listOf("COMMAND", "VALUE", "FROM", "WHER
             }
 
             val structure = when {
-                formatString(args["VALUE"]) == "*" -> table!!.structure
+                formatString(args["VALUE"]) == "*" -> table.structure
                 else -> formatList(args["VALUE"]) ?: return
             }
 
-            if (table is RelationalTable && structure.stream().anyMatch { entry -> !table.structure.contains(entry) }) {
+            if (table.type == TableType.RELATIONAL && structure.stream()
+                    .anyMatch { entry -> !table.structure.contains(entry) }
+            ) {
                 sender.sendError("Specified values don't match table structure!")
                 return
             }
@@ -103,10 +105,10 @@ class SelectCommand : Command("select", listOf("COMMAND", "VALUE", "FROM", "WHER
                     return
                 }
 
-                if (sortedBy == null) sortedBy = table!!.primary
+                if (sortedBy == null) sortedBy = table.primary
             }
 
-            val resultType = if (table is RelationalTable) ResultType.RELATIONAL else ResultType.DOCUMENT
+            val resultType = if (table.type == TableType.RELATIONAL) ResultType.RELATIONAL else ResultType.DOCUMENT
 
             if (args.containsKey("PRIMARY-KEY")) {
                 val primaryKey = formatString(args["PRIMARY-KEY"])
@@ -116,7 +118,7 @@ class SelectCommand : Command("select", listOf("COMMAND", "VALUE", "FROM", "WHER
                     return
                 }
 
-                val entry = table!!.getEntry(primaryKey)
+                val entry = table.getEntry(primaryKey)
 
                 if (entry == null) {
                     sender.sendError("Entry was not found!")
@@ -152,7 +154,7 @@ class SelectCommand : Command("select", listOf("COMMAND", "VALUE", "FROM", "WHER
 
                 sender.sendResult(entries, structure, resultType)
             } else {
-                val entries = if (sortedBy == null) table!!.entries else table!!.getEntries(
+                val entries = if (sortedBy == null) table.entries else table.getEntries(
                     TableEntryComparator(sortedBy), order
                 )
 

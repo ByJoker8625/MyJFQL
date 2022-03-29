@@ -17,7 +17,7 @@ public class UserTable extends InternalTable {
     private final UserService userService;
 
     public UserTable(UserService userService) {
-        super("users", Arrays.asList("id", "name", "password", "accesses", "preferred_database_id"), "id");
+        super("users", "users", Arrays.asList("id", "name", "password", "accesses", "preferred_database_id"), "id");
         this.userService = userService;
     }
 

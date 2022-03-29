@@ -32,6 +32,8 @@ public interface Table {
 
     String getName();
 
+    String getId();
+
     void clear();
 
 }

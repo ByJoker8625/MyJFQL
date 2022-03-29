@@ -4,18 +4,17 @@ import de.byjoker.myjfql.exception.TableException;
 import de.byjoker.myjfql.lang.TableEntryComparator;
 import de.byjoker.myjfql.util.Order;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public abstract class InternalTable implements Table {
 
+    private final String id;
     private final String name;
     private final Collection<String> structure;
     private final String primary;
 
-    protected InternalTable(String name, List<String> structure, String primary) {
+    protected InternalTable(String id, String name, List<String> structure, String primary) {
+        this.id = id;
         this.name = name;
         this.structure = structure;
         this.primary = primary;
@@ -60,6 +59,11 @@ public abstract class InternalTable implements Table {
     }
 
     @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
     public TableType getType() {
         return TableType.RELATIONAL;
     }
@@ -67,5 +71,28 @@ public abstract class InternalTable implements Table {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String toString() {
+        return "InternalTable{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", structure=" + structure +
+                ", primary='" + primary + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        InternalTable that = (InternalTable) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

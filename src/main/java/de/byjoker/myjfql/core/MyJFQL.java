@@ -158,7 +158,7 @@ public final class MyJFQL {
                 throw new FileException(ex);
             }
 
-            databaseService.saveDatabase(new InternalDatabase(Arrays.asList(new UserTable(userService), new SessionTable(sessionService))));
+            databaseService.saveDatabase(new InternalDatabase(Arrays.asList(new UserTable(userService), new SessionTable(sessionService), new DatabasesTable(databaseService))));
             console.logInfo("Loading finished!");
         }
 
