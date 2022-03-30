@@ -154,7 +154,6 @@ public class TablePrinter {
             line.append(part);
         }
         if (ucode) {
-            assert line != null;
             line.append(gc(VERTICAL_TSEP));
         }
         assert line != null;

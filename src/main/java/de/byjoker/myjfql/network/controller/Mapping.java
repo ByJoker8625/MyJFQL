@@ -1,7 +1,7 @@
 package de.byjoker.myjfql.network.controller;
 
-import de.byjoker.myjfql.network.util.LoginRequirement;
-import de.byjoker.myjfql.network.util.RequestMethod;
+import de.byjoker.myjfql.network.util.AccessLevel;
+import de.byjoker.myjfql.network.util.Request;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,8 +14,8 @@ public @interface Mapping {
 
     String path();
 
-    RequestMethod method();
+    Request.Method method();
 
-    LoginRequirement login() default LoginRequirement.SESSION_AND_NO_SESSION;
+    AccessLevel access() default AccessLevel.SESSION_AND_NO_SESSION;
 
 }

@@ -1,15 +1,24 @@
 package de.byjoker.myjfql.database
 
+import java.time.LocalDate
+
 interface Database {
-    val tables: Collection<Table>
-    val type: DatabaseType
-    val name: String
-    val id: String
-    fun regenerateId()
-    fun createTable(table: Table)
-    fun saveTable(table: Table)
-    fun existsTable(name: String): Boolean
-    fun deleteTable(name: String)
-    fun reformat(type: DatabaseType, service: DatabaseService)
-    fun getTable(name: String): Table?
+
+    var id: String
+    var name: String
+    var type: Type
+    var changes: MutableList<String>
+    fun pushTable(table: Table)
+    fun pullTable(uniqueId: String): Table?
+    fun pullTableByName(name: String): Table?
+    fun popTable(uniqueId: String)
+    fun getTables(): List<Table>
+    var createdAt: LocalDate
+
+    enum class Type(val identifier: List<String>) {
+        INTERNAL(listOf("internal", "intern")),
+        STANDALONE(listOf("standalone", "singleton")),
+        HALF_DOCUMENT(listOf("half_document")), DOCUMENT(listOf("document"))
+    }
+
 }

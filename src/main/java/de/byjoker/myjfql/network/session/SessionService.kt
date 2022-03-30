@@ -1,8 +1,6 @@
 package de.byjoker.myjfql.network.session
 
-import de.byjoker.myjfql.util.StorageService
-
-interface SessionService : StorageService {
+interface SessionService {
 
     fun openSession(session: Session)
 

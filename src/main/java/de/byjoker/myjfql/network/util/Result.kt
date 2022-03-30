@@ -1,10 +1,15 @@
 package de.byjoker.myjfql.network.util
 
-import de.byjoker.myjfql.database.TableEntry
-import de.byjoker.myjfql.util.ResultType
+import com.fasterxml.jackson.databind.JsonNode
 
 data class Result(
-    val result: Collection<TableEntry>,
+    val result: Collection<JsonNode>,
     val structure: Collection<String>,
     val resultType: ResultType
-) : Response(ResponseType.RESULT)
+) : Response(ResponseType.RESULT) {
+
+    enum class ResultType {
+        RELATIONAL, DOCUMENT
+    }
+
+}

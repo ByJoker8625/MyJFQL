@@ -6,7 +6,7 @@
 
     <groupId>de.byjoker</groupId>
     <artifactId>MyJFQL</artifactId>
-    <version>1.5.6</version>
+    <version>1.6.1</version>
     <name>MyJFQL</name>
     <description>Java based easy to use dbms for fast and smaller applications.</description>
     <properties>
@@ -23,6 +23,21 @@
     </developers>
     <dependencies>
         <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.13.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>2.13.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.1-jre</version>
+        </dependency>
+        <dependency>
             <groupId>de.mkammerer</groupId>
             <artifactId>argon2-jvm</artifactId>
             <version>2.11</version>
@@ -30,43 +45,17 @@
         <dependency>
             <groupId>io.javalin</groupId>
             <artifactId>javalin</artifactId>
-            <version>4.3.0</version>
+            <version>4.4.0</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.35</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.jline</groupId>
             <artifactId>jline</artifactId>
             <version>3.21.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20160810</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.13.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>2.13.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>31.0.1-jre</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -79,8 +68,13 @@
             <version>${kotlin.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

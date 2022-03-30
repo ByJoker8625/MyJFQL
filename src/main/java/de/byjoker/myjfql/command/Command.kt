@@ -1,58 +1,11 @@
 package de.byjoker.myjfql.command
 
 import org.jline.reader.ParsedLine
-import java.util.stream.Collectors
-import java.util.stream.IntStream
-import kotlin.streams.toList
 
-abstract class Command(val name: String, val syntax: List<String>) {
+abstract class Command(val name: String, val keywords: List<String>, val aliases: List<String>) {
 
-    abstract fun execute(sender: CommandSender, args: Map<String, List<String>>)
+    abstract fun execute(sender: CommandSender, args: Map<String, String>)
 
     open fun complete(sender: CommandSender, line: ParsedLine): List<String>? = null
-
-    fun formatString(strings: List<String>?): String? {
-        if (strings == null) {
-            return null
-        }
-
-        return if (strings.isEmpty()) null else IntStream.range(1, strings.size).mapToObj { i: Int -> " " + strings[i] }
-            .collect(Collectors.joining("", strings[0], "")).replace("'", "")
-    }
-
-    fun formatList(strings: List<String>?): List<String>? {
-        if (strings == null) {
-            return null
-        }
-
-        return if (strings.isEmpty()) listOf() else strings.stream().map { s: String -> s.replace("'", "") }.toList()
-    }
-
-    fun formatInteger(strings: List<String>?): Int {
-        if (strings == null) return -1
-
-        return if (strings.isEmpty()) -1 else IntStream.range(1, strings.size).mapToObj { i: Int -> " " + strings[i] }
-            .collect(Collectors.joining("", strings[0], "")).replace("'", "").toInt()
-    }
-
-    override fun toString(): String {
-        return "Command(name='$name', syntax=$syntax)"
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Command
-
-        if (name != other.name) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return name.hashCode()
-    }
-
 
 }

@@ -13,17 +13,14 @@ object IDGenerator {
             .collect(Collectors.joining())
     }
 
-    @JvmStatic
     fun generateMixed(length: Int): String {
         return generate("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", length)
     }
 
-    @JvmStatic
     fun generateString(length: Int): String {
         return generate("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", length)
     }
 
-    @JvmStatic
     fun generateDigits(length: Int): String {
         return generate("0123456789", length)
     }

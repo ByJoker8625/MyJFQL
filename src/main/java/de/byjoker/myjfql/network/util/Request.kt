@@ -8,6 +8,10 @@ interface Request {
 
     val payload: JsonNode?
 
-    val method: RequestMethod
+    val method: Method
+
+    enum class Method {
+        GET, POST, PUT, DELETE
+    }
 
 }
