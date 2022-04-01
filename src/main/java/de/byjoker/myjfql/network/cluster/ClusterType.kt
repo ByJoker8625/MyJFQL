@@ -1,4 +1,4 @@
-package de.byjoker.myjfql.network.util
+package de.byjoker.myjfql.network.cluster
 
 enum class ClusterType {
 
