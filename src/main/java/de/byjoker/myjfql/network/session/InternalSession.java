@@ -7,7 +7,7 @@ import java.util.Collections;
 public class InternalSession extends Session {
 
     public InternalSession(String name) {
-        super(name, Type.INTERNAL, name, null, Collections.emptyList());
+        super(name, SessionType.INTERNAL, name, null, Collections.emptyList());
     }
 
     @Override

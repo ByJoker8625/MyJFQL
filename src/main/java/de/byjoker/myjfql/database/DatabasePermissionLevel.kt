@@ -1,6 +1,6 @@
 package de.byjoker.myjfql.database
 
-enum class DatabasePermissionLevel(private val level: Int) {
+enum class DatabasePermissionLevel(val level: Int) {
 
     NONE(0), READ(1), READ_WRITE(2);
 

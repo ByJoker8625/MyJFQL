@@ -1,13 +1,13 @@
 package de.byjoker.myjfql.database
 
-import de.byjoker.myjfql.util.StorageService
+interface DatabaseService {
 
-interface DatabaseService : StorageService {
-
-    var changes: MutableList<String>
-
-    fun saveDatabase()
+    val databases: List<Database>
+    fun createDatabase(database: Database)
+    fun saveDatabase(database: Database)
+    fun deleteDatabase(id: String)
     fun getDatabase(id: String): Database?
     fun getDatabaseByName(name: String): Database?
+    fun loadDatabase(id: String): Database?
 
 }

@@ -8,6 +8,6 @@ interface Interpreter {
     fun interpretPullFieldDefinitions(definitions: String): List<PullFieldDefinition>
     fun interpretPushFieldDefinitions(definitions: String): List<PushFieldDefinition>
     fun interpretConditions(conditions: String): List<List<Requirement>>
-    fun interpretCommand(command: String): Map<String, String>
+    fun interpretCommand(command: String): Map<String, List<String>>
 
 }

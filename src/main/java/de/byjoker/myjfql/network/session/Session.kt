@@ -1,7 +1,11 @@
 package de.byjoker.myjfql.network.session
 
 abstract class Session(
-    val token: String, val type: Type, var userId: String, var databaseId: String?, var addresses: MutableList<String>
+    val token: String,
+    val type: SessionType,
+    var userId: String,
+    var databaseId: String?,
+    var addresses: MutableList<String>
 ) {
 
     abstract fun validAddress(address: String): Boolean
@@ -23,10 +27,6 @@ abstract class Session(
 
     override fun hashCode(): Int {
         return token.hashCode()
-    }
-
-    enum class Type {
-        STATIC, DYNAMIC, INTERNAL
     }
 
 }

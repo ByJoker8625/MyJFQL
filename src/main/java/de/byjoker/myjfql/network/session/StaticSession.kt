@@ -7,7 +7,7 @@ class StaticSession(
     userId: String,
     databaseId: String? = null,
     addresses: MutableList<String> = mutableListOf()
-) : Session(token, Type.STATIC, userId, databaseId, addresses) {
+) : Session(token, SessionType.STATIC, userId, databaseId, addresses) {
 
     override fun validAddress(address: String): Boolean {
         if (addresses.contains("*")) {

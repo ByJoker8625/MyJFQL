@@ -6,10 +6,4 @@ data class Result(
     val result: Collection<JsonNode>,
     val structure: Collection<String>,
     val resultType: ResultType
-) : Response(ResponseType.RESULT) {
-
-    enum class ResultType {
-        RELATIONAL, DOCUMENT
-    }
-
-}
+) : Response(ResponseType.RESULT)

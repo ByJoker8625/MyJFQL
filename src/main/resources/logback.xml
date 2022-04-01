@@ -1,12 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<configuration debug="false">
+<configuration>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss} [%t] %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <root level="info">
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/latest.log</file>
+        <append>false</append>
+        <encoder class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d [%thread] %level %mdc %logger{35} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>.logs/%i.log.zip
+            </FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>10</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <root level="all">
+        <appender-ref ref="FILE"/>
         <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>

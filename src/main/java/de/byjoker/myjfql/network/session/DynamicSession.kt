@@ -7,7 +7,7 @@ class DynamicSession(
     userId: String,
     databaseId: String? = null,
     addresses: MutableList<String> = mutableListOf()
-) : Session(token, Type.DYNAMIC, userId, databaseId, addresses) {
+) : Session(token, SessionType.DYNAMIC, userId, databaseId, addresses) {
 
     override fun validAddress(address: String): Boolean {
         return address.contains(address)
