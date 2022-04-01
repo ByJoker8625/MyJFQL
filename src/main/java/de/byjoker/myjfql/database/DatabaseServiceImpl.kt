@@ -1,8 +1,6 @@
 package de.byjoker.myjfql.database
 
-import java.io.File
-
-class JsonDatabaseService() : DatabaseService {
+class DatabaseServiceImpl() : DatabaseService {
 
     private val databases: MutableMap<String, Database> = mutableMapOf()
 

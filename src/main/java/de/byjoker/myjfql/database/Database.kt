@@ -7,7 +7,6 @@ interface Database {
     var id: String
     var name: String
     var type: DatabaseType
-    var owner: String
     fun pushTable(table: Table)
     fun getTable(uniqueId: String): Table?
     fun getTableByName(name: String): Table?
