@@ -197,13 +197,14 @@ class JFQLInterpreter(val commandService: CommandService) : Interpreter {
     override fun interpretCommand(command: String): Map<String, List<String>> {
         val attributes: List<String> = command.split(" ")
 
-        val definitions: MutableList<String> = ArrayList()
+        val definitions: MutableList<String> = mutableListOf()
         var builder: StringBuilder? = null
 
         for (index in attributes.indices) {
             val current = attributes[index]
+
             if (index == 0) {
-                definitions.add("COMMAND")
+                definitions.add("command")
                 definitions.add(current)
             } else {
                 if (current.startsWith("'") && current.endsWith("'") && current != "'") {
@@ -234,14 +235,13 @@ class JFQLInterpreter(val commandService: CommandService) : Interpreter {
             throw CommandException("Unknown command $command!")
         }
 
-
-        val arguments: MutableMap<String, MutableList<String>> = HashMap()
+        val arguments: MutableMap<String, MutableList<String>> = mutableMapOf()
         var section: String? = null
 
         for (current in definitions) {
-            if (keywords.contains(current.uppercase())) {
-                section = current.uppercase()
-                arguments[section] = mutableListOf()
+            if (keywords.contains(current)) {
+                arguments[current] = mutableListOf()
+                section = current
             } else {
                 if (section == null) {
                     break

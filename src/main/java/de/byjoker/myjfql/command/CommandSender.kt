@@ -10,6 +10,7 @@ interface CommandSender {
     fun permitted(action: DatabasePermissionLevel, databaseId: String): Boolean
     fun success()
     fun result(result: Any)
+    fun error(exception: Exception)
     fun error(exception: String)
 
 }

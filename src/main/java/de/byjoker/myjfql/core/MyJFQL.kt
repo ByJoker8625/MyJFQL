@@ -1,129 +1,69 @@
-package de.byjoker.myjfql.core;
+package de.byjoker.myjfql.core
 
-import de.byjoker.myjfql.command.Command;
-import de.byjoker.myjfql.command.CommandSender;
-import de.byjoker.myjfql.command.CommandService;
-import de.byjoker.myjfql.command.CommandServiceImpl;
-import de.byjoker.myjfql.database.DatabasePermissionLevel;
-import de.byjoker.myjfql.database.DatabaseService;
-import de.byjoker.myjfql.lang.Interpreter;
-import de.byjoker.myjfql.lang.JFQLInterpreter;
-import de.byjoker.myjfql.network.NetworkService;
-import de.byjoker.myjfql.network.session.InternalSession;
-import de.byjoker.myjfql.network.session.Session;
-import de.byjoker.myjfql.network.session.SessionService;
-import de.byjoker.myjfql.user.UserService;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.byjoker.myjfql.command.CommandService
+import de.byjoker.myjfql.command.CommandServiceImpl
+import de.byjoker.myjfql.config.ConfigService
+import de.byjoker.myjfql.config.GeneralConfig
+import de.byjoker.myjfql.config.YamlConfigService
+import de.byjoker.myjfql.database.DatabaseService
+import de.byjoker.myjfql.lang.Interpreter
+import de.byjoker.myjfql.lang.JFQLInterpreter
+import de.byjoker.myjfql.network.HttpNetworkService
+import de.byjoker.myjfql.network.NetworkService
+import de.byjoker.myjfql.network.session.SessionService
+import de.byjoker.myjfql.network.session.SessionServiceImpl
+import de.byjoker.myjfql.network.util.Response
+import de.byjoker.myjfql.user.UserService
+import de.byjoker.myjfql.util.Cache
+import de.byjoker.myjfql.util.QueryCache
+import org.slf4j.LoggerFactory
 
-import java.util.*;
+fun main() {
+    MyJFQL.getInstance().start()
+}
 
-public final class MyJFQL {
+class MyJFQL private constructor() {
 
-    final Logger logger = LoggerFactory.getLogger(MyJFQL.class);
+    private val logger = LoggerFactory.getLogger(javaClass)
 
-    private static MyJFQL instance = null;
-    private CommandService commandService;
-    private NetworkService networkService;
-    private SessionService sessionService;
-    private DatabaseService databaseService;
-    private UserService userService;
-    private Interpreter interpreter;
+    val configService: ConfigService
+    val config: GeneralConfig
+    val commandService: CommandService
+    val networkService: NetworkService
+    val sessionService: SessionService
+    val databaseService: DatabaseService? = null
+    val userService: UserService? = null
+    val interpreter: Interpreter
+    val cache: Cache<String, Response>
 
-    private MyJFQL() {
-        instance = this;
-
-        commandService = new CommandServiceImpl();
-        interpreter = new JFQLInterpreter(commandService);
+    init {
+        instance = this
+        configService = YamlConfigService()
+        config = configService.loadMapped()
+        sessionService = SessionServiceImpl()
+        commandService = CommandServiceImpl()
+        networkService = HttpNetworkService()
+        interpreter = JFQLInterpreter(commandService)
+        cache = QueryCache()
     }
 
-    public static void main(String[] args) {
-        MyJFQL.getInstance().start();
+    fun start() {
+        logger.info("Starting MyJFQL...")
+        networkService.start(2291)
     }
 
-    public static MyJFQL getInstance() {
-        if (instance == null) {
-            return new MyJFQL();
-        }
+    fun shutdown() {
 
-        return instance;
     }
 
-    public void start() {
-        commandService.registerCommand(new Command("push", Arrays.asList("command", "fields"), Collections.emptyList()) {
-            @Override
-            public void execute(@NotNull CommandSender sender, @NotNull Map<String, ? extends List<String>> args) {
-                logger.debug(args.toString());
+    companion object {
+        private var instance: MyJFQL? = null
 
-                if (args.containsKey("fields")) {
-                    logger.debug(interpreter.interpretPushFieldDefinitions(Objects.requireNonNull(formatString(args.get("fields")))).toString());
-                }
+        fun getInstance(): MyJFQL {
+            return when (instance) {
+                null -> MyJFQL()
+                else -> instance!!
             }
-        });
-
-        while (true) {
-            commandService.execute(new CommandSender() {
-                @NotNull
-                @Override
-                public String getName() {
-                    return "null";
-                }
-
-                @NotNull
-                @Override
-                public Session getSession() {
-                    return new InternalSession("d");
-                }
-
-                @Override
-                public boolean permitted(@NotNull DatabasePermissionLevel action, @NotNull String databaseId) {
-                    return false;
-                }
-
-                @Override
-                public void success() {
-
-                }
-
-                @Override
-                public void result(@NotNull Object result) {
-
-                }
-
-                @Override
-                public void error(@NotNull String exception) {
-
-                }
-            }, new Scanner(System.in).nextLine(), interpreter);
         }
-    }
-
-    public void shutdown() {
-
-    }
-
-    public CommandService getCommandService() {
-        return commandService;
-    }
-
-    public NetworkService getNetworkService() {
-        return networkService;
-    }
-
-    public SessionService getSessionService() {
-        return sessionService;
-    }
-
-    public DatabaseService getDatabaseService() {
-        return databaseService;
-    }
-
-    public UserService getUserService() {
-        return userService;
-    }
-
-    public Interpreter getInterpreter() {
-        return interpreter;
     }
 }

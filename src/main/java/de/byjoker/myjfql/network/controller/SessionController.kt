@@ -1,6 +1,5 @@
 package de.byjoker.myjfql.network.controller
 
-class AuthenticationController {
-
+class SessionController : Controller {
 
 }

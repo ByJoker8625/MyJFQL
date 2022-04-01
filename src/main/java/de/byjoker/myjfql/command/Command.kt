@@ -5,7 +5,7 @@ import java.util.stream.Collectors
 import java.util.stream.IntStream
 import kotlin.streams.toList
 
-abstract class Command(val name: String, val keywords: List<String>, val aliases: List<String>) {
+abstract class Command(val name: String, val keywords: List<String>, val aliases: List<String> = listOf()) {
 
     abstract fun execute(sender: CommandSender, args: Map<String, List<String>>)
 

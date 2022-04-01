@@ -8,6 +8,7 @@ data class ClusterConfig(
     val uniqueId: String = "${IDGenerator.generateString(5)}${IDGenerator.generateDigits(2)}",
     val role: ClusterRole = ClusterRole.STANDALONE,
     val type: ClusterType = ClusterType.DISABLED,
+    val range: List<Int> = listOf(0, 1000000),
     val level: Int = -1,
     val superior: String = "",
     val auth: List<String> = listOf()

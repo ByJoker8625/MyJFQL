@@ -1,12 +1,8 @@
 package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.lang.Interpreter
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 class CommandServiceImpl(private var commands: MutableList<Command> = mutableListOf()) : CommandService {
-
-    val logger: Logger = LoggerFactory.getLogger("CommandService")
 
     override fun registerCommand(command: Command) {
         commands.add(command)
@@ -14,10 +10,6 @@ class CommandServiceImpl(private var commands: MutableList<Command> = mutableLis
 
     override fun unregisterCommand(name: String) {
         commands.removeIf { command -> command.name.equals(name, ignoreCase = true) }
-    }
-
-    override fun searchCommands(`package`: String) {
-        TODO("Not yet implemented")
     }
 
     override fun getCommand(name: String): Command? {
@@ -44,8 +36,7 @@ class CommandServiceImpl(private var commands: MutableList<Command> = mutableLis
 
             command.execute(sender, arguments)
         } catch (ex: Exception) {
-            sender.error(ex.message ?: "Unknown error happened!")
-            logger.error(ex.message, ex)
+            sender.error(ex)
         }
     }
 }

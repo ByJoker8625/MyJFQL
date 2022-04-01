@@ -9,5 +9,6 @@ interface DatabaseService {
     fun getDatabase(id: String): Database?
     fun getDatabaseByName(name: String): Database?
     fun loadDatabase(id: String): Database?
+    fun loadDatabases()
 
 }

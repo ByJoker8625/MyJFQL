@@ -1,4 +1,4 @@
 package de.byjoker.myjfql.network.controller
 
-class ClusterController {
+class ClusterController : Controller {
 }
