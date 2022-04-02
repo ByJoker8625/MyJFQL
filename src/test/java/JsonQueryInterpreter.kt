@@ -48,7 +48,7 @@ class JsonQueryInterpreter(private val json: JsonNode) {
     private fun searchArray(node: JsonNode, fields: List<String>, stringify: Boolean): Any? {
         return try {
             if (fields.isEmpty()) {
-                return node.toString()
+                return node
             }
 
             val index = fields[0].toInt()
@@ -72,7 +72,7 @@ class JsonQueryInterpreter(private val json: JsonNode) {
     private fun searchObject(node: JsonNode, fields: List<String>, stringify: Boolean): Any? {
         return try {
             if (fields.isEmpty()) {
-                return node.toString()
+                return node
             }
 
             val o = node[fields[0]] ?: return null

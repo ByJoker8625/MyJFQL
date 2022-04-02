@@ -11,8 +11,6 @@ import de.byjoker.myjfql.lang.Interpreter
 import de.byjoker.myjfql.lang.JFQLInterpreter
 import de.byjoker.myjfql.network.HttpNetworkService
 import de.byjoker.myjfql.network.NetworkService
-import de.byjoker.myjfql.network.cluster.Cluster
-import de.byjoker.myjfql.network.cluster.StandaloneCluster
 import de.byjoker.myjfql.network.session.InternalSession
 import de.byjoker.myjfql.network.session.SessionService
 import de.byjoker.myjfql.network.session.SessionServiceImpl
@@ -40,7 +38,6 @@ class MyJFQL private constructor() {
     val databaseService: DatabaseService? = null
     val userService: UserService? = null
     val interpreter: Interpreter
-    val cluster: Cluster
     val cache: Cache<String, Response>
 
     init {
@@ -51,24 +48,24 @@ class MyJFQL private constructor() {
         commandService = CommandServiceImpl()
         networkService = HttpNetworkService()
         interpreter = JFQLInterpreter(commandService)
-        cluster = StandaloneCluster()
         cache = QueryCache()
     }
 
     fun start() {
-        cluster.join()
 
         while (true) {
+            val line = Scanner(System.`in`).nextLine()
+            val l = System.currentTimeMillis()
             commandService.execute(
                 ConsoleCommandSender("Console", InternalSession("Console")),
-                Scanner(System.`in`).nextLine()
+                line
             )
+            println(System.currentTimeMillis() - l)
         }
     }
 
     fun shutdown() {
         try {
-            cluster.quit()
         } catch (ex: Exception) {
             logger.error(ex.message, ex)
         }

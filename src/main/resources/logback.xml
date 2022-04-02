@@ -21,8 +21,11 @@
         </encoder>
     </appender>
 
+    <logger name="de.byjoker.myjfql" level="all">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <root level="error">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
     </root>
 </configuration>

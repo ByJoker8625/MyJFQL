@@ -1,16 +1,20 @@
-import de.byjoker.myjfql.config.GeneralConfig;
-import de.byjoker.myjfql.util.Yaml;
+import de.byjoker.myjfql.util.Json;
 
-import java.io.File;
+import java.util.Arrays;
 
-public class Main {
+public class HashFunMio {
 
     public static void main(String[] args) throws Exception {
-        String s = "423142qewds423erwd5f34trwefd4t2wgresd1t34qegfad2312312a4324re";
-        System.out.println(s.length());
-        System.out.println(hashCode(s));
-        Yaml.INSTANCE.write(new GeneralConfig(), new File("config.yml"));
+        Json.INSTANCE.stringify("a");
 
+        long l = System.currentTimeMillis();
+        System.out.println(Json.INSTANCE.stringify(Arrays.asList("l")));
+        l = System.currentTimeMillis() - l;
+        System.out.println(l);
+
+        /*String s = "423142qewds423erwd5f34trwefd4t2wgresd1t34qegfad2312312a4324re";
+        System.out.println(s.length());
+        System.out.println(hashCode(s));*/
     }
 
     static int hashCode(String value) {

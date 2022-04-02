@@ -13,6 +13,10 @@ object Json {
         return OBJECT_MAPPER.writeValueAsString(any)
     }
 
+    fun pretty(any: Any): String {
+        return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(any)
+    }
+
     fun read(file: File): JsonNode {
         return OBJECT_MAPPER.readTree(file)
     }

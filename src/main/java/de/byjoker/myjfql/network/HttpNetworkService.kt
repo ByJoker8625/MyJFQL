@@ -9,7 +9,6 @@ import de.byjoker.myjfql.network.session.Session
 import de.byjoker.myjfql.network.util.*
 import de.byjoker.myjfql.util.Json
 import io.javalin.Javalin
-import io.javalin.http.ContentType
 import io.javalin.http.Handler
 
 class HttpNetworkService : NetworkService {
@@ -28,13 +27,14 @@ class HttpNetworkService : NetworkService {
 
     override fun start(port: Int) {
         app._conf.showJavalinBanner = false
+        app._conf.defaultContentType = "application/json"
         app.start(port)
 
         registerController(SessionController())
         registerController(QueryController())
 
         app.error(404) { context ->
-            context.contentType(ContentType.APPLICATION_JSON).result(Json.stringify(ErrorResponse("Unknown syntax!")))
+            context.result(Json.stringify(ErrorResponse("Unknown syntax!")))
         }
 
         controllers.forEach { controller ->
