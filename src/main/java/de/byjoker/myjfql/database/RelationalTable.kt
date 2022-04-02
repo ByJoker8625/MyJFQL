@@ -1,23 +1,28 @@
 package de.byjoker.myjfql.database
 
+import de.byjoker.myjfql.exception.LanguageException
 import de.byjoker.myjfql.lang.Requirement
 import de.byjoker.myjfql.util.IDGenerator
 import java.time.LocalDate
 
-class DocumentCollection(
+class RelationalTable(
     override var id: String = IDGenerator.generateString(16),
     override var name: String,
-    override var databaseId: String,
-    override var createdAt: LocalDate = LocalDate.now()
+    override val databaseId: String,
+    override val structure: MutableList<String>,
+    override val primary: String = structure[0],
+    override val createdAt: LocalDate = LocalDate.now(),
 ) : Table {
 
-    override val structure: List<String> = listOf("_id", "*")
-    override val primary: String = "_id"
-    override val type: TableType = TableType.DOCUMENT
+    override val type: TableType = TableType.RELATIONAL
     private val entries: MutableMap<String, Entry> = mutableMapOf()
 
     override fun pushEntry(entry: Entry) {
-        entries[entry.id] = entry
+        if (entry.containsOrNotNullItem(primary)) {
+            throw LanguageException("Entry have to contain primary key!")
+        }
+
+        entries[entry.selectStringify(primary).toString()] = entry
     }
 
     override fun getEntry(entryId: String): Entry? {
@@ -53,25 +58,5 @@ class DocumentCollection(
     override fun clear() {
         entries.clear()
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as DocumentCollection
-
-        if (id != other.id) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
-
-    override fun toString(): String {
-        return "DocumentCollection(id='$id', name='$name', databaseId='$databaseId', createdAt=$createdAt, primary='$primary', type=$type, entries=$entries)"
-    }
-
 
 }

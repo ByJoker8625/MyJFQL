@@ -2,11 +2,11 @@ package de.byjoker.myjfql.util
 
 import java.io.File
 
-interface StorageService {
+interface StorageService<T> {
 
-    fun load(backend: File)
+    fun load(backend: File): T?
     fun loadAll()
-    fun save(backed: File)
-    fun saveAll()
+    fun write(backed: File, t: T)
+    fun writeAll()
 
 }

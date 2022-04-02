@@ -10,13 +10,12 @@ import java.time.LocalDate
 
 interface Table {
 
-    var id: String
+    val id: String
     var name: String
 
-    @get:JsonIgnore
-    var databaseId: String
-    var type: TableType
-    var primary: String
+    val structure: List<String>
+    val primary: String
+    val type: TableType
     fun pushEntry(entry: Entry)
     fun getEntry(entryId: String): Entry?
     fun removeEntry(entryId: String)
@@ -24,9 +23,11 @@ interface Table {
     fun getEntries(): List<Entry>
     fun clear()
 
-
     @get:JsonSerialize(using = LocalDateSerializer::class)
     @get:JsonDeserialize(using = LocalDateDeserializer::class)
-    var createdAt: LocalDate
+    val createdAt: LocalDate
+
+    @get:JsonIgnore
+    val databaseId: String
 
 }

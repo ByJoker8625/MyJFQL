@@ -1,6 +1,8 @@
 package de.byjoker.myjfql.database
 
-interface DatabaseService {
+import de.byjoker.myjfql.util.StorageService
+
+interface DatabaseService : StorageService<Database> {
 
     fun createDatabase(database: Database)
     fun saveDatabase(database: Database)

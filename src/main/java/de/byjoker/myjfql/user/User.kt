@@ -9,9 +9,9 @@ import java.time.LocalDate
 
 interface User {
 
-    var id: String
-    var name: String
-    var type: UserType
+    val id: String
+    val name: String
+    val type: UserType
     var locked: Boolean
     var password: String
     fun validPassword(password: String): Boolean
@@ -23,6 +23,6 @@ interface User {
 
     @get:JsonSerialize(using = LocalDateSerializer::class)
     @get:JsonDeserialize(using = LocalDateDeserializer::class)
-    var createdAt: LocalDate
+    val createdAt: LocalDate
 
 }

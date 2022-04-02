@@ -1,12 +1,13 @@
 package de.byjoker.myjfql.core
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import de.byjoker.myjfql.command.CommandService
 import de.byjoker.myjfql.command.CommandServiceImpl
 import de.byjoker.myjfql.command.ConsoleCommandSender
 import de.byjoker.myjfql.config.ConfigService
 import de.byjoker.myjfql.config.GeneralConfig
 import de.byjoker.myjfql.config.YamlConfigService
-import de.byjoker.myjfql.database.DatabaseService
+import de.byjoker.myjfql.database.*
 import de.byjoker.myjfql.lang.Interpreter
 import de.byjoker.myjfql.lang.JFQLInterpreter
 import de.byjoker.myjfql.network.HttpNetworkService
@@ -17,9 +18,10 @@ import de.byjoker.myjfql.network.session.SessionServiceImpl
 import de.byjoker.myjfql.network.util.Response
 import de.byjoker.myjfql.user.UserService
 import de.byjoker.myjfql.util.Cache
+import de.byjoker.myjfql.util.IDGenerator
 import de.byjoker.myjfql.util.QueryCache
 import org.slf4j.LoggerFactory
-import java.util.*
+import java.util.stream.IntStream
 import kotlin.system.exitProcess
 
 fun main() {
@@ -28,14 +30,14 @@ fun main() {
 
 class MyJFQL private constructor() {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val logger = LoggerFactory.getLogger("de.byjoker.myjfql")
 
     val configService: ConfigService
     val config: GeneralConfig
     val commandService: CommandService
     val networkService: NetworkService
     val sessionService: SessionService
-    val databaseService: DatabaseService? = null
+    val databaseService: DatabaseService
     val userService: UserService? = null
     val interpreter: Interpreter
     val cache: Cache<String, Response>
@@ -47,21 +49,47 @@ class MyJFQL private constructor() {
         sessionService = SessionServiceImpl()
         commandService = CommandServiceImpl()
         networkService = HttpNetworkService()
+        databaseService = DatabaseServiceImpl()
         interpreter = JFQLInterpreter(commandService)
         cache = QueryCache()
     }
 
     fun start() {
 
-        while (true) {
-            val line = Scanner(System.`in`).nextLine()
-            val l = System.currentTimeMillis()
-            commandService.execute(
-                ConsoleCommandSender("Console", InternalSession("Console")),
-                line
+        val cs = ConsoleCommandSender("Console", InternalSession("Console"))
+
+        commandService.searchCommands("de.byjoker.myjfql.command")
+
+        databaseService.loadAll()
+
+        /*
+        val database = SimpleDatabase(name = "test", type = DatabaseType.SHARDED)
+        val users = RelationalTable(
+            name = "users",
+            databaseId = database.id,
+            structure = mutableListOf("id", "name", "password", "email")
+        )
+
+        val factory = JsonNodeFactory.instance
+
+        for (i in IntStream.range(0, 100)) {
+            users.pushEntry(
+                RelationalEntry()
+                    .insert("id", factory.textNode(IDGenerator.generateDigits(5)))
+                    .insert("name", factory.textNode(IDGenerator.generateString(6)))
+                    .insert("password", factory.textNode(IDGenerator.generateMixed(12)))
+                    .insert(
+                        "email",
+                        factory.textNode("${IDGenerator.generateString(4)}@${IDGenerator.generateString(5)}.com")
+                    )
             )
-            println(System.currentTimeMillis() - l)
         }
+
+        database.pushTable(users)
+
+        databaseService.saveDatabase(database)
+        databaseService.writeAll()*/
+
     }
 
     fun shutdown() {

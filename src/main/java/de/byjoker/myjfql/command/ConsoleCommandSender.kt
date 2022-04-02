@@ -3,11 +3,12 @@ package de.byjoker.myjfql.command
 import de.byjoker.myjfql.database.DatabasePermissionLevel
 import de.byjoker.myjfql.network.session.Session
 import de.byjoker.myjfql.user.UserType
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class ConsoleCommandSender(override val name: String, override val session: Session) : CommandSender {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val logger: Logger = LoggerFactory.getLogger("de.byjoker.myjfql")
 
     override fun permitted(action: DatabasePermissionLevel, databaseId: String): Boolean {
         return true

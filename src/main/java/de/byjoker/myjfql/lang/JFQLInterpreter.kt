@@ -10,7 +10,7 @@ import java.util.regex.Pattern
 
 class JFQLInterpreter(val commandService: CommandService) : Interpreter {
 
-    override fun interpretJsonQuery(json: JsonNode, query: String, stringify: Boolean, superior: Boolean): Any? {
+    override fun interpretJsonQuery(json: JsonNode, query: String, superior: Boolean): JsonNode? {
         val fields = mutableListOf(*query.split(".").toTypedArray())
 
         if (fields.indexOf("$") == 0) {
@@ -21,14 +21,14 @@ class JFQLInterpreter(val commandService: CommandService) : Interpreter {
             fields.removeLast()
         }
 
-        fun search(node: JsonNode, fields: List<String>, dataType: DataType): Any? {
+        fun search(node: JsonNode, fields: List<String>, dataType: DataType): JsonNode? {
             return try {
                 if (fields.isEmpty()) {
-                    return node.toString()
+                    return node
                 }
 
                 when (dataType) {
-                    DataType.OBJECT -> {
+                    DataType.LIST -> {
                         val index = fields[0].toInt()
 
                         val o = node[index] ?: return null
@@ -40,9 +40,9 @@ class JFQLInterpreter(val commandService: CommandService) : Interpreter {
                         if (o.isArray && fields.size != 1)
                             search(
                                 o, fields.subList(1, fields.size), DataType.LIST
-                            ) else if (stringify) o.toString() else o
+                            ) else o
                     }
-                    DataType.LIST -> {
+                    DataType.OBJECT -> {
                         val o = node[fields[0]] ?: return null
 
                         if (o.isArray && fields.size != 1) {
@@ -52,10 +52,10 @@ class JFQLInterpreter(val commandService: CommandService) : Interpreter {
                         if (o.isObject) {
                             return if (fields.size != 1) {
                                 search(o, fields.subList(1, fields.size), DataType.OBJECT)
-                            } else if (stringify) o.toString() else o
+                            } else o
                         }
 
-                        if (fields.size != 1) null else if (stringify) o.toString() else o
+                        if (fields.size != 1) null else o
                     }
                     else -> null
                 }
