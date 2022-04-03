@@ -2,12 +2,10 @@ package de.byjoker.myjfql.user
 
 import de.byjoker.myjfql.database.DatabasePermissionLevel
 import de.byjoker.myjfql.util.IDGenerator
-import java.time.LocalDate
 
 class InternalUser(
     override var id: String = IDGenerator.generateDigits(8),
     override var name: String,
-    override var createdAt: LocalDate = LocalDate.now()
 ) : User {
 
     override var type: UserType = UserType.INTERNAL
@@ -30,7 +28,7 @@ class InternalUser(
 
 
     override fun toString(): String {
-        return "InternalUser(id='$id', name='$name', createdAt=$createdAt, type=$type, locked=$locked, password='$password')"
+        return "InternalUser(id='$id', name='$name', type=$type, locked=$locked, password='$password')"
     }
 
     override fun equals(other: Any?): Boolean {

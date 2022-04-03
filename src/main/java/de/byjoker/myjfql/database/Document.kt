@@ -8,11 +8,10 @@ import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.exception.DatabaseException
 import de.byjoker.myjfql.exception.LanguageException
 import de.byjoker.myjfql.util.IDGenerator
-import java.time.LocalDate
 
+@Suppress("DEPRECATION")
 class Document(
     override var id: String = IDGenerator.generateMixed(12),
-    override var createdAt: LocalDate = LocalDate.now()
 ) : EntryMatcher() {
 
     override var content: ObjectNode = JsonNodeFactory.instance.objectNode()
@@ -56,7 +55,7 @@ class Document(
             node.isObject -> {
                 (node as ObjectNode).put(target, value)
             }
-            else -> throw LanguageException("idk!")
+            else -> throw LanguageException("Node has a type that it shouldn't have!")
         }
 
         return this
@@ -110,7 +109,7 @@ class Document(
 
 
     override fun toString(): String {
-        return "Document(id='$id', content=$content, createdAt=$createdAt)"
+        return "Document(id='$id', content=$content)"
     }
 
     override fun equals(other: Any?): Boolean {

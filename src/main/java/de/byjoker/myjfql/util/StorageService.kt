@@ -4,9 +4,9 @@ import java.io.File
 
 interface StorageService<T> {
 
-    fun load(backend: File): T?
+    suspend fun load(backend: File): T?
     fun loadAll()
-    fun write(backed: File, t: T)
+    suspend fun write(backed: File, t: T)
     fun writeAll()
 
 }

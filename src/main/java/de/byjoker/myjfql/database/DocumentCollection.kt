@@ -2,13 +2,12 @@ package de.byjoker.myjfql.database
 
 import de.byjoker.myjfql.lang.Requirement
 import de.byjoker.myjfql.util.IDGenerator
-import java.time.LocalDate
 
 class DocumentCollection(
     override var id: String = IDGenerator.generateString(16),
     override var name: String,
-    override var databaseId: String,
-    override var createdAt: LocalDate = LocalDate.now()
+    override var partitioner: String = "_id",
+    override var databaseId: String
 ) : Table {
 
     override val structure: List<String> = listOf("_id", "*")
@@ -70,7 +69,7 @@ class DocumentCollection(
     }
 
     override fun toString(): String {
-        return "DocumentCollection(id='$id', name='$name', databaseId='$databaseId', createdAt=$createdAt, primary='$primary', type=$type, entries=$entries)"
+        return "DocumentCollection(id='$id', name='$name', databaseId='$databaseId', primary='$primary', type=$type, entries=$entries)"
     }
 
 

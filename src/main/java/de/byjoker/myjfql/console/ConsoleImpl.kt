@@ -2,27 +2,39 @@ package de.byjoker.myjfql.console
 
 import de.byjoker.myjfql.exception.ConsoleException
 import org.jline.reader.Completer
+import org.slf4j.LoggerFactory
+import java.util.*
 
 class ConsoleImpl : Console {
 
+    private val logger = LoggerFactory.getLogger("de.byjoker.myjfql")
+    private val scanner = Scanner(System.`in`)
+
     override fun info(message: String) {
-        TODO("Not yet implemented")
+        logger.info(message)
     }
 
     override fun error(message: String) {
-        TODO("Not yet implemented")
+        logger.error(message)
+    }
+
+    override fun error(exception: Throwable) {
+        logger.error(exception.message, exception)
     }
 
     override fun warn(message: String) {
-        TODO("Not yet implemented")
+        logger.warn(message)
+    }
+
+    override fun debug(message: String) {
+        logger.debug(message)
     }
 
     override fun bind(completer: Completer) {
-        TODO("Not yet implemented")
     }
 
     override fun readPrompt(): String {
-        TODO("Not yet implemented")
+        return scanner.nextLine()
     }
 
     override fun clear() {

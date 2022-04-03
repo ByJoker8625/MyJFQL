@@ -3,19 +3,17 @@ package de.byjoker.myjfql.database
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.ObjectNode
-import de.byjoker.myjfql.exception.LanguageException
 import de.byjoker.myjfql.util.IDGenerator
-import java.time.LocalDate
 
+@Suppress("DEPRECATION")
 class RelationalEntry(
     override var id: String = IDGenerator.generateString(12),
-    override var createdAt: LocalDate = LocalDate.now()
 ) : EntryMatcher() {
 
     override var content: ObjectNode = JsonNodeFactory.instance.objectNode()
 
     override fun insert(field: String, value: JsonNode): Entry {
-        content.put(field, value.toString())
+        content.put(field, JsonNodeFactory.instance.textNode(value.asText()))
         return this
     }
 
@@ -36,7 +34,7 @@ class RelationalEntry(
     }
 
     override fun contains(field: String): Boolean {
-        return content.hasNonNull(field)
+        return content.has(field)
     }
 
     override fun containsOrNotNullItem(field: String): Boolean {
@@ -45,15 +43,32 @@ class RelationalEntry(
 
     override fun applyContent(content: ObjectNode, fully: Boolean) {
         if (fully) {
-            if (!content.hasNonNull("_id")) {
-                throw LanguageException("Unique id of entry can't be removed!")
-            }
-
             this.content = content
             return
         }
 
         content.fields().forEach { insert(it.key, it.value) }
     }
+
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as RelationalEntry
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
+    override fun toString(): String {
+        return "RelationalEntry(id='$id', content=$content)"
+    }
+
 
 }

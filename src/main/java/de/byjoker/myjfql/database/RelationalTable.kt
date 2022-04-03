@@ -3,7 +3,6 @@ package de.byjoker.myjfql.database
 import de.byjoker.myjfql.exception.LanguageException
 import de.byjoker.myjfql.lang.Requirement
 import de.byjoker.myjfql.util.IDGenerator
-import java.time.LocalDate
 
 class RelationalTable(
     override var id: String = IDGenerator.generateString(16),
@@ -11,16 +10,18 @@ class RelationalTable(
     override val databaseId: String,
     override val structure: MutableList<String>,
     override val primary: String = structure[0],
-    override val createdAt: LocalDate = LocalDate.now(),
+    override var partitioner: String = primary
 ) : Table {
 
     override val type: TableType = TableType.RELATIONAL
     private val entries: MutableMap<String, Entry> = mutableMapOf()
 
     override fun pushEntry(entry: Entry) {
-        if (entry.containsOrNotNullItem(primary)) {
+        if (!entry.containsOrNotNullItem(primary)) {
             throw LanguageException("Entry have to contain primary key!")
         }
+
+        println(entry.select(primary))
 
         entries[entry.selectStringify(primary).toString()] = entry
     }
@@ -42,6 +43,8 @@ class RelationalTable(
                 break
             }
 
+            print(entry.matches(conditions))
+
             if (entry.matches(conditions)) {
                 match.add(entry)
                 count++
@@ -58,5 +61,25 @@ class RelationalTable(
     override fun clear() {
         entries.clear()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as RelationalTable
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
+    override fun toString(): String {
+        return "RelationalTable(id='$id', name='$name', databaseId='$databaseId', structure=$structure, primary='$primary', type=$type, entries=$entries)"
+    }
+
 
 }

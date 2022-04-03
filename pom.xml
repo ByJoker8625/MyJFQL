@@ -6,7 +6,7 @@
 
     <groupId>de.byjoker</groupId>
     <artifactId>MyJFQL</artifactId>
-    <version>1.6.1</version>
+    <version>1.6.0</version>
     <name>MyJFQL</name>
     <description>Java based easy to use dbms for fast and smaller applications.</description>
     <properties>
@@ -68,6 +68,11 @@
             <version>${kotlin.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>1.6.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-junit</artifactId>
             <version>${kotlin.version}</version>
@@ -100,7 +105,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>de.byjoker.myjfql.core.boot.Boot</mainClass>
+                                    <mainClass>de.byjoker.myjfql.core.MyJFQLKt</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>

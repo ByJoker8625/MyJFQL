@@ -2,7 +2,7 @@
 <configuration>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{HH:mm:ss} [%t] %logger{36} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss} [%t] %level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -25,7 +25,7 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <root level="error">
+    <root level="error" debug="false">
         <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>

@@ -2,7 +2,6 @@ package de.byjoker.myjfql.user
 
 import de.byjoker.myjfql.database.DatabasePermissionLevel
 import de.byjoker.myjfql.util.IDGenerator
-import java.time.LocalDate
 
 class WorkerUser(
     override var id: String = IDGenerator.generateDigits(8),
@@ -10,7 +9,6 @@ class WorkerUser(
     override var locked: Boolean = false,
     var permissions: MutableMap<String, DatabasePermissionLevel>,
     override var password: String,
-    override var createdAt: LocalDate = LocalDate.now()
 ) : User {
 
     override var type: UserType = UserType.WORKER
@@ -47,7 +45,7 @@ class WorkerUser(
     }
 
     override fun toString(): String {
-        return "WorkerUser(id='$id', name='$name', locked=$locked, permissions=$permissions, password='$password', createdAt=$createdAt, type=$type)"
+        return "WorkerUser(id='$id', name='$name', locked=$locked, permissions=$permissions, password='$password', type=$type)"
     }
 
 }

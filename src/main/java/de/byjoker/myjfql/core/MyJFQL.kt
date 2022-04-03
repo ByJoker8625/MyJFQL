@@ -1,39 +1,38 @@
 package de.byjoker.myjfql.core
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import de.byjoker.myjfql.command.CommandService
 import de.byjoker.myjfql.command.CommandServiceImpl
 import de.byjoker.myjfql.command.ConsoleCommandSender
 import de.byjoker.myjfql.config.ConfigService
 import de.byjoker.myjfql.config.GeneralConfig
 import de.byjoker.myjfql.config.YamlConfigService
+import de.byjoker.myjfql.console.Console
+import de.byjoker.myjfql.console.ConsoleCommandCompleter
+import de.byjoker.myjfql.console.ConsoleImpl
+import de.byjoker.myjfql.console.SimpleJLineConsole
 import de.byjoker.myjfql.database.*
 import de.byjoker.myjfql.lang.Interpreter
 import de.byjoker.myjfql.lang.JFQLInterpreter
 import de.byjoker.myjfql.network.HttpNetworkService
 import de.byjoker.myjfql.network.NetworkService
-import de.byjoker.myjfql.network.session.InternalSession
 import de.byjoker.myjfql.network.session.SessionService
 import de.byjoker.myjfql.network.session.SessionServiceImpl
 import de.byjoker.myjfql.network.util.Response
 import de.byjoker.myjfql.user.UserService
-import de.byjoker.myjfql.util.Cache
-import de.byjoker.myjfql.util.IDGenerator
-import de.byjoker.myjfql.util.QueryCache
-import org.slf4j.LoggerFactory
-import java.util.stream.IntStream
+import de.byjoker.myjfql.util.*
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlin.system.exitProcess
 
 fun main() {
     MyJFQL.getInstance().start()
 }
 
+@DelicateCoroutinesApi
 class MyJFQL private constructor() {
 
-    private val logger = LoggerFactory.getLogger("de.byjoker.myjfql")
-
+    val version: String = "1.6.0"
     val configService: ConfigService
-    val config: GeneralConfig
+    val consoleCommandSender: ConsoleCommandSender
     val commandService: CommandService
     val networkService: NetworkService
     val sessionService: SessionService
@@ -41,60 +40,82 @@ class MyJFQL private constructor() {
     val userService: UserService? = null
     val interpreter: Interpreter
     val cache: Cache<String, Response>
+    var config: GeneralConfig
+    var encryptor: Encryptor
+    var console: Console
 
     init {
         instance = this
         configService = YamlConfigService()
-        config = configService.loadMapped()
+        config = configService.defaults()
         sessionService = SessionServiceImpl()
         commandService = CommandServiceImpl()
         networkService = HttpNetworkService()
         databaseService = DatabaseServiceImpl()
         interpreter = JFQLInterpreter(commandService)
+        encryptor = NoneEncryptor()
+        console = ConsoleImpl()
+        consoleCommandSender = ConsoleCommandSender()
         cache = QueryCache()
     }
 
     fun start() {
-        commandService.searchCommands("de.byjoker.myjfql.command")
+        println(
+            " /\$\$      /\$\$              /\$\$\$\$\$ /\$\$\$\$\$\$\$\$ /\$\$\$\$\$\$  /\$\$      \n" + "| \$\$\$    /\$\$\$             |__  \$\$| \$\$_____//\$\$__  \$\$| \$\$      \n" + "| \$\$\$\$  /\$\$\$\$ /\$\$   /\$\$      | \$\$| \$\$     | \$\$  \\ \$\$| \$\$      \n" + "| \$\$ \$\$/\$\$ \$\$| \$\$  | \$\$      | \$\$| \$\$\$\$\$  | \$\$  | \$\$| \$\$      \n" + "| \$\$  \$\$\$| \$\$| \$\$  | \$\$ /\$\$  | \$\$| \$\$__/  | \$\$  | \$\$| \$\$      \n" + "| \$\$\\  \$ | \$\$| \$\$  | \$\$| \$\$  | \$\$| \$\$     | \$\$/\$\$ \$\$| \$\$      \n" + "| \$\$ \\/  | \$\$|  \$\$\$\$\$\$\$|  \$\$\$\$\$\$/| \$\$     |  \$\$\$\$\$\$/| \$\$\$\$\$\$\$\$\n" + "|__/     |__/ \\____  \$\$ \\______/ |__/      \\____ \$\$\$|________/\n" + "              /\$\$  | \$\$                         \\__/          \n" + "             |  \$\$\$\$\$\$/                                       \n" + "              \\______/    "
+        )
+        console.info("Starting MyJFQL v$version...")
 
+        console.info("Initializing configuration...")
+        config = try {
+            configService.loadMapped()
+        } catch (ex: Exception) {
+            console.error("Failed ×")
+            exitProcess(-1)
+        }
+        console.info("Finished ✓")
+
+        commandService.searchCommands("de.byjoker.myjfql.command")
         databaseService.loadAll()
 
-        /*
-        val database = SimpleDatabase(name = "test", type = DatabaseType.SHARDED)
-        val users = RelationalTable(
-            name = "users",
-            databaseId = database.id,
-            structure = mutableListOf("id", "name", "password", "email")
-        )
-
-        val factory = JsonNodeFactory.instance
-
-        for (i in IntStream.range(0, 100)) {
-            users.pushEntry(
-                RelationalEntry()
-                    .insert("id", factory.textNode(IDGenerator.generateDigits(5)))
-                    .insert("name", factory.textNode(IDGenerator.generateString(6)))
-                    .insert("password", factory.textNode(IDGenerator.generateMixed(12)))
-                    .insert(
-                        "email",
-                        factory.textNode("${IDGenerator.generateString(4)}@${IDGenerator.generateString(5)}.com")
-                    )
-            )
+        when (encryptor.name) {
+            "NONE" -> NoneEncryptor()
+            "ARGON2" -> Argon2Encryptor(config.salt)
         }
 
-        database.pushTable(users)
+        if (config.jline) {
+            console = SimpleJLineConsole(console)
+            console.bind(ConsoleCommandCompleter(commandService, consoleCommandSender))
+        }
 
-        databaseService.saveDatabase(database)
-        databaseService.writeAll()*/
+        if (databaseService.getDatabaseByName("internal") == null) {
+            console.info("Setting up 'internal' database...")
 
+            val internal = SimpleDatabase("internal", "internal", DatabaseType.INTERNAL)
+            val users = DocumentCollection("users", "users", databaseId = internal.id)
+            val sessions = DocumentCollection("sessions", "sessions", databaseId = internal.id)
+
+
+        }
+
+        console.info("MyJFQL is now up and running.")
+
+        while (true) try {
+            commandService.execute(consoleCommandSender, console.readPrompt())
+        } catch (ex: Exception) {
+            console.error(ex)
+        }
     }
 
     fun shutdown() {
+        console.info("Exiting and saving all running processes...")
+
         try {
+            databaseService.writeAll()
         } catch (ex: Exception) {
-            logger.error(ex.message, ex)
+            console.error(ex)
         }
 
+        console.info("Shutdown MyJFQL!")
         exitProcess(0)
     }
 

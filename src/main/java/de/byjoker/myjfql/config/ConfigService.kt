@@ -7,5 +7,6 @@ interface ConfigService {
 
     fun load(file: File): JsonNode
     fun loadMapped(): GeneralConfig
+    fun defaults(): GeneralConfig = GeneralConfig()
 
 }
