@@ -55,9 +55,6 @@ class MyJFQL private constructor() {
     }
 
     fun start() {
-
-        val cs = ConsoleCommandSender("Console", InternalSession("Console"))
-
         commandService.searchCommands("de.byjoker.myjfql.command")
 
         databaseService.loadAll()
