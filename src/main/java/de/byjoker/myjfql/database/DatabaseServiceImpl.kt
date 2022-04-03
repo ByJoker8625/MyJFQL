@@ -38,6 +38,14 @@ class DatabaseServiceImpl : DatabaseService {
         return databases.values.firstOrNull { database -> database.getName() == name }
     }
 
+    override fun getDatabaseByIdentifier(identifier: String): Database? {
+        if (identifier.startsWith("#")) {
+            return getDatabase(identifier.replaceFirst("#", ""))
+        }
+
+        return getDatabaseByName(identifier)
+    }
+
     override fun getDatabases(): List<Database> {
         return databases.values.toList()
     }
@@ -165,10 +173,10 @@ class DatabaseServiceImpl : DatabaseService {
                 else -> return null
             }
 
-            console.info("Finished ${backend.name} _/")
+            console.info("Finished with ${backend.name} _/")
             return database
         } catch (ex: Exception) {
-            console.error("Failed ${backend.name} x")
+            console.error("Failed at ${backend.name} x")
         }
 
         return null
@@ -223,11 +231,11 @@ class DatabaseServiceImpl : DatabaseService {
                 }
             }
         } catch (ex: Exception) {
-            console.error("Failed ${t.getName()} x")
+            console.error("Failed at ${t.getName()} x")
             return
         }
 
-        console.info("Finished ${t.getName()} _/")
+        console.info("Finished with ${t.getName()} _/")
     }
 
     override fun writeAll() {

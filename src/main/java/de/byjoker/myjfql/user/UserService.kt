@@ -6,8 +6,9 @@ interface UserService {
     fun saveUser(user: User)
     fun deleteUser(id: String)
     fun load(table: UsersTable)
-    fun getUserByName(name: String): User?
     fun getUser(id: String): User?
+    fun getUserByName(name: String): User?
+    fun getUserByIdentifier(identifier: String): User?
     fun getUsers(): List<User>
 
 }

@@ -1,5 +1,9 @@
 package de.byjoker.myjfql.network.session
 
+import de.byjoker.myjfql.core.MyJFQL
+import de.byjoker.myjfql.database.Database
+import de.byjoker.myjfql.database.DatabaseService
+
 abstract class Session(
     val token: String,
     val type: SessionType,
@@ -9,6 +13,10 @@ abstract class Session(
 ) {
 
     abstract fun validAddress(address: String): Boolean
+
+    fun getDatabase(databaseService: DatabaseService = MyJFQL.getInstance().databaseService): Database? {
+        return if (databaseId == null) null else databaseService.getDatabase(databaseId!!)
+    }
 
     override fun toString(): String {
         return "Session(token='$token', type=$type, userId='$userId', databaseId=$databaseId, addresses=$addresses)"

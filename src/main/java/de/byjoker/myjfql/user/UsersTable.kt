@@ -1,6 +1,7 @@
 package de.byjoker.myjfql.user
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import de.byjoker.myjfql.database.DatabasePermissionLevel
 import de.byjoker.myjfql.database.Entry
@@ -12,11 +13,13 @@ import de.byjoker.myjfql.util.Json.stringify
 import java.util.stream.Collectors
 
 
-class UsersTable :
-    InternalTable("users", listOf("id", "name", "password", "permissions", "preferred_database_id")) {
+class UsersTable : InternalTable("users", listOf("id", "name", "password", "permissions", "preferred_database_id")) {
 
-    val users: MutableMap<String, User> = mutableMapOf("console" to InternalUser("console", "console"))
+    @JsonIgnore
     private val factory: JsonNodeFactory = JsonNodeFactory.instance
+
+    @get:JsonIgnore
+    val users: MutableMap<String, User> = mutableMapOf("console" to InternalUser("%console%", "console"))
 
     override fun pushEntry(entry: Entry) {
         val user = convert(entry) ?: throw UserException("Entry isn't valid user!")
@@ -32,8 +35,7 @@ class UsersTable :
     }
 
     override fun getEntries(): List<Entry> {
-        return users.values.stream().map { user -> this.convert(user)!! }
-            .collect(Collectors.toList())
+        return users.values.stream().map { user -> this.convert(user)!! }.collect(Collectors.toList())
     }
 
     override fun clear() {
@@ -43,11 +45,8 @@ class UsersTable :
     private fun convert(user: User?): Entry? {
         if (user == null) return null
 
-        return RelationalEntry()
-            .insert("id", factory.textNode(user.id))
-            .insert("name", factory.textNode(user.name))
-            .insert("password", factory.textNode(user.password))
-            .insert("type", factory.textNode(user.type.name))
+        return RelationalEntry().insert("id", factory.textNode(user.id)).insert("name", factory.textNode(user.name))
+            .insert("password", factory.textNode(user.password)).insert("type", factory.textNode(user.type.name))
             .insert("permissions", factory.textNode(stringify(user.permissions)))
             .insert("preferred_database_id", factory.textNode(user.preferredDatabaseId))
     }
@@ -57,9 +56,7 @@ class UsersTable :
             val user = when (entry.selectStringify("type")) {
                 "INTERNAL" -> InternalUser(entry.selectStringify("id")!!, entry.selectStringify("name")!!)
                 "MANAGER" -> ManagerUser(
-                    entry.selectStringify("id")!!,
-                    entry.selectStringify("name")!!,
-                    entry.selectStringify("password")!!
+                    entry.selectStringify("id")!!, entry.selectStringify("name")!!, entry.selectStringify("password")!!
                 )
                 "WORKER" -> {
                     val permissions = mutableMapOf<String, DatabasePermissionLevel>()

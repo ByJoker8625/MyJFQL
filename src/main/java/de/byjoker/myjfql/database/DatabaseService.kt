@@ -9,6 +9,7 @@ interface DatabaseService : StorageService<Database> {
     fun deleteDatabase(id: String)
     fun getDatabase(id: String): Database?
     fun getDatabaseByName(name: String): Database?
+    fun getDatabaseByIdentifier(identifier: String): Database?
     fun getDatabases(): List<Database>
 
 }

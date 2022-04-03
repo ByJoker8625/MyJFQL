@@ -10,8 +10,8 @@ class ConsoleCommandSender : CommandSender {
 
     private val console = MyJFQL.getInstance().console
     override val name: String = "Console"
-    override val session: Session
-        get() = MyJFQL.getInstance().sessionService.getSession("%CONSOLE%")!!
+    override val session: Session?
+        get() = MyJFQL.getInstance().sessionService.getSession("%console%")
 
     override fun permitted(action: DatabasePermissionLevel, databaseId: String): Boolean {
         return true
@@ -23,10 +23,6 @@ class ConsoleCommandSender : CommandSender {
 
     override fun success() {
         console.info("Command was successfully executed.")
-    }
-
-    override fun forbidden() {
-        console.error("No permissions!")
     }
 
     override fun result(result: Any) {

@@ -1,9 +1,6 @@
 package de.byjoker.myjfql.core
 
-import de.byjoker.myjfql.command.CommandService
-import de.byjoker.myjfql.command.CommandServiceImpl
-import de.byjoker.myjfql.command.ConsoleCommandSender
-import de.byjoker.myjfql.command.ShutdownCommand
+import de.byjoker.myjfql.command.*
 import de.byjoker.myjfql.config.ConfigService
 import de.byjoker.myjfql.config.GeneralConfig
 import de.byjoker.myjfql.config.YamlConfigService
@@ -74,10 +71,10 @@ class MyJFQL private constructor() {
         config = try {
             configService.loadMapped()
         } catch (ex: Exception) {
-            console.error("Failed x")
+            console.error("Failed at config initialization!")
             exitProcess(-1)
         }
-        console.info("Finished _/")
+        console.info("Finished configuration initialization.")
 
         when (encryptor.name) {
             "NONE" -> NoneEncryptor()
@@ -88,30 +85,31 @@ class MyJFQL private constructor() {
         try {
             databaseService.loadAll()
         } catch (ex: Exception) {
-            console.error("Failed x")
+            console.error("Failed at database initialization!")
             exitProcess(-1)
         }
-        console.info("Finished _/")
+        console.info("Finished database initialization.")
 
         var internal = databaseService.getDatabaseByName("internal")
         if (internal == null) {
-            console.info("Setting up 'internal' database...")
+            console.info("Setting up internal database...")
             try {
                 internal = SimpleDatabase("internal", "internal", DatabaseType.INTERNAL)
                 internal.saveTable(UsersTable())
 
                 databaseService.saveDatabase(internal)
             } catch (ex: Exception) {
-                console.error("Failed x")
+                console.error("Failed with internal database setup!")
                 exitProcess(-1)
             }
-            console.info("Finished _/")
+            console.info("Finished internal database setup.")
         }
         userService.load(internal.getTable("users") as UsersTable)
 
         println(userService.getUsers())
 
         commandService.registerCommand(ShutdownCommand())
+        commandService.registerCommand(PushCommand())
 
         if (config.jline) {
             console = SimpleJLineConsole(console)

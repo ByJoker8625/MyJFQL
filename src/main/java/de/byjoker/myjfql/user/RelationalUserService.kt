@@ -28,6 +28,14 @@ class RelationalUserService(private var table: UsersTable = UsersTable()) : User
         return table.users.values.firstOrNull { it.name == name }
     }
 
+    override fun getUserByIdentifier(identifier: String): User? {
+        if (identifier.startsWith("#")) {
+            return getUser(identifier.replaceFirst("#", ""))
+        }
+
+        return getUserByName(identifier)
+    }
+
     override fun getUser(id: String): User? {
         return table.users[id]
     }
