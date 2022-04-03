@@ -8,6 +8,9 @@ class InternalUser(
     override var name: String,
 ) : User {
 
+    override val permissions: MutableMap<String, DatabasePermissionLevel>
+        get() = mutableMapOf("*" to DatabasePermissionLevel.READ_WRITE)
+    override var preferredDatabaseId: String? = null
     override var type: UserType = UserType.INTERNAL
     override var locked: Boolean = true
     override var password: String = "internal"

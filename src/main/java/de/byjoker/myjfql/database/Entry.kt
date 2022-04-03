@@ -6,7 +6,6 @@ import de.byjoker.myjfql.lang.Requirement
 
 interface Entry {
 
-    val id: String
     fun insert(field: String, value: JsonNode): Entry
     fun select(field: String): JsonNode?
     fun selectStringify(field: String): String?
@@ -15,6 +14,8 @@ interface Entry {
     fun containsOrNotNullItem(field: String): Boolean
     fun applyContent(content: ObjectNode, fully: Boolean = false)
     fun matches(conditions: List<List<Requirement>>): Boolean
-    val content: ObjectNode
+    fun setContent(content: ObjectNode)
+    fun getContent(): ObjectNode
+    fun getId(): String
 
 }

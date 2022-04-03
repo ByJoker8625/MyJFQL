@@ -7,10 +7,9 @@ import de.byjoker.myjfql.util.IDGenerator
 
 @Suppress("DEPRECATION")
 class RelationalEntry(
-    override var id: String = IDGenerator.generateString(12),
+    private var id: String = IDGenerator.generateString(12),
+    private var content: ObjectNode = JsonNodeFactory.instance.objectNode()
 ) : EntryMatcher() {
-
-    override var content: ObjectNode = JsonNodeFactory.instance.objectNode()
 
     override fun insert(field: String, value: JsonNode): Entry {
         content.put(field, JsonNodeFactory.instance.textNode(value.asText()))
@@ -50,6 +49,17 @@ class RelationalEntry(
         content.fields().forEach { insert(it.key, it.value) }
     }
 
+    override fun setContent(content: ObjectNode) {
+        applyContent(content, fully = true)
+    }
+
+    override fun getContent(): ObjectNode {
+        return content
+    }
+
+    override fun getId(): String {
+        return id
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

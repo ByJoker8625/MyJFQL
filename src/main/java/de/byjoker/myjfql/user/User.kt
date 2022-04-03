@@ -9,6 +9,8 @@ interface User {
     val type: UserType
     var locked: Boolean
     var password: String
+    var preferredDatabaseId: String?
+    val permissions: MutableMap<String, DatabasePermissionLevel>
     fun validPassword(password: String): Boolean
     fun permitted(level: UserType): Boolean = type.permitted(level)
     fun permitted(action: DatabasePermissionLevel, databaseId: String): Boolean

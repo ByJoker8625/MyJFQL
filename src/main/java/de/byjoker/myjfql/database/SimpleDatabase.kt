@@ -5,15 +5,15 @@ import de.byjoker.myjfql.util.IDGenerator
 import java.io.File
 
 class SimpleDatabase(
-    override var id: String = IDGenerator.generateString(16),
-    override var name: String,
-    override var type: DatabaseType,
+    private var id: String = IDGenerator.generateString(12),
+    private var name: String,
+    private var type: DatabaseType,
 ) : Database {
 
     private val tables: MutableMap<String, Table> = mutableMapOf()
 
-    override fun pushTable(table: Table) {
-        tables[table.id] = table
+    override fun saveTable(table: Table) {
+        tables[table.getId()] = table
     }
 
     override fun getTable(tableId: String): Table? {
@@ -21,7 +21,7 @@ class SimpleDatabase(
     }
 
     override fun getTableByName(name: String): Table? {
-        return tables.values.firstOrNull { table -> table.name == name }
+        return tables.values.firstOrNull { table -> table.getName() == name }
     }
 
     override fun deleteTable(tableId: String) {
@@ -40,6 +40,36 @@ class SimpleDatabase(
         return tables.values.toList()
     }
 
+    override fun format(type: DatabaseType, databaseService: DatabaseService) {
+        val original = this.type
+
+        try {
+            databaseService.deleteDatabase(id)
+            this.type = type
+            databaseService.saveDatabase(this)
+        } catch (ex: Exception) {
+            databaseService.deleteDatabase(id)
+            this.type = original
+            databaseService.saveDatabase(this)
+        }
+    }
+
+    override fun setName(name: String) {
+        this.name = name
+    }
+
+    override fun getType(): DatabaseType {
+        return type
+    }
+
+    override fun getName(): String {
+        return name
+    }
+
+    override fun getId(): String {
+        return id
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -56,7 +86,7 @@ class SimpleDatabase(
     }
 
     override fun toString(): String {
-        return "SimpleDatabase(id='$id', name='$name', type=$type, tables=$tables)"
+        return "SimpleDatabase(id='$id', name='$name', type=$type, tables=${tables.keys}})"
     }
 
 

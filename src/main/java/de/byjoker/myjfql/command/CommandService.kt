@@ -7,7 +7,6 @@ interface CommandService {
 
     fun registerCommand(command: Command)
     fun unregisterCommand(name: String)
-    fun searchCommands(directory: String)
     fun getCommand(name: String): Command?
     fun getCommands(): List<Command>
     fun execute(sender: CommandSender, query: String, interpreter: Interpreter = MyJFQL.getInstance().interpreter)

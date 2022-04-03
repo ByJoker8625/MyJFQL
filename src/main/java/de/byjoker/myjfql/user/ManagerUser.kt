@@ -9,6 +9,9 @@ class ManagerUser(
     override var password: String,
 ) : User {
 
+    override val permissions: MutableMap<String, DatabasePermissionLevel>
+        get() = mutableMapOf("*" to DatabasePermissionLevel.READ_WRITE)
+    override var preferredDatabaseId: String? = null
     override var locked: Boolean = false
     override var type: UserType = UserType.MANAGER
 

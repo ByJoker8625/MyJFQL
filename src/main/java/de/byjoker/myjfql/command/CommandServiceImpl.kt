@@ -1,10 +1,6 @@
 package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.lang.Interpreter
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.util.stream.Collectors
 
 
 class CommandServiceImpl(private var commands: MutableList<Command> = mutableListOf()) : CommandService {
@@ -15,14 +11,6 @@ class CommandServiceImpl(private var commands: MutableList<Command> = mutableLis
 
     override fun unregisterCommand(name: String) {
         commands.removeIf { command -> command.name.equals(name, ignoreCase = true) }
-    }
-
-    override fun searchCommands(directory: String) {
-        for (clazz in findAllClassesUsingClassLoader(directory)) {
-            if (clazz.isInstance(Command::class)) registerCommand(
-                (clazz as Class<Command>).getDeclaredConstructor().newInstance()
-            )
-        }
     }
 
     override fun getCommand(name: String): Command? {
@@ -51,23 +39,6 @@ class CommandServiceImpl(private var commands: MutableList<Command> = mutableLis
         } catch (ex: Exception) {
             sender.error(ex)
         }
-    }
-
-    private fun findAllClassesUsingClassLoader(packageName: String): List<Class<*>> {
-        val stream: InputStream =
-            ClassLoader.getSystemClassLoader().getResourceAsStream(packageName.replace("[.]".toRegex(), "/"))
-        val reader = BufferedReader(InputStreamReader(stream))
-        return reader.lines().filter { line: String -> line.endsWith(".class") }.map { line: String ->
-            getClass(
-                line, packageName
-            )
-        }.collect(Collectors.toSet()).filter { clazz -> clazz.isAnnotationPresent(CommandHandler::class.java) }
-    }
-
-    private fun getClass(className: String, packageName: String): Class<*> {
-        return Class.forName(
-            packageName + "." + className.substring(0, className.lastIndexOf('.'))
-        )
     }
 
 }

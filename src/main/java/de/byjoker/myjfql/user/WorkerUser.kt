@@ -7,7 +7,8 @@ class WorkerUser(
     override var id: String = IDGenerator.generateDigits(8),
     override var name: String,
     override var locked: Boolean = false,
-    var permissions: MutableMap<String, DatabasePermissionLevel>,
+    override var permissions: MutableMap<String, DatabasePermissionLevel>,
+    override var preferredDatabaseId: String? = null,
     override var password: String,
 ) : User {
 

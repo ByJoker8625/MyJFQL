@@ -5,6 +5,7 @@ interface UserService {
     fun createUser(user: User)
     fun saveUser(user: User)
     fun deleteUser(id: String)
+    fun load(table: UsersTable)
     fun getUserByName(name: String): User?
     fun getUser(id: String): User?
     fun getUsers(): List<User>

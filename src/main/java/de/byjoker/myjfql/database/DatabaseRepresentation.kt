@@ -5,10 +5,10 @@ data class DatabaseRepresentation(
 ) {
 
     constructor(database: Database) : this(
-        database.id,
-        database.name,
-        database.getTables().map { table -> table.id },
-        database.type
+        database.getId(),
+        database.getName(),
+        database.getTables().map { table -> table.getId() },
+        database.getType()
     )
 
 }

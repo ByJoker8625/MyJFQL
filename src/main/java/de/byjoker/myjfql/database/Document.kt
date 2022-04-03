@@ -11,10 +11,11 @@ import de.byjoker.myjfql.util.IDGenerator
 
 @Suppress("DEPRECATION")
 class Document(
-    override var id: String = IDGenerator.generateMixed(12),
+    private var id: String = IDGenerator.generateMixed(12),
+    private var content: ObjectNode = JsonNodeFactory.instance.objectNode()
 ) : EntryMatcher() {
 
-    override var content: ObjectNode = JsonNodeFactory.instance.objectNode()
+
     private val interpreter = MyJFQL.getInstance().interpreter
 
     override fun insert(field: String, value: JsonNode): Entry {
@@ -105,6 +106,18 @@ class Document(
         }
 
         content.fields().forEach { insert(it.key, it.value) }
+    }
+
+    override fun setContent(content: ObjectNode) {
+        applyContent(content, fully = true)
+    }
+
+    override fun getContent(): ObjectNode {
+        return content
+    }
+
+    override fun getId(): String {
+        return id
     }
 
 

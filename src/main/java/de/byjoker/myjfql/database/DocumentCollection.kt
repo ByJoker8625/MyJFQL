@@ -1,22 +1,22 @@
 package de.byjoker.myjfql.database
 
+import de.byjoker.myjfql.exception.DatabaseException
 import de.byjoker.myjfql.lang.Requirement
 import de.byjoker.myjfql.util.IDGenerator
 
 class DocumentCollection(
-    override var id: String = IDGenerator.generateString(16),
-    override var name: String,
-    override var partitioner: String = "_id",
-    override var databaseId: String
+    private var id: String = IDGenerator.generateString(16),
+    private var name: String,
+    private var partitioner: String = "_id",
+    private var database: Database
 ) : Table {
 
-    override val structure: List<String> = listOf("_id", "*")
-    override val primary: String = "_id"
-    override val type: TableType = TableType.DOCUMENT
+    private var structure: MutableList<String> = mutableListOf("_id")
+    private val type: TableType = TableType.DOCUMENT
     private val entries: MutableMap<String, Entry> = mutableMapOf()
 
     override fun pushEntry(entry: Entry) {
-        entries[entry.id] = entry
+        entries[entry.getId()] = entry
     }
 
     override fun getEntry(entryId: String): Entry? {
@@ -49,6 +49,53 @@ class DocumentCollection(
         return entries.values.toList()
     }
 
+    override fun format(type: TableType): Table {
+        return when (type) {
+            TableType.DOCUMENT -> this
+            TableType.RELATIONAL -> throw DatabaseException("A unstructured table can't be casted to a structured!")
+        }
+    }
+
+    override fun setPrimary(primary: String) {
+        throw DatabaseException("Document tables have a fixed primary key!")
+    }
+
+    override fun getPrimary(): String {
+        return "_id"
+    }
+
+    override fun setPartitioner(partitioner: String) {
+        this.partitioner = partitioner
+    }
+
+    override fun getPartitioner(): String {
+        return partitioner
+    }
+
+    override fun setStructure(structure: List<String>) {
+        this.structure = structure.toMutableList()
+    }
+
+    override fun getStructure(): List<String> {
+        return structure
+    }
+
+    override fun setName(name: String) {
+        this.name = name
+    }
+
+    override fun getName(): String {
+        return name
+    }
+
+    override fun getType(): TableType {
+        return type
+    }
+
+    override fun getId(): String {
+        return id
+    }
+
     override fun clear() {
         entries.clear()
     }
@@ -69,8 +116,7 @@ class DocumentCollection(
     }
 
     override fun toString(): String {
-        return "DocumentCollection(id='$id', name='$name', databaseId='$databaseId', primary='$primary', type=$type, entries=$entries)"
+        return "DocumentCollection(id='$id', name='$name', databaseId='${database.getId()}', primary='_id', type=$type, entries=$entries)"
     }
-
 
 }

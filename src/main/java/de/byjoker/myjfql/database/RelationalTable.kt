@@ -1,19 +1,20 @@
 package de.byjoker.myjfql.database
 
+import de.byjoker.myjfql.exception.DatabaseException
 import de.byjoker.myjfql.exception.LanguageException
 import de.byjoker.myjfql.lang.Requirement
 import de.byjoker.myjfql.util.IDGenerator
 
 class RelationalTable(
-    override var id: String = IDGenerator.generateString(16),
-    override var name: String,
-    override val databaseId: String,
-    override val structure: MutableList<String>,
-    override val primary: String = structure[0],
-    override var partitioner: String = primary
+    private var id: String = IDGenerator.generateString(12),
+    private var name: String,
+    private val database: Database,
+    private var structure: MutableList<String>,
+    private var primary: String = structure[0],
+    private var partitioner: String = primary
 ) : Table {
 
-    override val type: TableType = TableType.RELATIONAL
+    private val type: TableType = TableType.RELATIONAL
     private val entries: MutableMap<String, Entry> = mutableMapOf()
 
     override fun pushEntry(entry: Entry) {
@@ -58,6 +59,85 @@ class RelationalTable(
         return entries.values.toList()
     }
 
+    override fun format(type: TableType): Table {
+        return when (type) {
+            TableType.DOCUMENT -> {
+                val table = DocumentCollection(id, name, partitioner = partitioner, database)
+
+                entries.values.forEach { entry ->
+                    table.pushEntry(
+                        Document(
+                            entry.getId(),
+                            entry.getContent()
+                        )
+                    )
+                }
+
+                table
+            }
+            TableType.RELATIONAL -> this
+        }
+    }
+
+    private fun reindex() {
+        val entries: Collection<Entry> = entries.values.toList()
+        this.entries.clear()
+        entries.forEach { entry -> pushEntry(entry) }
+    }
+
+    override fun setPrimary(primary: String) {
+        if (!structure.contains(primary)) {
+            throw DatabaseException("Structure of a relational table have to contain the primary key!")
+        }
+
+        this.primary = primary
+        reindex()
+    }
+
+    override fun getPrimary(): String {
+        return primary
+    }
+
+    override fun setPartitioner(partitioner: String) {
+        if (!structure.contains(partitioner)) {
+            throw DatabaseException("Structure of a relational table have to contain the partitioner!")
+        }
+
+        this.partitioner = partitioner
+    }
+
+    override fun getPartitioner(): String {
+        return partitioner
+    }
+
+    override fun setStructure(structure: List<String>) {
+        if (!structure.contains(partitioner) || !structure.contains(primary)) {
+            throw DatabaseException("Structure of a relational table have to contain the partitioner and primary key!")
+        }
+
+        this.structure = structure.toMutableList()
+    }
+
+    override fun getStructure(): List<String> {
+        return structure
+    }
+
+    override fun setName(name: String) {
+        this.name = name
+    }
+
+    override fun getName(): String {
+        return name
+    }
+
+    override fun getType(): TableType {
+        return type
+    }
+
+    override fun getId(): String {
+        return id
+    }
+
     override fun clear() {
         entries.clear()
     }
@@ -78,7 +158,7 @@ class RelationalTable(
     }
 
     override fun toString(): String {
-        return "RelationalTable(id='$id', name='$name', databaseId='$databaseId', structure=$structure, primary='$primary', type=$type, entries=$entries)"
+        return "RelationalTable(id='$id', name='$name', databaseId='${database.getId()}', structure=$structure, primary='$primary', type=$type, entries=$entries)"
     }
 
 

@@ -10,12 +10,12 @@ data class TableRepresentation(
 ) {
 
     constructor(table: Table) : this(
-        table.id,
-        table.name,
-        table.primary,
-        table.partitioner,
-        table.structure,
-        table.type
+        table.getId(),
+        table.getName(),
+        table.getPrimary(),
+        table.getPartitioner(),
+        table.getStructure(),
+        table.getType()
     )
 
 }

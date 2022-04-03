@@ -1,6 +1,6 @@
 package de.byjoker.myjfql.network.session
 
-class SessionServiceImpl : SessionService {
+class RelationalSessionService : SessionService {
     override fun openSession(session: Session) {
         TODO("Not yet implemented")
     }
