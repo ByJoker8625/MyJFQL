@@ -91,7 +91,7 @@ class DatabaseServiceImpl : DatabaseService {
                 TableType.DOCUMENT -> Document(entryNode["id"].asText())
                 TableType.RELATIONAL -> RelationalEntry(entryNode["id"].asText())
             }
-            entry.applyContent(content, fully = true)
+            entry.setContent(content)
 
             return entry
         }
@@ -176,6 +176,7 @@ class DatabaseServiceImpl : DatabaseService {
             console.info("Finished with ${backend.name} _/")
             return database
         } catch (ex: Exception) {
+            ex.printStackTrace()
             console.error("Failed at ${backend.name} x")
         }
 
@@ -231,6 +232,7 @@ class DatabaseServiceImpl : DatabaseService {
                 }
             }
         } catch (ex: Exception) {
+            ex.printStackTrace()
             console.error("Failed at ${t.getName()} x")
             return
         }

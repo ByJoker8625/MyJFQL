@@ -10,4 +10,8 @@ enum class UserType(val level: Int) {
         return level >= action.level
     }
 
+    fun permitted(permission: Permission): Boolean {
+        return level >= permission.level
+    }
+
 }

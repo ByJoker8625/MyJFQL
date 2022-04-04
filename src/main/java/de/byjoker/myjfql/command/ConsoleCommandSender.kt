@@ -3,6 +3,7 @@ package de.byjoker.myjfql.command
 import de.byjoker.myjfql.core.MyJFQL
 import de.byjoker.myjfql.database.DatabasePermissionLevel
 import de.byjoker.myjfql.network.session.Session
+import de.byjoker.myjfql.user.Permission
 import de.byjoker.myjfql.user.UserType
 import de.byjoker.myjfql.util.Json
 
@@ -17,7 +18,7 @@ class ConsoleCommandSender : CommandSender {
         return true
     }
 
-    override fun permitted(action: UserType): Boolean {
+    override fun permitted(permission: Permission): Boolean {
         return true
     }
 

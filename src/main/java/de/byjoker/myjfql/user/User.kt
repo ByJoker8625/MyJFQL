@@ -12,7 +12,7 @@ interface User {
     var preferredDatabaseId: String?
     val permissions: MutableMap<String, DatabasePermissionLevel>
     fun validPassword(password: String): Boolean
-    fun permitted(level: UserType): Boolean = type.permitted(level)
+    fun permitted(permission: Permission): Boolean = type.permitted(permission)
     fun permitted(action: DatabasePermissionLevel, databaseId: String): Boolean
     fun grantAccess(action: DatabasePermissionLevel, databaseId: String)
     fun revokeAccess(databaseId: String)

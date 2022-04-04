@@ -48,7 +48,7 @@ class UsersTable : InternalTable("users", listOf("id", "name", "password", "perm
         return RelationalEntry().insert("id", factory.textNode(user.id)).insert("name", factory.textNode(user.name))
             .insert("password", factory.textNode(user.password)).insert("type", factory.textNode(user.type.name))
             .insert("permissions", factory.textNode(stringify(user.permissions)))
-            .insert("preferred_database_id", factory.textNode(user.preferredDatabaseId))
+            .insert("preferred_database_id", factory.textNode(user.preferredDatabaseId.toString()))
     }
 
     private fun convert(entry: Entry): User? {
@@ -71,7 +71,7 @@ class UsersTable : InternalTable("users", listOf("id", "name", "password", "perm
                         entry.selectStringify("name")!!,
                         entry.selectStringify("locked")!!.toBoolean(),
                         permissions,
-                        if (entry.contains("preferredDatabaseId")) entry.selectStringify("preferredDatabaseId")!! else null,
+                        if (entry.containsOrNotNullItem("preferredDatabaseId")) entry.selectStringify("preferredDatabaseId")!! else null,
                         entry.selectStringify("password")!!
                     )
                 }

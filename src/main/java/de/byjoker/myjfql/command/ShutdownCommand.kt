@@ -1,6 +1,7 @@
 package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.core.MyJFQL
+import de.byjoker.myjfql.user.Permission
 import de.byjoker.myjfql.user.UserType
 import org.jline.reader.ParsedLine
 import kotlin.system.exitProcess
@@ -9,7 +10,7 @@ import kotlin.system.exitProcess
 class ShutdownCommand : Command("shutdown", listOf("command", "hardly"), listOf("stop", "exit")) {
 
     override fun execute(sender: CommandSender, args: Map<String, List<String>>) {
-        if (!sender.permitted(UserType.MANAGER)) {
+        if (!sender.permitted(Permission.SHUTDOWN)) {
             sender.forbidden()
             return
         }

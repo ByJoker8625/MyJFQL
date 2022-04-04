@@ -14,7 +14,12 @@ class CommandServiceImpl(private var commands: MutableList<Command> = mutableLis
     }
 
     override fun getCommand(name: String): Command? {
-        return commands.firstOrNull { command -> command.name.equals(name, ignoreCase = true) }
+        return commands.firstOrNull { command ->
+            command.name.equals(
+                name,
+                ignoreCase = true
+            ) || command.aliases.any { it.equals(name, ignoreCase = true) }
+        }
     }
 
     override fun getCommands(): List<Command> = commands

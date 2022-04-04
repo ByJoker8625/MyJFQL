@@ -10,7 +10,7 @@ interface Table {
     fun clear()
     fun findEntries(conditions: List<List<Requirement>>, limit: Int): List<Entry>
     fun getEntries(): List<Entry>
-    fun format(type: TableType) : Table
+    fun format(type: TableType): Table
     fun setPrimary(primary: String)
     fun getPrimary(): String
     fun setPartitioner(partitioner: String)

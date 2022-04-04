@@ -12,6 +12,14 @@ class SimpleDatabase(
 
     private val tables: MutableMap<String, Table> = mutableMapOf()
 
+    override fun createTable(table: Table) {
+        if (getTable(table.getId()) != null || getTableByName(table.getName()) != null) {
+            throw DatabaseException("Table already exist!")
+        }
+
+        saveTable(table)
+    }
+
     override fun saveTable(table: Table) {
         tables[table.getId()] = table
     }
@@ -22,6 +30,14 @@ class SimpleDatabase(
 
     override fun getTableByName(name: String): Table? {
         return tables.values.firstOrNull { table -> table.getName() == name }
+    }
+
+    override fun getTableByIdentifier(identifier: String): Table? {
+        if (identifier.startsWith("#")) {
+            return getTable(identifier.replaceFirst("#", ""))
+        }
+
+        return getTableByName(identifier)
     }
 
     override fun deleteTable(tableId: String) {

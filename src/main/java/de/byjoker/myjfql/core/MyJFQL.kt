@@ -106,8 +106,6 @@ class MyJFQL private constructor() {
         }
         userService.load(internal.getTable("users") as UsersTable)
 
-        println(userService.getUsers())
-
         commandService.registerCommand(ShutdownCommand())
         commandService.registerCommand(PushCommand())
 

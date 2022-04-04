@@ -2,6 +2,7 @@ package de.byjoker.myjfql.command
 
 import de.byjoker.myjfql.database.DatabasePermissionLevel
 import de.byjoker.myjfql.network.session.Session
+import de.byjoker.myjfql.user.Permission
 import de.byjoker.myjfql.user.UserType
 
 interface CommandSender {
@@ -9,7 +10,7 @@ interface CommandSender {
     val name: String
     val session: Session?
     fun permitted(action: DatabasePermissionLevel, databaseId: String): Boolean
-    fun permitted(action: UserType): Boolean
+    fun permitted(permission: Permission): Boolean
     fun success()
     fun forbidden() = error("No permission!")
     fun syntax() = error("Unknown syntax!")
